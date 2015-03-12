@@ -91,8 +91,7 @@ class PlungeApp(App):
         config.setdefaults('poloniex',
                            {'address': '', 'public': '', 'secret': '', 'nubot': 0, "btc": 0})
         config.setdefaults('bitcoincoid',
-                           {'address': '', 'public': '', 'secret': '', 'nubot': 0,
-                            "btc": 0, "ltc": 0, "ppc": 0, "eur": 0, "usd": 0})
+                           {'address': '', 'public': '', 'secret': '', 'nubot': 0, "btc": 0})
 
     def build_settings(self, settings):
         settings.add_json_panel(self.get_string('Plunge_Configuration'), self.config, 'settings/plunge.json')
