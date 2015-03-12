@@ -1,0 +1,6 @@
+client/*
+*.pyc
+logs/*
+.idea
+users.dat
+plunge.ini

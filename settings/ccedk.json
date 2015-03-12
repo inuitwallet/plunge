@@ -1,0 +1,81 @@
+[
+  {
+    "type": "title",
+    "title": "Payout Address"
+  },
+  {
+    "type": "string",
+    "title": "Payout Address",
+    "desc": "The payout address for CCEDK",
+    "section": "ccedk",
+    "key": "address"
+  },
+  {
+    "type": "title",
+    "title": "API Keys"
+  },
+  {
+    "type": "string",
+    "title": "Public Key",
+    "desc": "The public API Key provided by CCEDK",
+    "section": "ccedk",
+    "key": "public"
+  },
+  {
+    "type": "string",
+    "title": "Secret Key",
+    "desc": "The secret API Key provided by CCEDK",
+    "section": "ccedk",
+    "key": "secret"
+  },
+  {
+    "type": "title",
+    "title": "Client"
+  },
+  {
+    "type": "bool",
+    "title": "Use NuBot?",
+    "desc": "Use a NuBot instance on each pair rather then the built in Python client",
+    "section": "ccedk",
+    "key": "nubot"
+  },
+  {
+    "type": "title",
+    "title": "Enabled Pairs"
+  },
+  {
+    "type": "bool",
+    "title": "BTC",
+    "desc": "Enable or Disable the NBT / BTC pair",
+    "section": "ccedk",
+    "key": "btc"
+  },
+  {
+    "type": "bool",
+    "title": "LTC",
+    "desc": "Enable or Disable the NBT / LTC pair",
+    "section": "ccedk",
+    "key": "ltc"
+  },
+  {
+    "type": "bool",
+    "title": "PPC",
+    "desc": "Enable or Disable the NBT / PPC pair",
+    "section": "ccedk",
+    "key": "ppc"
+  },
+  {
+    "type": "bool",
+    "title": "EUR",
+    "desc": "Enable or Disable the NBT / EUR pair",
+    "section": "ccedk",
+    "key": "eur"
+  },
+  {
+    "type": "bool",
+    "title": "USD",
+    "desc": "Enable or Disable the NBT / USD pair",
+    "section": "ccedk",
+    "key": "usd"
+  }
+]

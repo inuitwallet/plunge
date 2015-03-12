@@ -1,0 +1,53 @@
+[
+  {
+    "type": "title",
+    "title": "Payout Address"
+  },
+  {
+    "type": "string",
+    "title": "Payout Address",
+    "desc": "The payout address for Bitcoin Indonesia",
+    "section": "bitcoincoid",
+    "key": "address"
+  },
+  {
+    "type": "title",
+    "title": "API Keys"
+  },
+  {
+    "type": "string",
+    "title": "Public Key",
+    "desc": "The public API Key provided by Bitcoin Indonesia",
+    "section": "bitcoincoid",
+    "key": "public"
+  },
+  {
+    "type": "string",
+    "title": "Secret Key",
+    "desc": "The secret API Key provided by Bitcoin Indonesia",
+    "section": "bitcoincoid",
+    "key": "secret"
+  },
+  {
+    "type": "title",
+    "title": "Client"
+  },
+  {
+    "type": "bool",
+    "title": "Use NuBot?",
+    "desc": "Use a NuBot instance on each pair rather then the built in Python client",
+    "section": "bitcoincoid",
+    "key": "nubot"
+  },
+  {
+    "type": "title",
+    "title": "Enabled Pairs"
+  },
+  {
+    "type": "bool",
+    "title": "BTC",
+    "desc": "Enable or Disable the NBT / BTC pair",
+    "section": "bitcoincoid",
+    "key": "btc"
+  }
+]

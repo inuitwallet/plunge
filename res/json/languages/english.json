@@ -1,0 +1,32 @@
+{
+  "Main_Title": "Plunge",
+  "Home_Screen": "Home Screen",
+  "Start": "Start",
+  "Stop": "Stop",
+
+  "Plunge_Configuration": "Plunge Configuration",
+  "CCEDK_Settings": "CCEDK Settings",
+  "Poloniex_Settings": "Poloniex Settings",
+  "BitcoinCoId_Settings": "Bitcoin Indonesia Settings",
+
+  "ccedk": "CCEDK",
+  "poloniex": "Poloniex",
+  "bitcoincoid": "Bitcoin Indonesia",
+
+  "OK": "OK",
+  "Config_Error": "Configuration Error",
+  "No_Address": "There is no payment address set for %s",
+  "Invalid_Address": "The payment address supplied for %s is not valid",
+  "No_Public": "There is no public API key set for %s",
+  "No_Secret": "There is no secret API key set for %s",
+
+  "Popup_Error": "Error",
+  "Client_Run_Error": "The was a problem in starting the client.",
+
+  "Client_Stopped": "The client is stopped.",
+  "Client_Started": "The client is running.",
+
+  "Overall_Liquidity": "Overall Liquidity",
+  "Buy_Side": "Buy Side",
+  "Sell_Side": "Sell Side"
+}

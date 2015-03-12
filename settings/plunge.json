@@ -1,0 +1,82 @@
+[
+  {
+    "type": "title",
+    "title": "Server Details"
+  },
+  {
+    "type": "string",
+    "title": "Server IP / Hostname",
+    "desc": "The ip address or hostname of the server you would like to connect to",
+    "section": "server",
+    "key": "host"
+  },
+  {
+    "type": "numeric",
+    "title": "Server Port",
+    "desc": "The port to connect to the server on",
+    "section": "server",
+    "key": "port"
+  },
+  {
+    "type": "numeric",
+    "title": "Check Period",
+    "desc": "The number of seconds between data requests from the server\n(doesn't affect the client)",
+    "section": "server",
+    "key": "period"
+  },
+  {
+    "type": "title",
+    "title": "Configuration"
+  },
+  {
+    "type": "path",
+    "title": "Config File",
+    "desc": "The path to the configuration file that will be used to start the client.",
+    "section": "config",
+    "key": "file"
+  },
+  {
+    "type": "bool",
+    "title": "Override",
+    "desc": "Override the current settings using the file specified above",
+    "section": "config",
+    "key": "override"
+  },
+  {
+    "type": "title",
+    "title": "Active Exchanges"
+  },
+  {
+    "type": "bool",
+    "title": "CCEDK",
+    "desc": "Enable or Disable CCEDK",
+    "section": "exchanges",
+    "key": "ccedk"
+  },
+  {
+    "type": "bool",
+    "title": "Poloniex",
+    "desc": "Enable or Disable Poloniex",
+    "section": "exchanges",
+    "key": "poloniex"
+  },
+  {
+    "type": "bool",
+    "title": "Bitcoin Indonesia",
+    "desc": "Enable or Disable Bitcoin Indonesia",
+    "section": "exchanges",
+    "key": "bitcoincoid"
+  },
+  {
+    "type": "title",
+    "title": "Language"
+  },
+  {
+    "type": "options",
+    "title": "Choose Language",
+    "desc": "Set the language file to use\n(Doesn't affect this settings menu)",
+    "options": ["english"],
+    "section": "language",
+    "key": "active_language"
+  }
+]

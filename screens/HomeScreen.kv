@@ -1,0 +1,87 @@
+<HomeScreen>
+
+	canvas:
+		Color:
+			rgb: 0.13725, 0.12157, 0.12549
+		Rectangle:
+            pos: self.pos
+            size: self.size
+
+	name: app.get_string('Home_Screen')
+
+	FloatLayout:
+		id: main_layout
+
+		Label:
+		    size_hint: (None, None)
+		    width: 1000
+		    height: 40
+		    pos: (0, 900)
+		    text: app.get_string("Overall_Liquidity")
+		    font_size: 20
+
+		Label:
+		    id: overall_buy_side
+		    size_hint: (None, None)
+		    width: 200
+		    height: 40
+		    pos: (200, 830)
+		    padding_y: ( self.height - self.line_height ) / 2
+
+		Label:
+		    size_hint: (None, None)
+		    width: 200
+		    height: 40
+		    pos: (200, 865)
+		    text: app.get_string("Buy_Side")
+
+		Label:
+		    id: overall_sell_side
+		    size_hint: (None, None)
+		    width: 200
+		    height: 40
+		    pos: (600, 830)
+		    padding_y: ( self.height - self.line_height ) / 2
+
+		Label:
+		    size_hint: (None, None)
+		    width: 200
+		    height: 40
+		    pos: (600, 865)
+		    text: app.get_string("Sell_Side")
+
+        Button:
+            id: start_button
+            size_hint: (None, None)
+			width: 200
+			height: 50
+			pos: (25, 220)
+            text: app.get_string("Start")
+            on_release: root.toggle_client()
+
+        Label:
+            id: running_label
+            size_hint: (None, None)
+            width: 100
+            height: 50
+            pos: (300, 220)
+            text: app.get_string("Client_Stopped")
+            color: [0.93725, 0.21176, 0.07843, 1]
+
+
+        TextInput:
+            id: log_output
+            multiline: True
+            size_hint: (None, None)
+            width: 950
+            height: 200
+            pos: (25, 0)
+            background_color: [0, 0, 0, 0]
+            foreground_color: [1, 1, 1, 1]
+            readonly: True
+            font_size: 11
+
+
+
+
+

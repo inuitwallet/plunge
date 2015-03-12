@@ -1,0 +1,36 @@
+#:import Factory kivy.factory.Factory
+
+<Widget>:
+	font_name:'res/fonts/Roboto-Medium.ttf'
+
+<ActionSpinnerOptions@SpinnerOption>
+    background_color: .4, .4, .4, 1
+
+<ActionSpinner@Spinner+ActionItem>
+    canvas.before:
+        Color:
+            rgba: 0.128, 0.128, 0.128, 1
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    border: 27, 20, 12, 12
+    background_normal: 'atlas://data/images/defaulttheme/action_group'
+	option_cls: Factory.ActionSpinnerOptions
+
+<ActionDropdown>:
+    on_size: self.width = '220dp'
+
+<TopActionBar>:
+
+	id: topActionBar
+
+	ActionView:
+	    id: topActionView
+
+	    ActionPrevious:
+	        id: topActionPrevious
+	        with_previous: False
+	        app_icon: 'res/icons/nu.png'
+	        title: app.get_string('Main_Title')
+	        background_down: 'res/images/branding/black.png'
+	        on_release: app.open_settings()
