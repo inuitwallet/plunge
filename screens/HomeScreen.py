@@ -24,8 +24,8 @@ class HomeScreen(Screen):
         self.pool_buy_side = self.ids.pool_buy_side.__self__
         self.pool_sell_side = self.ids.pool_sell_side.__self__
 
-        #Clock.schedule_interval(self.get_stats, self.PlungeApp.config.getint('server', 'period'))
-        #self.get_stats(0)
+        Clock.schedule_interval(self.get_stats, self.PlungeApp.config.getint('server', 'period'))
+        self.get_stats(0)
         return
 
     def get_stats(self, dt):
