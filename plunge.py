@@ -43,7 +43,7 @@ class PlungeApp(App):
 
     def build(self):
 
-        self.language = self.config.get('language', 'active_language')
+        self.language = self.config.get('standard', 'language')
         try:
             self.lang = json.load(open('res/json/languages/' + self.language + '.json', 'r'))
         except (ValueError, IOError) as e:
@@ -77,7 +77,6 @@ class PlungeApp(App):
         return return_string
 
     def build_config(self, config):
-        config.setdefaults('language', {'active_language': 'english'})
         config.setdefaults('server', {'host': "104.245.36.10", 'port': 2019, 'period': 30})
         config.setdefaults('config', {'file': os.getcwd() + "/users.dat", 'override': 0})
         config.setdefaults('exchanges', {'ccedk': 1, 'poloniex': 1, 'bitcoincoid': 1})
@@ -88,6 +87,7 @@ class PlungeApp(App):
                            {'address': '', 'public': '', 'secret': '', 'nubot': 0, "btc": 0})
         config.setdefaults('bitcoincoid',
                            {'address': '', 'public': '', 'secret': '', 'nubot': 0, "btc": 0})
+        config.setdefaults('standard', {'language': 'english'})
 
     def build_settings(self, settings):
         settings.add_json_panel(self.get_string('Plunge_Configuration'), self.config, 'settings/plunge.json')

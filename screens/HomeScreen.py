@@ -21,11 +21,11 @@ class HomeScreen(Screen):
         self.start_button = self.ids.start_button.__self__
         self.log_output = self.ids.log_output.__self__
         self.running_label = self.ids.running_label.__self__
-        self.overall_buy_side = self.ids.overall_buy_side.__self__
-        self.overall_sell_side = self.ids.overall_sell_side.__self__
+        self.pool_buy_side = self.ids.pool_buy_side.__self__
+        self.pool_sell_side = self.ids.pool_sell_side.__self__
 
-        Clock.schedule_interval(self.get_stats, self.PlungeApp.config.getint('server', 'period'))
-        self.get_stats(0)
+        #Clock.schedule_interval(self.get_stats, self.PlungeApp.config.getint('server', 'period'))
+        #self.get_stats(0)
         return
 
     def get_stats(self, dt):
@@ -46,8 +46,8 @@ class HomeScreen(Screen):
 
     def update_overall_liquidity(self):
         liquidity = list(self.status['liquidity'])
-        self.overall_buy_side.text = str(liquidity[0])
-        self.overall_sell_side.text = str(liquidity[1])
+        self.pool_buy_side.text = "%s NBT" % str(round(liquidity[0], 4))
+        self.pool_sell_side.text = "%s NBT" % str(round(liquidity[1], 4))
 
 
     def toggle_client(self):

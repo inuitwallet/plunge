@@ -76,7 +76,7 @@
     "title": "Choose Language",
     "desc": "Set the language file to use\n(Doesn't affect this settings menu)",
     "options": ["english"],
-    "section": "language",
-    "key": "active_language"
+    "section": "standard",
+    "key": "language"
   }
 ]

@@ -17,16 +17,15 @@
 		    width: 1000
 		    height: 40
 		    pos: (0, 900)
-		    text: app.get_string("Overall_Liquidity")
+		    text: app.get_string("Pool_Liquidity")
 		    font_size: 20
 
 		Label:
-		    id: overall_buy_side
+		    id: pool_buy_side
 		    size_hint: (None, None)
 		    width: 200
 		    height: 40
 		    pos: (200, 830)
-		    padding_y: ( self.height - self.line_height ) / 2
 
 		Label:
 		    size_hint: (None, None)
@@ -36,7 +35,7 @@
 		    text: app.get_string("Buy_Side")
 
 		Label:
-		    id: overall_sell_side
+		    id: pool_sell_side
 		    size_hint: (None, None)
 		    width: 200
 		    height: 40

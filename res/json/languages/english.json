@@ -1,5 +1,6 @@
 {
   "Main_Title": "Plunge",
+  "Settings": "Settings",
   "Home_Screen": "Home Screen",
   "Start": "Start",
   "Stop": "Stop",
@@ -26,7 +27,7 @@
   "Client_Stopped": "The client is stopped.",
   "Client_Started": "The client is running.",
 
-  "Overall_Liquidity": "Overall Liquidity",
+  "Pool_Liquidity": "Pool Liquidity",
   "Buy_Side": "Buy Side",
   "Sell_Side": "Sell Side"
 }
