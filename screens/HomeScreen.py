@@ -135,7 +135,7 @@ class HomeScreen(Screen):
         if 'error' not in exchanges:
             self.PlungeApp.logger.info("Server returned %s" % exchanges)
             self.stats = {}
-            for exchange in self.PlungeApp.exchanges:
+            for exchange in self.PlungeApp.active_exchanges:
                 self.stats[exchange] = {}
                 for currency in self.PlungeApp.currencies:
                     if currency in exchanges[exchange]:
@@ -157,7 +157,7 @@ class HomeScreen(Screen):
     def get_personal_stats(self):
         #get the individual status for each acccount
         self.user = {}
-        for exchange in self.PlungeApp.exchanges:
+        for exchange in self.PlungeApp.active_exchanges:
             self.PlungeApp.logger.info("Get Personal Stats for %s" % exchange)
             user = dict(self.PlungeApp.utils.get("http://%s:%s/%s" %
                                                  (self.PlungeApp.config.get('server', 'host'),
@@ -235,7 +235,7 @@ class HomeScreen(Screen):
                     self.PlungeApp.logger.error("%s and %s not found in personal stats" % (exchange, currency))
         # efficiency
         efficiency = 0
-        self.PlungeApp.logger.info("Calculating Efficiency Liquidity")
+        self.PlungeApp.logger.info("Calculating Efficiency")
         for exchange in self.PlungeApp.active_exchanges:
             if exchange in self.user:
                 efficiency += self.user[exchange]['efficiency']
@@ -324,7 +324,7 @@ class HomeScreen(Screen):
                     if active == 1:
                         config_file.write("%s %s %s %s %s %s\n" % (address, currency.upper(), exchange, public, secret, nubot))
         config_file.close()
-        self.PlungeApp.logger.error("Config file built")
+        self.PlungeApp.logger.info("Config file built")
         return True
 
     def enqueue_output(self, out, queue):
