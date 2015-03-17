@@ -22,7 +22,7 @@ class utils:
 
     def check_checksum(self, key):
         try:
-            check_key = self.decode(key)
+            check_key = self.decode(key.strip().replace(' ', ''))
         except ValueError:
             return False
         checksum = check_key[-4:]
@@ -86,6 +86,7 @@ class utils:
         for exchange in self.PlungeApp.exchanges:
             if self.PlungeApp.config.getint('exchanges', exchange) == 1:
                 exchanges.append(exchange)
+        self.PlungeApp.logger.info("Got active exchanges - %s" % str(exchanges))
         return exchanges
 
     def get_active_currencies(self, exchange):
@@ -93,6 +94,7 @@ class utils:
         for currency in self.PlungeApp.currencies:
             if self.PlungeApp.config.getdefaultint(exchange, currency, 0) == 1:
                 currencies.append(currency)
+        self.PlungeApp.logger.info("Got active currencies - %s" % str(currency))
         return currencies
 
     def get_currency_prices(self):
@@ -104,4 +106,5 @@ class utils:
             price['currency'] = 0
             if 'price' in price:
                 prices[currency] = price['price']
+        self.PlungeApp.logger.info("Got active prices - %s" % str(prices))
         return prices

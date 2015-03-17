@@ -7,7 +7,6 @@ from Queue import Queue, Empty
 from threading  import Thread
 import sys
 from decimal import Decimal
-import utils
 
 __author__ = 'woolly_sammoth'
 
@@ -19,6 +18,7 @@ class HomeScreen(Screen):
     def __init__(self, PlungeApp, **kwargs):
         super(HomeScreen, self).__init__(**kwargs)
         self.PlungeApp = PlungeApp
+        self.PlungeApp.logger.info("Building Home Page")
         self.start_button = self.ids.start_button.__self__
         self.log_output = self.ids.log_output.__self__
         self.running_label = self.ids.running_label.__self__
@@ -50,6 +50,7 @@ class HomeScreen(Screen):
         self.user = {}
         self.set_exchange_spinners()
 
+        self.PlungeApp.logger.info("Setting refresh Period to %s" % self.PlungeApp.config.get('server', 'period'))
         Clock.schedule_interval(self.get_stats, self.PlungeApp.config.getint('server', 'period'))
         Clock.schedule_once(self.get_stats, 5)
         return
@@ -62,6 +63,7 @@ class HomeScreen(Screen):
         for exchange in self.PlungeApp.active_exchanges:
             if self.PlungeApp.get_string(exchange) == self.exchange_spinner.text:
                 self.primary_exchange = exchange
+        self.PlungeApp.logger.info("Set Primary Exchange to %s" % self.primary_exchange)
         if self.primary_exchange == '':
             self.PlungeApp.active_exchanges = self.PlungeApp.utils.get_active_exchanges()
             if self.PlungeApp.active_exchanges:
@@ -89,6 +91,7 @@ class HomeScreen(Screen):
 
     def set_primary_currency(self):
         self.primary_currency = self.currency_spinner.text.lower()
+        self.PlungeApp.logger.info("Set Primary Currency to %s" % self.primary_currency)
         if self.stats:
             if self.primary_exchange in self.stats:
                 if self.primary_currency in self.stats[self.primary_exchange]:
@@ -105,24 +108,32 @@ class HomeScreen(Screen):
 
     def get_pool_stats(self):
         # get the pool status
+        self.PlungeApp.logger.info("Get the Pool Stats")
         status = dict(self.PlungeApp.utils.get("http://%s:%s/status" %
                                                (self.PlungeApp.config.get('server', 'host'),
                                                 self.PlungeApp.config.get('server', 'port'))))
         
         if 'error' not in status:
-            self.pool_buy_liquidity = str(round(status['liquidity'][0], 4))
-            self.pool_sell_liquidity = str(round(status['liquidity'][1], 4))
-            self.num_users = str(status['users'])
-            self.sampling = str(status['sampling'])
+            self.PlungeApp.logger.info("Server returned %s" % status)
+            self.pool = {}
+            self.pool['buy_liquidity'] = str(round(status['liquidity'][0], 4))
+            self.pool['sell_liquidity'] = str(round(status['liquidity'][1], 4))
+            self.pool['num_users'] = str(status['users'])
+            self.pool['sampling'] = str(status['sampling'])
+            self.PlungeApp.logger.info("Pool stats - %s" % str(self.pool))
             self.update_pool_stats()
+        else:
+            self.PlungeApp.logger.error("%d - %s" % (status['code'], status['message']))
 
     def get_exchange_stats(self):
         # get the exchange status
+        self.PlungeApp.logger.info("Get the Exchange Stats")
         exchanges = dict(self.PlungeApp.utils.get("http://%s:%s/exchanges" %
                                                   (self.PlungeApp.config.get('server', 'host'),
                                                    self.PlungeApp.config.get('server', 'port'))))
 
         if 'error' not in exchanges:
+            self.PlungeApp.logger.info("Server returned %s" % exchanges)
             self.stats = {}
             for exchange in self.PlungeApp.exchanges:
                 self.stats[exchange] = {}
@@ -132,19 +143,28 @@ class HomeScreen(Screen):
                         self.stats[exchange][currency]['rate'] = str(round(exchanges[exchange][currency]['rate'], 4))
                         self.stats[exchange][currency]['fee'] = str(round(exchanges[exchange][currency]['fee'], 4))
                         self.stats[exchange][currency]['target'] = str(round(exchanges[exchange][currency]['target'], 4))
+            self.PlungeApp.logger.info("Exchange Stats - %s" % str(self.stats))
             if self.primary_exchange in self.stats:
                 if self.primary_currency in self.stats[self.primary_exchange]:
                     self.update_exchange_stats()
+                else:
+                    self.PlungeApp.logger.error("%s not found in exchange stats" % self.primary_currency)
+            else:
+                self.PlungeApp.logger.error("%s not found in exchange stats" % self.primary_exchange)
+        else:
+            self.PlungeApp.logger.error("%d - %s" % (exchanges['code'], exchanges['message']))
 
     def get_personal_stats(self):
         #get the individual status for each acccount
         self.user = {}
         for exchange in self.PlungeApp.exchanges:
+            self.PlungeApp.logger.info("Get Personal Stats for %s" % exchange)
             user = dict(self.PlungeApp.utils.get("http://%s:%s/%s" %
                                                  (self.PlungeApp.config.get('server', 'host'),
                                                   self.PlungeApp.config.get('server', 'port'),
                                                   self.PlungeApp.config.get(exchange, 'public'))))
             if 'error' not in user:
+                self.PlungeApp.logger.info("Server returned %s" % user)
                 self.user[exchange] = {}
                 self.user[exchange]['efficiency'] = user['efficiency']
                 self.user[exchange]['balance'] = "%.8f" % user['balance']
@@ -158,22 +178,35 @@ class HomeScreen(Screen):
                         self.user[exchange][currency]['last_error'] = user['units'][currency]['last_error']
                         self.user[exchange][currency]['rejects'] = str(user['units'][currency]['rejects'])
                         self.user[exchange][currency]['missing'] = str(user['units'][currency]['missing'])
+                    else:
+                        self.PlungeApp.logger.error("%s not found in server return" % currency)
+            else:
+                self.PlungeApp.logger.error("%d - %s" % (user['code'], user['message']))
+        self.PlungeApp.logger.info("Personal Stats - %s" % str(self.user))
         if self.primary_exchange in self.user:
             if self.primary_currency in self.user[self.primary_exchange]:
                 self.update_personal_stats()
+            else:
+                self.PlungeApp.logger.error("%s not found in personal stats" % self.primary_currency)
+        else:
+            self.PlungeApp.logger.error("%s not found in personal stats" % self.primary_exchange)
+
 
     def update_pool_stats(self):
-        self.pool_buy_side.text = self.pool_buy_liquidity
-        self.pool_sell_side.text = self.pool_sell_liquidity
-        self.pool_num_users.text = self.num_users
-        self.pool_sampling.text = self.sampling
+        self.PlungeApp.logger.info("Update Pool stats")
+        self.pool_buy_side.text = self.pool['buy_liquidity']
+        self.pool_sell_side.text = self.pool['sell_liquidity']
+        self.pool_num_users.text = self.pool['num_users']
+        self.pool_sampling.text = self.pool['sampling']
 
     def update_exchange_stats(self):
+        self.PlungeApp.logger.info("Update Exchange stats")
         self.exchange_fee.text = self.stats[self.primary_exchange][self.primary_currency]['fee']
         self.exchange_rate.text = self.stats[self.primary_exchange][self.primary_currency]['rate']
         self.exchange_target.text = self.stats[self.primary_exchange][self.primary_currency]['target']
 
     def update_personal_stats(self):
+        self.PlungeApp.logger.info("Update Personal stats")
         self.exchange_balance.text = self.user[self.primary_exchange]['balance']
         self.exchange_efficiency.text = "%s%%" % str(self.user[self.primary_exchange]['efficiency'] *100)
         self.exchange_missing.text = self.user[self.primary_exchange][self.primary_currency]['missing']
@@ -182,31 +215,46 @@ class HomeScreen(Screen):
         # calculations
         # buy side liquidity
         buy_side = 0
+        self.PlungeApp.logger.info("Calculating Buy Side Liquidity")
         for exchange in self.PlungeApp.active_exchanges:
             for currency in self.PlungeApp.active_currencies:
                 if exchange in self.user and currency in self.user:
                     for order in self.user[exchange][currency]['bid_orders']:
                         buy_side += order[1]
+                else:
+                    self.PlungeApp.logger.error("%s and %s not found in personal stats" % (exchange, currency))
         # sell side liquidity
         sell_side = 0
+        self.PlungeApp.logger.info("Calculating Sell Side Liquidity")
         for exchange in self.PlungeApp.active_exchanges:
             for currency in self.PlungeApp.active_currencies:
                 if exchange in self.user and currency in self.user:
                     for order in self.user[exchange][currency]['ask_orders']:
                         sell_side += order[1]
+                else:
+                    self.PlungeApp.logger.error("%s and %s not found in personal stats" % (exchange, currency))
         # efficiency
         efficiency = 0
+        self.PlungeApp.logger.info("Calculating Efficiency Liquidity")
         for exchange in self.PlungeApp.active_exchanges:
             if exchange in self.user:
                 efficiency += self.user[exchange]['efficiency']
+            else:
+                self.PlungeApp.logger.error("%s not found in personal stats" % exchange)
         efficiency = efficiency / len(self.PlungeApp.active_exchanges)
         # balance
+        self.PlungeApp.logger.info("Calculating Balance")
         balance = Decimal(buy_side + sell_side)
         prices = self.PlungeApp.utils.get_currency_prices()
         for exchange in self.PlungeApp.active_exchanges:
             for currency in self.PlungeApp.currencies:
-                if exchange in self.user and currency in prices:
-                    balance += (Decimal(self.user[exchange]['balance']) * Decimal(prices[currency]))
+                if exchange in self.user:
+                    if currency in prices:
+                        balance += (Decimal(self.user[exchange]['balance']) * Decimal(prices[currency]))
+                    else:
+                        self.PlungeApp.logger.error("%s not found in prices (%s)" % (currency, str(prices)))
+                else:
+                    self.PlungeApp.logger.error("%s not found in personal stats (%s)" % (exchange, str(self.user)))
 
         self.personal_buy_side.text = str(round(buy_side, 4))
         self.personal_sell_side.text = str(round(sell_side, 4))
@@ -216,8 +264,10 @@ class HomeScreen(Screen):
     def toggle_client(self):
         text = self.start_button.text
         if text == "Start":
+            self.PlungeApp.logger.info("Starting client")
             self.start_client()
         else:
+            self.PlungeApp.logger.info("Stopping client")
             self.stop_client()
 
     def start_client(self):
@@ -225,6 +275,7 @@ class HomeScreen(Screen):
         config_file = self.PlungeApp.config.get('config', 'file')
         if os.path.isfile(config_file):
             if override == 1:
+                self.PlungeApp.logger.info("Starting client without building config file")
                 self.run_client()
                 return
             else:
@@ -233,30 +284,36 @@ class HomeScreen(Screen):
             self.run_client()
 
     def build_config_file(self):
+        self.PlungeApp.logger.info("Building config file")
         with open(self.PlungeApp.config.get('config', 'file'), "w+") as config_file:
             for exchange in self.PlungeApp.exchanges:
+                self.PlungeApp.logger.info("Setting config for %s" % exchange)
                 active = self.PlungeApp.config.getint('exchanges', exchange)
                 if active == 0:
                     continue
                 address = self.PlungeApp.config.get(exchange, 'address')
                 if address == "":
+                    self.PlungeApp.logger.error("No Payout Address set")
                     self.PlungeApp.show_popup(self.PlungeApp.get_string("Config_Error"),
                                               self.PlungeApp.get_string("No_Address") %
                                               self.PlungeApp.get_string(exchange))
                     return False
                 if not self.PlungeApp.utils.check_checksum(address):
+                    self.PlungeApp.logger.error("Invalid Payout Address")
                     self.PlungeApp.show_popup(self.PlungeApp.get_string("Config_Error"),
                                               self.PlungeApp.get_string("Invalid_Address") %
                                               self.PlungeApp.get_string(exchange))
                     return False
                 public = self.PlungeApp.config.get(exchange, 'public')
                 if public == "":
+                    self.PlungeApp.logger.error("No Public API Key set")
                     self.PlungeApp.show_popup(self.PlungeApp.get_string("Config_Error"),
                                               self.PlungeApp.get_string("No_Public") %
                                               self.PlungeApp.get_string(exchange))
                     return False
                 secret = self.PlungeApp.config.get(exchange, 'secret')
                 if secret == "":
+                    self.PlungeApp.logger.error("No Secret API Key set")
                     self.PlungeApp.show_popup(self.PlungeApp.get_string("Config_Error"),
                                               self.PlungeApp.get_string("No_Secret") %
                                               self.PlungeApp.get_string(exchange))
@@ -267,6 +324,7 @@ class HomeScreen(Screen):
                     if active == 1:
                         config_file.write("%s %s %s %s %s %s\n" % (address, currency.upper(), exchange, public, secret, nubot))
         config_file.close()
+        self.PlungeApp.logger.error("Config file built")
         return True
 
     def enqueue_output(self, out, queue):
@@ -282,6 +340,7 @@ class HomeScreen(Screen):
         ON_POSIX = 'posix' in sys.builtin_module_names
         if system() == 'Linux':
             command = ["python", "%s/client/client.py" % os.getcwd(), "%s:%s" % (host, ip), "%s" % config_file]
+        self.PlungeApp.logger.info("Running client with command %s" % command)
         try:
             self.output = subprocess.Popen(command, stderr=subprocess.PIPE, bufsize=1, close_fds=ON_POSIX)
             self.q = Queue()
@@ -311,3 +370,4 @@ class HomeScreen(Screen):
         self.running_label.color = (0.93725, 0.21176, 0.07843, 1)
         self.running_label.text = self.PlungeApp.get_string("Client_Stopped")
         self.start_button.text = self.PlungeApp.get_string('Start')
+        self.PlungeApp.logger.error("Client Stopped")

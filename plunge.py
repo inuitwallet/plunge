@@ -1,4 +1,6 @@
 from kivy.clock import Clock
+import logging
+import time
 import utils
 
 __author__ = 'woolly_sammoth'
@@ -45,21 +47,35 @@ class PlungeApp(App):
         self.active_exchanges = []
         self.currencies = ['btc', 'ltc', 'eur', 'usd', 'ppc']
         self.active_currencies = []
+
+        self.logger = logging.getLogger('Plunge')
+        self.logger.setLevel(logging.DEBUG)
+        fh = logging.FileHandler('logs/%s_%d.log' % ('Plunge', time.time()))
+        fh.setLevel(logging.DEBUG)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        formatter = logging.Formatter(fmt='%(asctime)s %(levelname)s: %(message)s', datefmt="%Y/%m/%d-%H:%M:%S")
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+        self.logger.addHandler(fh)
+        self.logger.addHandler(ch)
+
         return
 
     def build(self):
+        self.logger.info("Fetching language from config")
         self.language = self.config.get('standard', 'language')
         try:
             self.lang = json.load(open('res/json/languages/' + self.language.lower() + '.json', 'r'))
         except (ValueError, IOError) as e:
-            print('')
-            print('##################################################################')
-            print('')
-            print('There was an Error loading the ' + self.language + ' language file.')
-            print('')
-            print(str(e))
-            print('')
-            print('##################################################################')
+            self.logger.error('')
+            self.logger.error('##################################################################')
+            self.logger.error('')
+            self.logger.error('There was an Error loading the ' + self.language + ' language file.')
+            self.logger.error('')
+            self.logger.error(str(e))
+            self.logger.error('')
+            self.logger.error('##################################################################')
             raise SystemExit
 
         self.root = BoxLayout(orientation='vertical')
@@ -76,8 +92,10 @@ class PlungeApp(App):
 
     def get_string(self, text):
         try:
+            self.logger.debug("Getting string for %s" % text)
             return_string = self.lang[text]
         except (ValueError, KeyError):
+            self.logger.error("No string found for %s in %s language file" % (text, self.language))
             return_string = 'Language Error'
         return return_string
 
@@ -109,11 +127,13 @@ class PlungeApp(App):
 
     def on_config_change(self, config, section, key, value):
         if section == "exchanges":
+            self.logger.info("%s/%s config changed to %s" % (section, key, value))
             self.close_settings()
             self.destroy_settings()
             self.open_settings()
         if section == "server" and key == "period":
             Clock.unschedule(self.homeScreen.get_stats)
+            self.logger.info("Setting refresh Period to %s" % self.config.get('server', 'period'))
             Clock.schedule_interval(self.homeScreen.get_stats, self.config.getint('server', 'period'))
         self.active_exchanges = self.utils.get_active_exchanges()
         self.homeScreen.exchange_spinner.values = [self.get_string(exchange) for exchange in self.active_exchanges]
