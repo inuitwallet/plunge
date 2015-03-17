@@ -58,6 +58,7 @@ class HomeScreen(Screen):
         # see if any exchanges are enabled so that we can display the stats
         self.primary_exchange = ''
         self.primary_currency = ''
+        self.PlungeApp.active_exchanges = self.PlungeApp.utils.get_active_exchanges()
         for exchange in self.PlungeApp.active_exchanges:
             if self.PlungeApp.get_string(exchange) == self.exchange_spinner.text:
                 self.primary_exchange = exchange
@@ -70,17 +71,13 @@ class HomeScreen(Screen):
                 self.exchange_spinner.text = self.PlungeApp.get_string(self.primary_exchange)
             else:
                 self.PlungeApp.show_popup(self.PlungeApp.get_string('Popup_Error'),
-                                     self.PlungeApp.get_string('No_Exchanges'))
+                                          self.PlungeApp.get_string('No_Exchanges'))
                 return
         self.PlungeApp.active_currencies = self.PlungeApp.utils.get_active_currencies(self.primary_exchange)
         if self.PlungeApp.active_currencies:
             self.currency_spinner.values = [currency.upper() for currency in self.PlungeApp.active_currencies]
             self.primary_currency = self.PlungeApp.active_currencies[0]
             self.currency_spinner.text = self.primary_currency.upper()
-        else:
-            self.PlungeApp.show_popup(self.PlungeApp.get_string('Popup_Error'),
-                                 self.PlungeApp.get_string('No_Currencies') % self.primary_exchange)
-            return
         if self.stats:
             if self.primary_exchange in self.stats:
                 if self.primary_currency in self.stats[self.primary_exchange]:
@@ -93,9 +90,13 @@ class HomeScreen(Screen):
     def set_primary_currency(self):
         self.primary_currency = self.currency_spinner.text.lower()
         if self.stats:
-            self.update_exchange_stats()
+            if self.primary_exchange in self.stats:
+                if self.primary_currency in self.stats[self.primary_exchange]:
+                    self.update_exchange_stats()
         if self.user:
-            self.update_personal_stats()
+            if self.primary_exchange in self.user:
+                if self.primary_currency in self.user[self.primary_exchange]:
+                    self.update_personal_stats()
 
     def get_stats(self, dt):
         self.get_pool_stats()
@@ -158,7 +159,7 @@ class HomeScreen(Screen):
                         self.user[exchange][currency]['rejects'] = str(user['units'][currency]['rejects'])
                         self.user[exchange][currency]['missing'] = str(user['units'][currency]['missing'])
         if self.primary_exchange in self.user:
-            if self.primary_currency in self.stats[self.primary_exchange]:
+            if self.primary_currency in self.user[self.primary_exchange]:
                 self.update_personal_stats()
 
     def update_pool_stats(self):
@@ -183,18 +184,21 @@ class HomeScreen(Screen):
         buy_side = 0
         for exchange in self.PlungeApp.active_exchanges:
             for currency in self.PlungeApp.active_currencies:
-                for order in self.user[exchange][currency]['bid_orders']:
-                    buy_side += order[1]
+                if exchange in self.user and currency in self.user:
+                    for order in self.user[exchange][currency]['bid_orders']:
+                        buy_side += order[1]
         # sell side liquidity
         sell_side = 0
         for exchange in self.PlungeApp.active_exchanges:
             for currency in self.PlungeApp.active_currencies:
-                for order in self.user[exchange][currency]['ask_orders']:
-                    sell_side += order[1]
+                if exchange in self.user and currency in self.user:
+                    for order in self.user[exchange][currency]['ask_orders']:
+                        sell_side += order[1]
         # efficiency
         efficiency = 0
         for exchange in self.PlungeApp.active_exchanges:
-            efficiency += self.user[exchange]['efficiency']
+            if exchange in self.user:
+                efficiency += self.user[exchange]['efficiency']
         efficiency = efficiency / len(self.PlungeApp.active_exchanges)
         # balance
         balance = Decimal(buy_side + sell_side)

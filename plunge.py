@@ -109,13 +109,14 @@ class PlungeApp(App):
 
     def on_config_change(self, config, section, key, value):
         if section == "exchanges":
-            self.utils.get_active_exchanges()
             self.close_settings()
             self.destroy_settings()
             self.open_settings()
         if section == "server" and key == "period":
             Clock.unschedule(self.homeScreen.get_stats)
             Clock.schedule_interval(self.homeScreen.get_stats, self.config.getint('server', 'period'))
+        self.active_exchanges = self.utils.get_active_exchanges()
+        self.homeScreen.exchange_spinner.values = [self.get_string(exchange) for exchange in self.active_exchanges]
         self.homeScreen.set_exchange_spinners()
 
     def show_popup(self, title, text):
