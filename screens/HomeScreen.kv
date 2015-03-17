@@ -9,76 +9,410 @@
 
 	name: app.get_string('Home_Screen')
 
-	FloatLayout:
+	BoxLayout:
 		id: main_layout
+		orientation: 'vertical'
 
-		Label:
-		    size_hint: (None, None)
-		    width: 1000
-		    height: 40
-		    pos: (0, 900)
-		    text: app.get_string("Pool_Liquidity")
-		    font_size: 20
+		BoxLayout:
+		    orientation: 'vertical'
+		    size_hint: (1, 0.65)
 
-		Label:
-		    id: pool_buy_side
-		    size_hint: (None, None)
-		    width: 200
-		    height: 40
-		    pos: (200, 830)
+            Label:
+                size_hint: (1, 0.2)
+                text: app.get_string("Pool_Stats")
+                font_size: 20
+                canvas.before:
+                    Color:
+                        rgb: 0.23725, 0.22157, 0.22549
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
 
-		Label:
-		    size_hint: (None, None)
-		    width: 200
-		    height: 40
-		    pos: (200, 865)
-		    text: app.get_string("Buy_Side")
+            #Top row of Pool Stats
+            GridLayout:
+                cols: 4
+                size_hint: (1, 0.4)
 
-		Label:
-		    id: pool_sell_side
-		    size_hint: (None, None)
-		    width: 200
-		    height: 40
-		    pos: (600, 830)
-		    padding_y: ( self.height - self.line_height ) / 2
+                BoxLayout:
+                    orientation: 'vertical'
 
-		Label:
-		    size_hint: (None, None)
-		    width: 200
-		    height: 40
-		    pos: (600, 865)
-		    text: app.get_string("Sell_Side")
+		            Label:
+		                text: app.get_string("Buy_Side_Liquidity")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
 
-        Button:
-            id: start_button
-            size_hint: (None, None)
-			width: 200
-			height: 50
-			pos: (25, 220)
-            text: app.get_string("Start")
-            on_release: root.toggle_client()
+		            Label:
+		                id: pool_buy_side
+		                size_hint: (1, 0.7)
+		                font_size: 18
 
-        Label:
-            id: running_label
-            size_hint: (None, None)
-            width: 100
-            height: 50
-            pos: (300, 220)
-            text: app.get_string("Client_Stopped")
-            color: [0.93725, 0.21176, 0.07843, 1]
+		        BoxLayout:
+		            orientation: 'vertical'
+
+		            Label:
+		                text: app.get_string("Sell_Side_Liquidity")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+		            Label:
+		                id: pool_sell_side
+		                size_hint: (1, 0.7)
+		                font_size: 18
+
+		        BoxLayout:
+                    orientation: 'vertical'
+
+		            Label:
+		                text: app.get_string("Num_Users")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+		            Label:
+		                id: pool_num_users
+		                size_hint: (1, 0.7)
+		                font_size: 16
+
+		        BoxLayout:
+		            orientation: 'vertical'
+
+		            Label:
+		                text: app.get_string("Sampling")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+		            Label:
+		                id: pool_sampling
+		                size_hint: (1, 0.7)
+		                font_size: 16
+
+		    BoxLayout:
+		        size_hint: (1, 0.05)
+
+            Label:
+                size_hint: (1, 0.2)
+                text: app.get_string("Exchange_Stats")
+                font_size: 20
+                canvas.before:
+                    Color:
+                        rgb: 0.23725, 0.22157, 0.22549
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+            BoxLayout:
+                size_hint: (1, 0.35)
+                orientation: 'horizontal'
+                padding: 5
+
+                Spinner:
+                    id: exchange_spinner
+                    values: [app.get_string(exchange) for exchange in app.exchanges]
+                    on_text: root.set_exchange_spinners()
+
+                Spinner:
+                    id: currency_spinner
+                    on_text: root.set_primary_currency()
+
+            # Top row of Exchange Stats
+            GridLayout:
+                cols: 3
+                size_hint: (1, 0.4)
+
+                BoxLayout:
+                    orientation: 'vertical'
+
+		            Label:
+		                text: app.get_string("Rate")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+		            Label:
+		                id: exchange_rate
+		                size_hint: (1, 0.7)
+		                font_size: 16
+
+		        BoxLayout:
+                    orientation: 'vertical'
+
+		            Label:
+		                text: app.get_string("Fee")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+		            Label:
+		                id: exchange_fee
+		                size_hint: (1, 0.7)
+		                font_size: 16
+
+		        BoxLayout:
+                    orientation: 'vertical'
+
+		            Label:
+		                text: app.get_string("Target")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+		            Label:
+		                id: exchange_target
+		                size_hint: (1, 0.7)
+		                font_size: 16
+
+            #Second Row of Exchange stats
+            GridLayout:
+                cols: 4
+                size_hint: (1, 0.4)
+
+                BoxLayout:
+                    orientation: 'vertical'
+
+                    Label:
+		                text: app.get_string("Balance")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+		            Label:
+		                id: exchange_balance
+		                size_hint: (1, 0.7)
+		                font_size: 18
+
+		        BoxLayout:
+                    orientation: 'vertical'
+
+		            Label:
+		                text: app.get_string("Efficiency")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+		            Label:
+		                id: exchange_efficiency
+		                size_hint: (1, 0.7)
+		                font_size: 18
+
+		        BoxLayout:
+                    orientation: 'vertical'
+
+		            Label:
+		                text: app.get_string("Missing")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+		            Label:
+		                id: exchange_missing
+		                size_hint: (1, 0.7)
+		                font_size: 16
+
+		        BoxLayout:
+                    orientation: 'vertical'
+
+		            Label:
+		                text: app.get_string("Rejects")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+		            Label:
+		                id: exchange_rejects
+		                size_hint: (1, 0.7)
+		                font_size: 16
+
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: (1, 0.4)
+
+                Label:
+                    text: app.get_string("Last_Error")
+                    size_hint: (1, 0.3)
+                    canvas.before:
+                        Color:
+                            rgb: 0.18725, 0.17157, 0.17549
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+
+                Label:
+                    id: exchange_last_error
+                    size_hint: (1, 0.7)
+                    font_size: 15
+                    color: (0.93725, 0.21176, 0.07843, 1)
+
+            BoxLayout:
+		        size_hint: (1, 0.05)
+
+		    Label:
+                size_hint: (1, 0.2)
+                text: app.get_string("Personal_Stats")
+                font_size: 20
+                canvas.before:
+                    Color:
+                        rgb: 0.23725, 0.22157, 0.22549
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+            GridLayout:
+                cols: 4
+                size_hint: (1, 0.4)
+
+                BoxLayout:
+                    orientation: 'vertical'
+
+		            Label:
+		                text: app.get_string("Buy_Side_Liquidity")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+		            Label:
+		                id: personal_buy_side
+		                size_hint: (1, 0.7)
+		                font_size: 18
+
+		        BoxLayout:
+                    orientation: 'vertical'
+
+		            Label:
+		                text: app.get_string("Sell_Side_Liquidity")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+		            Label:
+		                id: personal_sell_side
+		                size_hint: (1, 0.7)
+		                font_size: 18
+
+		        BoxLayout:
+                    orientation: 'vertical'
+
+		            Label:
+		                text: app.get_string("Efficiency")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+		            Label:
+		                id: personal_efficiency
+		                size_hint: (1, 0.7)
+		                font_size: 18
+
+		        BoxLayout:
+                    orientation: 'vertical'
+
+		            Label:
+		                text: app.get_string("Balance")
+		                size_hint: (1, 0.3)
+		                canvas.before:
+                            Color:
+                                rgb: 0.18725, 0.17157, 0.17549
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+		            Label:
+		                id: personal_balance
+		                size_hint: (1, 0.7)
+		                font_size: 18
+
+		#Run Section
+		BoxLayout:
+		    size_hint: (1, 0.35)
+		    orientation: 'vertical'
+
+		    BoxLayout:
+		        orientation: 'horizontal'
+		        size_hint: (1, 0.2)
+		        padding: 10
+
+                Button:
+                    id: start_button
+                    size_hint: (None, None)
+                    width: 200
+                    height: 50
+                    text: app.get_string("Start")
+                    on_release: root.toggle_client()
+
+                Label:
+                    id: running_label
+                    size_hint: (None, 1)
+                    width: 300
+                    text: app.get_string("Client_Stopped")
+                    color: [0.93725, 0.21176, 0.07843, 1]
 
 
-        TextInput:
-            id: log_output
-            multiline: True
-            size_hint: (None, None)
-            width: 950
-            height: 200
-            pos: (25, 0)
-            background_color: [0, 0, 0, 0]
-            foreground_color: [1, 1, 1, 1]
-            readonly: True
-            font_size: 11
+            TextInput:
+                id: log_output
+                multiline: True
+                size_hint: (1, 0.8)
+                background_color: [0, 0, 0, 0]
+                foreground_color: [1, 1, 1, 1]
+                readonly: True
+                font_size: 11
 
 
 

@@ -6,8 +6,8 @@
   {
     "type": "string",
     "title": "Payout Address",
-    "desc": "The payout address for CCEDK",
-    "section": "ccedk",
+    "desc": "The payout address for BTER",
+    "section": "bter",
     "key": "address"
   },
   {
@@ -17,15 +17,15 @@
   {
     "type": "string",
     "title": "Public Key",
-    "desc": "The public API Key provided by CCEDK",
-    "section": "ccedk",
+    "desc": "The public API Key provided by BTER",
+    "section": "bter",
     "key": "public"
   },
   {
     "type": "string",
     "title": "Secret Key",
-    "desc": "The secret API Key provided by CCEDK",
-    "section": "ccedk",
+    "desc": "The secret API Key provided by BTER",
+    "section": "bter",
     "key": "secret"
   },
   {
@@ -36,7 +36,7 @@
     "type": "bool",
     "title": "Use NuBot?",
     "desc": "Use a NuBot instance on each pair rather then the built in Python client",
-    "section": "ccedk",
+    "section": "bter",
     "key": "nubot"
   },
   {
@@ -47,7 +47,7 @@
     "type": "bool",
     "title": "BTC",
     "desc": "Enable or Disable the NBT / BTC pair",
-    "section": "ccedk",
+    "section": "bter",
     "key": "btc"
   }
 ]

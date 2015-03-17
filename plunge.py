@@ -1,12 +1,14 @@
-import os
+from kivy.clock import Clock
+import utils
 
 __author__ = 'woolly_sammoth'
 
 from kivy.config import Config
 
+Config.set('graphics', 'borderless', '0')
 Config.set('graphics', 'width', '1000')
 Config.set('graphics', 'height', '1000')
-Config.set('graphics', 'resizable', '0')
+Config.set('graphics', 'resizable', '1')
 Config.set('graphics', 'fullscreen', '0')
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
@@ -20,6 +22,7 @@ from kivy.uix.screenmanager import SlideTransition
 from kivy.uix.popup import Popup
 from kivy.lang import Builder
 
+import os
 import json
 
 import screens.HomeScreen as HomeScreen
@@ -36,16 +39,18 @@ class PlungeApp(App):
         super(PlungeApp, self).__init__(**kwargs)
         self.isPopup = False
         self.use_kivy_settings = False
-
-        self.exchanges = ["ccedk", "poloniex", "bitcoincoid"]
-        self.currencies = ["btc", "ltc", "ppc", "eur", "usd"]
+        self.settings_cls = 'Settings'
+        self.utils = utils.utils(self)
+        self.exchanges = ['ccedk', 'poloniex', 'bitcoincoid', 'bter']
+        self.active_exchanges = []
+        self.currencies = ['btc', 'ltc', 'eur', 'usd', 'ppc']
+        self.active_currencies = []
         return
 
     def build(self):
-
         self.language = self.config.get('standard', 'language')
         try:
-            self.lang = json.load(open('res/json/languages/' + self.language + '.json', 'r'))
+            self.lang = json.load(open('res/json/languages/' + self.language.lower() + '.json', 'r'))
         except (ValueError, IOError) as e:
             print('')
             print('##################################################################')
@@ -79,15 +84,17 @@ class PlungeApp(App):
     def build_config(self, config):
         config.setdefaults('server', {'host': "104.245.36.10", 'port': 2019, 'period': 30})
         config.setdefaults('config', {'file': os.getcwd() + "/users.dat", 'override': 0})
-        config.setdefaults('exchanges', {'ccedk': 1, 'poloniex': 1, 'bitcoincoid': 1})
+        config.setdefaults('exchanges', {'ccedk': 0, 'poloniex': 0, 'bitcoincoid': 0, 'bter': 0})
         config.setdefaults('ccedk',
                            {'address': '', 'public': '', 'secret': '', 'nubot': 0,
-                            "btc": 0, "ltc": 0, "ppc": 0, "eur": 0, "usd": 0})
+                            'btc': 0, 'ltc': 0, 'ppc': 0, 'usd': 0, 'eur': 0})
         config.setdefaults('poloniex',
                            {'address': '', 'public': '', 'secret': '', 'nubot': 0, "btc": 0})
         config.setdefaults('bitcoincoid',
                            {'address': '', 'public': '', 'secret': '', 'nubot': 0, "btc": 0})
-        config.setdefaults('standard', {'language': 'english'})
+        config.setdefaults('bter',
+                           {'address': '', 'public': '', 'secret': '', 'nubot': 0, "btc": 0})
+        config.setdefaults('standard', {'language': 'English'})
 
     def build_settings(self, settings):
         settings.add_json_panel(self.get_string('Plunge_Configuration'), self.config, 'settings/plunge.json')
@@ -97,12 +104,19 @@ class PlungeApp(App):
             settings.add_json_panel(self.get_string('Poloniex_Settings'), self.config, 'settings/poloniex.json')
         if self.config.getint('exchanges', 'bitcoincoid') == 1:
             settings.add_json_panel(self.get_string('BitcoinCoId_Settings'), self.config, 'settings/bitcoincoid.json')
+        if self.config.getint('exchanges', 'bter') == 1:
+            settings.add_json_panel(self.get_string('Bter_Settings'), self.config, 'settings/bter.json')
 
     def on_config_change(self, config, section, key, value):
         if section == "exchanges":
+            self.utils.get_active_exchanges()
             self.close_settings()
             self.destroy_settings()
             self.open_settings()
+        if section == "server" and key == "period":
+            Clock.unschedule(self.homeScreen.get_stats)
+            Clock.schedule_interval(self.homeScreen.get_stats, self.config.getint('server', 'period'))
+        self.homeScreen.set_exchange_spinners()
 
     def show_popup(self, title, text):
         content = BoxLayout(orientation='vertical')

@@ -9,10 +9,12 @@
   "CCEDK_Settings": "CCEDK Settings",
   "Poloniex_Settings": "Poloniex Settings",
   "BitcoinCoId_Settings": "Bitcoin Indonesia Settings",
+  "Bter_Settings": "BTER Settings",
 
   "ccedk": "CCEDK",
   "poloniex": "Poloniex",
   "bitcoincoid": "Bitcoin Indonesia",
+  "bter": "BTER",
 
   "OK": "OK",
   "Config_Error": "Configuration Error",
@@ -23,11 +25,27 @@
 
   "Popup_Error": "Error",
   "Client_Run_Error": "The was a problem in starting the client.",
+  "No_Exchanges": "No exchanges have been enabled.\nPlease enable at least one in the settings",
+  "No_Currencies": "There are no enabled pairs for %s.\nPlease enable at least on in the settings",
 
   "Client_Stopped": "The client is stopped.",
   "Client_Started": "The client is running.",
 
-  "Pool_Liquidity": "Pool Liquidity",
-  "Buy_Side": "Buy Side",
-  "Sell_Side": "Sell Side"
+  "Pool_Stats": "Pool Stats",
+  "Buy_Side_Liquidity": "Buy Side Liquidity (NBT)",
+  "Sell_Side_Liquidity": "Sell Side Liquidity (NBT)",
+  "Num_Users": "Number of Users",
+  "Sampling": "Sampling",
+
+  "Exchange_Stats": "Exchange Stats",
+  "Rate": "Rate",
+  "Fee": "Fee",
+  "Target": "Target",
+  "Balance": "Balance",
+  "Efficiency": "Efficiency",
+  "Missing": "Missing",
+  "Rejects": "Rejects",
+  "Last_Error": "Last Error",
+
+  "Personal_Stats": "Personal Stats"
 }

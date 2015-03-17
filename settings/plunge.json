@@ -68,6 +68,13 @@
     "key": "bitcoincoid"
   },
   {
+    "type": "bool",
+    "title": "BTER",
+    "desc": "Enable or Disable BTER",
+    "section": "exchanges",
+    "key": "bter"
+  },
+  {
     "type": "title",
     "title": "Language"
   },
@@ -75,7 +82,7 @@
     "type": "options",
     "title": "Choose Language",
     "desc": "Set the language file to use\n(Doesn't affect this settings menu)",
-    "options": ["english"],
+    "options": ["English"],
     "section": "standard",
     "key": "language"
   }
