@@ -36,7 +36,13 @@
 	        on_release: app.open_settings()
 
 	    ActionButton:
-	        id: top_action_button
+	        id: top_settings_button
 	        background_down: 'atlas://data/images/defaulttheme/action_item'
 	        text: app.get_string("Settings")
 	        on_release: app.open_settings()
+
+	    ActionButton:
+	        id: top_size_button
+	        background_down: 'atlas://data/images/defaulttheme/action_item'
+	        text: app.get_string("Minimise")
+	        on_release: app.resize_window()

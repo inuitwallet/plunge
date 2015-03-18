@@ -1,8 +1,3 @@
-from kivy.clock import Clock
-import logging
-import time
-import utils
-
 __author__ = 'woolly_sammoth'
 
 from kivy.config import Config
@@ -23,11 +18,99 @@ from kivy.uix.actionbar import ActionBar
 from kivy.uix.screenmanager import SlideTransition
 from kivy.uix.popup import Popup
 from kivy.lang import Builder
+from kivy.clock import Clock
+from kivy.core.window import Window
+from kivy.metrics import dp
+from kivy.uix.settings import SettingString, SettingSpacer, SettingNumeric, SettingItem, SettingsPanel
+from kivy.uix.textinput import TextInput
+from kivy.uix.widget import Widget
+from kivy.compat import string_types
 
+import logging
+import time
+import utils
 import os
 import json
 
 import screens.HomeScreen as HomeScreen
+
+
+class SettingStringFocus(SettingString):
+
+    def _create_popup(self, instance):
+        # create popup layout
+        content = BoxLayout(orientation='vertical', spacing='5dp')
+        popup_width = min(0.95 * Window.width, dp(500))
+        self.popup = popup = Popup(
+            title=self.title, content=content, size_hint=(None, None),
+            size=(popup_width, '250dp'))
+
+        # create the textinput used for numeric input
+        self.textinput = textinput = TextInput(
+            text=self.value, font_size='24sp', multiline=False,
+            size_hint_y=None, height='42sp')
+        textinput.bind(on_text_validate=self._validate)
+        self.textinput = textinput
+
+        # construct the content, widget are used as a spacer
+        content.add_widget(Widget())
+        content.add_widget(textinput)
+        content.add_widget(Widget())
+        content.add_widget(SettingSpacer())
+
+        # 2 buttons are created for acept or cancel the current value
+        btnlayout = BoxLayout(size_hint_y=None, height='50dp', spacing='5dp')
+        btn = Button(text='Ok')
+        btn.bind(on_release=self._validate)
+        btnlayout.add_widget(btn)
+        btn = Button(text='Cancel')
+        btn.bind(on_release=self._dismiss)
+        btnlayout.add_widget(btn)
+        content.add_widget(btnlayout)
+
+        # all done, open the popup !
+        popup.open()
+        textinput.focus = True
+        textinput.cursor = (1, 3000)
+
+
+class SettingNumericFocus(SettingNumeric):
+
+    def _create_popup(self, instance):
+        # create popup layout
+        content = BoxLayout(orientation='vertical', spacing='5dp')
+        popup_width = min(0.95 * Window.width, dp(500))
+        self.popup = popup = Popup(
+            title=self.title, content=content, size_hint=(None, None),
+            size=(popup_width, '250dp'))
+
+        # create the textinput used for numeric input
+        self.textinput = textinput = TextInput(
+            text=self.value, font_size='24sp', multiline=False,
+            size_hint_y=None, height='42sp')
+        textinput.bind(on_text_validate=self._validate)
+        self.textinput = textinput
+
+        # construct the content, widget are used as a spacer
+        content.add_widget(Widget())
+        content.add_widget(textinput)
+        content.add_widget(Widget())
+        content.add_widget(SettingSpacer())
+
+        # 2 buttons are created for acept or cancel the current value
+        btnlayout = BoxLayout(size_hint_y=None, height='50dp', spacing='5dp')
+        btn = Button(text='Ok')
+        btn.bind(on_release=self._validate)
+        btnlayout.add_widget(btn)
+        btn = Button(text='Cancel')
+        btn.bind(on_release=self._dismiss)
+        btnlayout.add_widget(btn)
+        content.add_widget(btnlayout)
+
+        # all done, open the popup !
+        popup.open()
+        textinput.focus = True
+        textinput.cursor = (1, 3000)
 
 
 class TopActionBar(ActionBar):
@@ -48,6 +131,8 @@ class PlungeApp(App):
         self.currencies = ['btc', 'ltc', 'eur', 'usd', 'ppc']
         self.active_currencies = []
 
+        if not os.path.isdir('logs'):
+            os.makedirs('logs')
         self.logger = logging.getLogger('Plunge')
         self.logger.setLevel(logging.DEBUG)
         fh = logging.FileHandler('logs/%s_%d.log' % ('Plunge', time.time()))
@@ -115,6 +200,8 @@ class PlungeApp(App):
         config.setdefaults('standard', {'language': 'English'})
 
     def build_settings(self, settings):
+        settings.register_type('string', SettingStringFocus)
+        settings.register_type('numeric', SettingNumericFocus)
         settings.add_json_panel(self.get_string('Plunge_Configuration'), self.config, 'settings/plunge.json')
         if self.config.getint('exchanges', 'ccedk') == 1:
             settings.add_json_panel(self.get_string('CCEDK_Settings'), self.config, 'settings/ccedk.json')
@@ -154,6 +241,10 @@ class PlungeApp(App):
         self.popup.dismiss()
         self.isPopup = False
         return
+
+    def resize_window(self):
+        Config.set('graphics', 'width', '100')
+        Config.set('graphics', 'height', '100')
 
 
 if __name__ == '__main__':
