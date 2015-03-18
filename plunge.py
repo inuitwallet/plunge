@@ -114,8 +114,20 @@ class SettingNumericFocus(SettingNumeric):
 
 
 class TopActionBar(ActionBar):
-    def __init__(self, **kwargs):
+    def __init__(self, PlungeApp, **kwargs):
         super(TopActionBar, self).__init__(**kwargs)
+        self.PlungeApp = PlungeApp
+        self.top_size_button = self.ids.top_size_button.__self__
+        return
+
+    def minimise(self):
+        min = self.top_size_button.text
+        if min == self.PlungeApp.get_string("Minimise"):
+            Window.size = (200, 300)
+            self.top_size_button.text = self.PlungeApp.get_string("Maximise")
+        else:
+            Window.size = (1000, 1000)
+            self.top_size_button.text = self.PlungeApp.get_string("Minimise")
         return
 
 
@@ -144,8 +156,7 @@ class PlungeApp(App):
         ch.setFormatter(formatter)
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
-        socketlogger.start_logging_receiver('Plunge')
-
+        self.logger_socket = socketlogger.start_logging_receiver('Plunge')
         return
 
     def build(self):
@@ -171,7 +182,7 @@ class PlungeApp(App):
         self.homeScreen = HomeScreen.HomeScreen(self)
         self.mainScreenManager.add_widget(self.homeScreen)
 
-        self.topActionBar = TopActionBar()
+        self.topActionBar = TopActionBar(self)
         self.root.add_widget(self.topActionBar)
         self.root.add_widget(self.mainScreenManager)
         return self.root
@@ -226,6 +237,7 @@ class PlungeApp(App):
         self.active_exchanges = self.utils.get_active_exchanges()
         self.homeScreen.exchange_spinner.values = [self.get_string(exchange) for exchange in self.active_exchanges]
         self.homeScreen.set_exchange_spinners()
+        self.homeScreen.get_stats(0)
 
     def show_popup(self, title, text):
         content = BoxLayout(orientation='vertical')
@@ -242,10 +254,6 @@ class PlungeApp(App):
         self.popup.dismiss()
         self.isPopup = False
         return
-
-    def resize_window(self):
-        Config.set('graphics', 'width', '100')
-        Config.set('graphics', 'height', '100')
 
 
 if __name__ == '__main__':

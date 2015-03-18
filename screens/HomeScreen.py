@@ -52,10 +52,14 @@ class HomeScreen(Screen):
 
         self.PlungeApp.logger.info("Setting refresh Period to %s" % self.PlungeApp.config.get('server', 'period'))
         Clock.schedule_interval(self.get_stats, self.PlungeApp.config.getint('server', 'period'))
-        Clock.schedule_once(self.get_stats, 5)
+        self.get_stats(0)
         return
 
     def set_exchange_spinners(self):
+        set_spinners = Thread(target=self._set_exchange_spinners)
+        set_spinners.start()
+
+    def _set_exchange_spinners(self):
         # see if any exchanges are enabled so that we can display the stats
         self.primary_exchange = ''
         self.primary_currency = ''
@@ -80,31 +84,20 @@ class HomeScreen(Screen):
             self.currency_spinner.values = [currency.upper() for currency in self.PlungeApp.active_currencies]
             self.primary_currency = self.PlungeApp.active_currencies[0]
             self.currency_spinner.text = self.primary_currency.upper()
-        if self.stats:
-            if self.primary_exchange in self.stats:
-                if self.primary_currency in self.stats[self.primary_exchange]:
-                    self.update_exchange_stats()
-        if self.user:
-            if self.primary_exchange in self.user:
-                if self.primary_currency in self.user[self.primary_exchange]:
-                    self.update_personal_stats()
+        self.get_stats(0)
 
     def set_primary_currency(self):
         self.primary_currency = self.currency_spinner.text.lower()
         self.PlungeApp.logger.info("Set Primary Currency to %s" % self.primary_currency)
-        if self.stats:
-            if self.primary_exchange in self.stats:
-                if self.primary_currency in self.stats[self.primary_exchange]:
-                    self.update_exchange_stats()
-        if self.user:
-            if self.primary_exchange in self.user:
-                if self.primary_currency in self.user[self.primary_exchange]:
-                    self.update_personal_stats()
+        self.get_stats(0)
 
     def get_stats(self, dt):
-        self.get_pool_stats()
-        self.get_exchange_stats()
-        self.get_personal_stats()
+        pool = Thread(target=self.get_pool_stats)
+        pool.start()
+        exchange = Thread(target=self.get_exchange_stats)
+        exchange.start()
+        personal = Thread(target=self.get_personal_stats)
+        personal.start()
 
     def get_pool_stats(self):
         # get the pool status
@@ -218,21 +211,27 @@ class HomeScreen(Screen):
         self.PlungeApp.logger.info("Calculating Buy Side Liquidity")
         for exchange in self.PlungeApp.active_exchanges:
             for currency in self.PlungeApp.active_currencies:
-                if exchange in self.user and currency in self.user:
-                    for order in self.user[exchange][currency]['bid_orders']:
-                        buy_side += order[1]
+                if exchange in self.user:
+                    if currency in self.user[exchange]:
+                        for order in self.user[exchange][currency]['bid_orders']:
+                            buy_side += order[1]
+                    else:
+                        self.PlungeApp.logger.error("%s not found in personal stats" % currency)
                 else:
-                    self.PlungeApp.logger.error("%s and %s not found in personal stats" % (exchange, currency))
+                    self.PlungeApp.logger.error("%s not found in personal stats" % exchange)
         # sell side liquidity
         sell_side = 0
         self.PlungeApp.logger.info("Calculating Sell Side Liquidity")
         for exchange in self.PlungeApp.active_exchanges:
             for currency in self.PlungeApp.active_currencies:
-                if exchange in self.user and currency in self.user:
-                    for order in self.user[exchange][currency]['ask_orders']:
-                        sell_side += order[1]
+                if exchange in self.user:
+                    if currency in self.user[exchange]:
+                        for order in self.user[exchange][currency]['ask_orders']:
+                            sell_side += order[1]
+                    else:
+                        self.PlungeApp.logger.error("%s not found in personal stats" % currency)
                 else:
-                    self.PlungeApp.logger.error("%s and %s not found in personal stats" % (exchange, currency))
+                    self.PlungeApp.logger.error("%s not found in personal stats" % exchange)
         # efficiency
         efficiency = 0
         self.PlungeApp.logger.info("Calculating Efficiency")
@@ -252,9 +251,9 @@ class HomeScreen(Screen):
                     if currency in prices:
                         balance += (Decimal(self.user[exchange]['balance']) * Decimal(prices[currency]))
                     else:
-                        self.PlungeApp.logger.error("%s not found in prices (%s)" % (currency, str(prices)))
+                        self.PlungeApp.logger.error("%s not found in prices" % currency)
                 else:
-                    self.PlungeApp.logger.error("%s not found in personal stats (%s)" % (exchange, str(self.user)))
+                    self.PlungeApp.logger.error("%s not found in personal stats" % exchange)
 
         self.personal_buy_side.text = str(round(buy_side, 4))
         self.personal_sell_side.text = str(round(sell_side, 4))
