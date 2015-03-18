@@ -21,16 +21,16 @@ from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.metrics import dp
-from kivy.uix.settings import SettingString, SettingSpacer, SettingNumeric, SettingItem, SettingsPanel
+from kivy.uix.settings import SettingString, SettingSpacer, SettingNumeric
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
-from kivy.compat import string_types
 
 import logging
 import time
 import utils
 import os
 import json
+import socketlogger
 
 import screens.HomeScreen as HomeScreen
 
@@ -144,6 +144,7 @@ class PlungeApp(App):
         ch.setFormatter(formatter)
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
+        socketlogger.start_logging_receiver('Plunge')
 
         return
 
