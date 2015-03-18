@@ -2,6 +2,7 @@ from kivy.clock import Clock
 import logging
 import time
 import utils
+import socketlogger
 
 __author__ = 'woolly_sammoth'
 
@@ -47,7 +48,6 @@ class PlungeApp(App):
         self.active_exchanges = []
         self.currencies = ['btc', 'ltc', 'eur', 'usd', 'ppc']
         self.active_currencies = []
-
         self.logger = logging.getLogger('Plunge')
         self.logger.setLevel(logging.DEBUG)
         fh = logging.FileHandler('logs/%s_%d.log' % ('Plunge', time.time()))
@@ -59,6 +59,7 @@ class PlungeApp(App):
         ch.setFormatter(formatter)
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
+        socketlogger.start_logging_receiver('Plunge')
 
         return
 
