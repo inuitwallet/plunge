@@ -11,14 +11,11 @@ class utils:
         self.PlungeApp = PlungeApp
         self. b58_digits = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 
-
     class Base58Error(Exception):
         pass
 
-
     class InvalidBase58Error(Base58Error):
         pass
-
 
     def check_checksum(self, key):
         try:
@@ -31,7 +28,6 @@ class utils:
             return True
         else:
             return False
-
 
     def decode(self, s):
         if not s:
@@ -56,8 +52,8 @@ class utils:
             else: break
         return b'\x00' * pad + res
 
-
     def get(self, url):
+        self.PlungeApp.logger.info("Request sent to %s" % url)
         try:
             r = requests.get(url, timeout=10)
             if r.status_code != requests.codes.OK:
@@ -68,8 +64,8 @@ class utils:
         except requests.exceptions.ConnectionError:
             return {'error': True, 'code': 500, 'message': 'connection refused'}
 
-
     def post(self, url, data={}):
+        self.PlungeApp.logger.info("Request sent to %s with data %s" % (url, str(data)))
         try:
             headers = {"Content-type": "application/x-www-form-urlencoded"}
             r = requests.post(url, data=data, headers=headers, timeout=10)
@@ -94,7 +90,7 @@ class utils:
         for currency in self.PlungeApp.currencies:
             if self.PlungeApp.config.getdefaultint(exchange, currency, 0) == 1:
                 currencies.append(currency)
-        self.PlungeApp.logger.info("Got active currencies - %s" % str(currency))
+        self.PlungeApp.logger.info("Got active currencies - %s" % str(currencies))
         return currencies
 
     def get_currency_prices(self):

@@ -19,6 +19,8 @@ class HomeScreen(Screen):
         super(HomeScreen, self).__init__(**kwargs)
         self.PlungeApp = PlungeApp
         self.PlungeApp.logger.info("Building Home Page")
+        self.max_layout = self.ids.max_layout.__self__
+        self.min_layout = self.ids.min_layout.__self__
         self.start_button = self.ids.start_button.__self__
         self.log_output = self.ids.log_output.__self__
         self.running_label = self.ids.running_label.__self__
@@ -40,6 +42,8 @@ class HomeScreen(Screen):
         self.personal_sell_side = self.ids.personal_sell_side.__self__
         self.personal_efficiency = self.ids.personal_efficiency.__self__
         self.personal_balance = self.ids.personal_balance.__self__
+        self.min_efficiency = self.ids.min_efficiency.__self__
+        self.min_balance = self.ids.min_balance.__self__
 
         self.pool_buy_liquidity = None
         self.pool_sell_liquidity = None
@@ -258,7 +262,9 @@ class HomeScreen(Screen):
         self.personal_buy_side.text = str(round(buy_side, 4))
         self.personal_sell_side.text = str(round(sell_side, 4))
         self.personal_efficiency.text = "%s%%" % str(efficiency * 100)
+        self.min_efficiency.text = "%s%%" % str(efficiency * 100)
         self.personal_balance.text = str(round(balance, 4))
+        self.min_balance.text = str(round(balance, 4))
 
     def toggle_client(self):
         text = self.start_button.text

@@ -76,7 +76,7 @@
   },
   {
     "type": "title",
-    "title": "Language"
+    "title": "Settings"
   },
   {
     "type": "options",
@@ -85,5 +85,12 @@
     "options": ["English"],
     "section": "standard",
     "key": "language"
+  },
+  {
+    "type": "bool",
+    "title": "Start Minimised",
+    "desc": "Choose whether to start Plunge in the minimised view",
+    "section": "standard",
+    "key": "start_min"
   }
 ]

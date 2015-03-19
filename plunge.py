@@ -120,14 +120,18 @@ class TopActionBar(ActionBar):
         self.top_size_button = self.ids.top_size_button.__self__
         return
 
-    def minimise(self):
-        min = self.top_size_button.text
+    def minimise(self, override=None):
+        min = self.top_size_button.text if override is None else override
         if min == self.PlungeApp.get_string("Minimise"):
-            Window.size = (200, 300)
+            Window.size = (400, 200)
             self.top_size_button.text = self.PlungeApp.get_string("Maximise")
+            self.PlungeApp.homeScreen.clear_widgets()
+            self.PlungeApp.homeScreen.add_widget(self.PlungeApp.homeScreen.min_layout)
         else:
             Window.size = (1000, 1000)
             self.top_size_button.text = self.PlungeApp.get_string("Minimise")
+            self.PlungeApp.homeScreen.clear_widgets()
+            self.PlungeApp.homeScreen.add_widget(self.PlungeApp.homeScreen.max_layout)
         return
 
 
@@ -185,7 +189,13 @@ class PlungeApp(App):
         self.topActionBar = TopActionBar(self)
         self.root.add_widget(self.topActionBar)
         self.root.add_widget(self.mainScreenManager)
+        self.homeScreen.clear_widgets()
+        if self.config.getint('standard', 'start_min') == 1:
+            self.topActionBar.minimise(self.get_string("Minimise"))
+        else:
+            self.topActionBar.minimise(self.get_string("Maximise"))
         return self.root
+
 
     def get_string(self, text):
         try:
@@ -209,7 +219,7 @@ class PlungeApp(App):
                            {'address': '', 'public': '', 'secret': '', 'nubot': 0, "btc": 0})
         config.setdefaults('bter',
                            {'address': '', 'public': '', 'secret': '', 'nubot': 0, "btc": 0})
-        config.setdefaults('standard', {'language': 'English'})
+        config.setdefaults('standard', {'language': 'English', 'start_min': 0})
 
     def build_settings(self, settings):
         settings.register_type('string', SettingStringFocus)

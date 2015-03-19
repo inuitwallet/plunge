@@ -9,8 +9,47 @@
 
 	name: app.get_string('Home_Screen')
 
+    BoxLayout:
+        id: min_layout
+
+        BoxLayout:
+            orientation: 'vertical'
+
+            Label:
+                text: app.get_string("Efficiency")
+                size_hint: (1, 0.3)
+                canvas.before:
+                    Color:
+                        rgb: 0.18725, 0.17157, 0.17549
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+            Label:
+                id: min_efficiency
+                size_hint: (1, 0.7)
+                font_size: 20
+
+        BoxLayout:
+            orientation: 'vertical'
+
+            Label:
+                text: app.get_string("Balance")
+                size_hint: (1, 0.3)
+                canvas.before:
+                    Color:
+                        rgb: 0.18725, 0.17157, 0.17549
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+            Label:
+                id: min_balance
+                size_hint: (1, 0.7)
+                font_size: 20
+
 	BoxLayout:
-		id: main_layout
+		id: max_layout
 		orientation: 'vertical'
 
 		BoxLayout:

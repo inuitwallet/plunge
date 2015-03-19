@@ -30,7 +30,7 @@
   "No_Exchanges": "No exchanges have been enabled.\nPlease enable at least one in the settings",
   "No_Currencies": "There are no enabled pairs for %s.\nPlease enable at least on in the settings",
 
-  "Client_Stopped": "The client is stopped.",
+  "Client_Stopped": "No client is running.",
   "Client_Started": "The client is running.",
 
   "Pool_Stats": "Pool Stats",
