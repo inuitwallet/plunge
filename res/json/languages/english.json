@@ -32,6 +32,8 @@
 
   "Client_Stopped": "No client is running.",
   "Client_Started": "The client is running.",
+  "Running": "Running",
+  "Stopped": "Stopped",
 
   "Pool_Stats": "Pool Stats",
   "Buy_Side_Liquidity": "Buy Side Liquidity (NBT)",

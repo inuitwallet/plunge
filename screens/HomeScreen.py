@@ -134,7 +134,7 @@ class HomeScreen(Screen):
             self.stats = {}
             for exchange in self.PlungeApp.active_exchanges:
                 self.stats[exchange] = {}
-                for currency in self.PlungeApp.currencies:
+                for currency in self.PlungeApp.active_currencies:
                     if currency in exchanges[exchange]:
                         self.stats[exchange][currency] = {}
                         self.stats[exchange][currency]['rate'] = str(round(exchanges[exchange][currency]['rate'], 4))
@@ -164,10 +164,10 @@ class HomeScreen(Screen):
                 self.PlungeApp.logger.info("Server returned %s" % user)
                 self.user[exchange] = {}
                 self.user[exchange]['efficiency'] = user['efficiency']
-                self.user[exchange]['balance'] = "%.8f" % user['balance']
+                self.user[exchange]['balance'] = "%.4f" % user['balance']
                 self.user[exchange]['missing'] = str(user['missing'])
                 self.user[exchange]['rejects'] = str(user['rejects'])
-                for currency in self.PlungeApp.currencies:
+                for currency in self.PlungeApp.active_currencies:
                     if currency in user['units']:
                         self.user[exchange][currency] = {}
                         self.user[exchange][currency]['ask_orders'] = user['units'][currency]['ask']
@@ -247,24 +247,19 @@ class HomeScreen(Screen):
         efficiency = efficiency / len(self.PlungeApp.active_exchanges)
         # balance
         self.PlungeApp.logger.info("Calculating Balance")
-        balance = Decimal(buy_side + sell_side)
-        prices = self.PlungeApp.utils.get_currency_prices()
+        balance = 0
         for exchange in self.PlungeApp.active_exchanges:
-            for currency in self.PlungeApp.currencies:
-                if exchange in self.user:
-                    if currency in prices:
-                        balance += (Decimal(self.user[exchange]['balance']) * Decimal(prices[currency]))
-                    else:
-                        self.PlungeApp.logger.error("%s not found in prices" % currency)
-                else:
-                    self.PlungeApp.logger.error("%s not found in personal stats" % exchange)
+            if exchange in self.user:
+                balance += Decimal(self.user[exchange]['balance'])
+            else:
+                self.PlungeApp.logger.error("%s not found in personal stats" % exchange)
 
         self.personal_buy_side.text = str(round(buy_side, 4))
         self.personal_sell_side.text = str(round(sell_side, 4))
         self.personal_efficiency.text = "%s%%" % str(efficiency * 100)
         self.min_efficiency.text = "%s%%" % str(efficiency * 100)
-        self.personal_balance.text = str(round(balance, 4))
-        self.min_balance.text = str(round(balance, 4))
+        self.personal_balance.text = "%.4f" % balance
+        self.min_balance.text = "%.4f" % balance
 
     def toggle_client(self):
         text = self.start_button.text
@@ -357,6 +352,7 @@ class HomeScreen(Screen):
                                       "%s\n\n%s" % (self.PlungeApp.get_string('Client_Run_Error'), e.strerror))
             return
         Clock.schedule_interval(self.read_output, 0.2)
+        self.PlungeApp.client_running = True
         self.running_label.color = (0, 1, 0.28235, 1)
         self.running_label.text = self.PlungeApp.get_string("Client_Started")
         self.start_button.text = self.PlungeApp.get_string('Stop')
@@ -372,6 +368,7 @@ class HomeScreen(Screen):
     def stop_client(self):
         self.output.send_signal(signal.SIGTERM)
         self.log_output.text += 'Stopped!\n'
+        self.PlungeApp.client_running = False
         self.running_label.color = (0.93725, 0.21176, 0.07843, 1)
         self.running_label.text = self.PlungeApp.get_string("Client_Stopped")
         self.start_button.text = self.PlungeApp.get_string('Start')

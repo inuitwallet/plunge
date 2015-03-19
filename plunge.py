@@ -1,3 +1,6 @@
+import sys
+import traceback
+
 __author__ = 'woolly_sammoth'
 
 from kivy.config import Config
@@ -117,19 +120,47 @@ class TopActionBar(ActionBar):
     def __init__(self, PlungeApp, **kwargs):
         super(TopActionBar, self).__init__(**kwargs)
         self.PlungeApp = PlungeApp
+        self.top_action_view = self.ids.top_action_view.__self__
+        self.top_action_previous = self.ids.top_action_previous.__self__
+        self.top_settings_button = self.ids.top_settings_button.__self__
         self.top_size_button = self.ids.top_size_button.__self__
+        self.standard_height = self.height
+        self.top_action_previous.bind(on_release=self.PlungeApp.open_settings)
+        self.top_settings_button.bind(on_release=self.PlungeApp.open_settings)
         return
 
     def minimise(self, override=None):
         min = self.top_size_button.text if override is None else override
         if min == self.PlungeApp.get_string("Minimise"):
-            Window.size = (400, 200)
+            Window.size = (350, 100)
+            height = self.height
+            self.height = 0.5 * height if height == self.standard_height else height
             self.top_size_button.text = self.PlungeApp.get_string("Maximise")
+            if self.PlungeApp.client_running is True:
+                self.top_action_previous.title = self.PlungeApp.get_string("Running")
+                self.top_action_previous.color = (0, 1, 0.28235, 1)
+            else:
+                self.top_action_previous.title = self.PlungeApp.get_string("Stopped")
+                self.top_action_previous.color = (0.93725, 0.21176, 0.07843, 1)
+            self.top_action_previous.bind(on_release=self.minimise)
+            self.top_action_previous.unbind(on_release=self.PlungeApp.open_settings)
+            self.top_settings_button.text = ''
+            self.top_settings_button.bind(on_release=self.minimise)
+            self.top_settings_button.unbind(on_release=self.PlungeApp.open_settings)
             self.PlungeApp.homeScreen.clear_widgets()
             self.PlungeApp.homeScreen.add_widget(self.PlungeApp.homeScreen.min_layout)
         else:
             Window.size = (1000, 1000)
+            height = self.height
+            self.height = 2 * height if height != self.standard_height else height
             self.top_size_button.text = self.PlungeApp.get_string("Minimise")
+            self.top_action_previous.title = self.PlungeApp.get_string('Main_Title')
+            self.top_action_previous.color = (1, 1, 1, 1)
+            self.top_action_previous.bind(on_release=self.PlungeApp.open_settings)
+            self.top_action_previous.unbind(on_release=self.minimise)
+            self.top_settings_button.text = self.PlungeApp.get_string("Settings")
+            self.top_settings_button.bind(on_release=self.PlungeApp.open_settings)
+            self.top_settings_button.unbind(on_release=self.minimise)
             self.PlungeApp.homeScreen.clear_widgets()
             self.PlungeApp.homeScreen.add_widget(self.PlungeApp.homeScreen.max_layout)
         return
@@ -146,6 +177,7 @@ class PlungeApp(App):
         self.active_exchanges = []
         self.currencies = ['btc', 'ltc', 'eur', 'usd', 'ppc']
         self.active_currencies = []
+        self.client_running = False
 
         if not os.path.isdir('logs'):
             os.makedirs('logs')
@@ -161,6 +193,12 @@ class PlungeApp(App):
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
         self.logger_socket = socketlogger.start_logging_receiver('Plunge')
+        sys.excepthook = self.log_uncaught_exceptions
+        return
+
+
+    def log_uncaught_exceptions(self, exctype, value, tb):
+        self.logger.exception('\n===================\nException Caught\n\n%s\n===================\n' % value)
         return
 
     def build(self):
