@@ -6,8 +6,8 @@ __author__ = 'woolly_sammoth'
 from kivy.config import Config
 
 Config.set('graphics', 'borderless', '0')
-Config.set('graphics', 'width', '1000')
-Config.set('graphics', 'height', '1000')
+#Config.set('graphics', 'width', '1000')
+#Config.set('graphics', 'height', '1000')
 Config.set('graphics', 'resizable', '1')
 Config.set('graphics', 'fullscreen', '0')
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
@@ -136,12 +136,14 @@ class TopActionBar(ActionBar):
             height = self.height
             self.height = 0.5 * height if height == self.standard_height else height
             self.top_size_button.text = self.PlungeApp.get_string("Maximise")
-            if self.PlungeApp.client_running is True:
-                self.top_action_previous.title = self.PlungeApp.get_string("Running")
-                self.top_action_previous.color = (0, 1, 0.28235, 1)
-            else:
-                self.top_action_previous.title = self.PlungeApp.get_string("Stopped")
-                self.top_action_previous.color = (0.93725, 0.21176, 0.07843, 1)
+            self.top_action_previous.title = ''
+            if self.PlungeApp.config.getint('server', 'monitor') == 0:
+                if self.PlungeApp.client_running is True:
+                    self.top_action_previous.title = self.PlungeApp.get_string("Running")
+                    self.top_action_previous.color = (0, 1, 0.28235, 1)
+                else:
+                    self.top_action_previous.title = self.PlungeApp.get_string("Stopped")
+                    self.top_action_previous.color = (0.93725, 0.21176, 0.07843, 1)
             self.top_action_previous.bind(on_release=self.minimise)
             self.top_action_previous.unbind(on_release=self.PlungeApp.open_settings)
             self.top_settings_button.text = ''
@@ -149,6 +151,7 @@ class TopActionBar(ActionBar):
             self.top_settings_button.unbind(on_release=self.PlungeApp.open_settings)
             self.PlungeApp.homeScreen.clear_widgets()
             self.PlungeApp.homeScreen.add_widget(self.PlungeApp.homeScreen.min_layout)
+            self.PlungeApp.is_min = True
         else:
             Window.size = (1000, 1000)
             height = self.height
@@ -163,6 +166,7 @@ class TopActionBar(ActionBar):
             self.top_settings_button.unbind(on_release=self.minimise)
             self.PlungeApp.homeScreen.clear_widgets()
             self.PlungeApp.homeScreen.add_widget(self.PlungeApp.homeScreen.max_layout)
+            self.PlungeApp.is_min = False
         return
 
 
@@ -178,6 +182,7 @@ class PlungeApp(App):
         self.currencies = ['btc', 'ltc', 'eur', 'usd', 'ppc']
         self.active_currencies = []
         self.client_running = False
+        self.is_min = False
 
         if not os.path.isdir('logs'):
             os.makedirs('logs')
@@ -193,7 +198,7 @@ class PlungeApp(App):
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
         self.logger_socket = socketlogger.start_logging_receiver('Plunge')
-        sys.excepthook = self.log_uncaught_exceptions
+        #sys.excepthook = self.log_uncaught_exceptions
         return
 
 
@@ -230,10 +235,21 @@ class PlungeApp(App):
         self.homeScreen.clear_widgets()
         if self.config.getint('standard', 'start_min') == 1:
             self.topActionBar.minimise(self.get_string("Minimise"))
+            self.is_min = True
         else:
             self.topActionBar.minimise(self.get_string("Maximise"))
+            self.is_min = False
+            self.set_monitor()
         return self.root
 
+    def set_monitor(self):
+        if self.is_min is False:
+            self.homeScreen.max_layout.remove_widget(self.homeScreen.run_layout)
+            if self.config.getint('server', 'monitor') == 1:
+                Window.size = (1000, 800)
+            else:
+                self.homeScreen.max_layout.add_widget(self.homeScreen.run_layout)
+                Window.size = (1000, 1000)
 
     def get_string(self, text):
         try:
@@ -245,8 +261,9 @@ class PlungeApp(App):
         return return_string
 
     def build_config(self, config):
-        config.setdefaults('server', {'host': "104.245.36.10", 'port': 2019, 'period': 30})
-        config.setdefaults('config', {'file': os.getcwd() + "/users.dat", 'override': 0})
+        config.setdefaults('server', {'host': "104.245.36.10", 'port': 2019, 'period': 30, 'monitor': 0})
+        config.setdefaults('config', {'file': os.getcwd() + "/users.dat", 'override': 0, 'remote': 0,
+                                      'remote_server': '', 'remote_port': ''})
         config.setdefaults('exchanges', {'ccedk': 0, 'poloniex': 0, 'bitcoincoid': 0, 'bter': 0})
         config.setdefaults('ccedk',
                            {'address': '', 'public': '', 'secret': '', 'nubot': 0,
@@ -257,7 +274,7 @@ class PlungeApp(App):
                            {'address': '', 'public': '', 'secret': '', 'nubot': 0, "btc": 0})
         config.setdefaults('bter',
                            {'address': '', 'public': '', 'secret': '', 'nubot': 0, "btc": 0})
-        config.setdefaults('standard', {'language': 'English', 'start_min': 0})
+        config.setdefaults('standard', {'language': 'English', 'start_min': 0, 'data': 0})
 
     def build_settings(self, settings):
         settings.register_type('string', SettingStringFocus)
@@ -278,10 +295,13 @@ class PlungeApp(App):
             self.close_settings()
             self.destroy_settings()
             self.open_settings()
-        if section == "server" and key == "period":
-            Clock.unschedule(self.homeScreen.get_stats)
-            self.logger.info("Setting refresh Period to %s" % self.config.get('server', 'period'))
-            Clock.schedule_interval(self.homeScreen.get_stats, self.config.getint('server', 'period'))
+        if section == "server":
+            if key == "period":
+                Clock.unschedule(self.homeScreen.get_stats)
+                self.logger.info("Setting refresh Period to %s" % self.config.get('server', 'period'))
+                Clock.schedule_interval(self.homeScreen.get_stats, self.config.getint('server', 'period'))
+            if key == "monitor":
+                self.set_monitor()
         self.active_exchanges = self.utils.get_active_exchanges()
         self.homeScreen.exchange_spinner.values = [self.get_string(exchange) for exchange in self.active_exchanges]
         self.homeScreen.set_exchange_spinners()
@@ -289,8 +309,8 @@ class PlungeApp(App):
 
     def show_popup(self, title, text):
         content = BoxLayout(orientation='vertical')
-        content.add_widget(Label(text=text, size_hint=(1, .7)))
-        button = Button(text=self.get_string('OK'), size_hint=(1, .3))
+        content.add_widget(Label(text=text, size_hint=(1, .9)))
+        button = Button(text=self.get_string('OK'), size_hint=(None, None), width=250, height=50)
         content.add_widget(button)
         self.popup = Popup(title=title, content=content, auto_dismiss=False, size_hint=(None, None), size=(500, 200))
         button.bind(on_press=self.close_popup)

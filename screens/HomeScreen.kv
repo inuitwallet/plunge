@@ -52,13 +52,14 @@
 		id: max_layout
 		orientation: 'vertical'
 
-		BoxLayout:
-		    orientation: 'vertical'
-		    size_hint: (1, 0.65)
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: (1, 0.65)
 
             Label:
                 size_hint: (1, 0.2)
-                text: app.get_string("Pool_Stats")
+                markup: True
+                text: "[ref='pool_stats']%s[/ref]" % app.get_string("Pool_Stats")
                 font_size: 20
                 canvas.before:
                     Color:
@@ -66,100 +67,84 @@
                     Rectangle:
                         pos: self.pos
                         size: self.size
+                on_ref_press:
+                    root.show_info(app.get_string("Pool_Info"),
+                    {'Total_Liquidity': (root.pool['buy_liquidity'] + root.pool['sell_liquidity']),
+                    'Num_Users': root.pool['num_users'],
+                    'Sampling' : root.pool['sampling']})
 
             #Top row of Pool Stats
             GridLayout:
-                cols: 4
+                cols: 2
                 size_hint: (1, 0.4)
 
                 BoxLayout:
                     orientation: 'vertical'
 
-		            Label:
-		                text: app.get_string("Buy_Side_Liquidity")
-		                size_hint: (1, 0.3)
-		                canvas.before:
+                    Label:
+                        text: app.get_string("Buy_Side_Liquidity")
+                        size_hint: (1, 0.3)
+                        canvas.before:
                             Color:
                                 rgb: 0.18725, 0.17157, 0.17549
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
 
-		            Label:
-		                id: pool_buy_side
-		                size_hint: (1, 0.7)
-		                font_size: 18
+                    Label:
+                        id: pool_buy_side
+                        size_hint: (1, 0.7)
+                        font_size: 22
+                        markup: True
+                        color: (1, 0.72157, 0, 1)
+                        on_ref_press: root.draw_liquidity_chart(app.get_string('Pool_Liquidity'), root.pool_buy_liquidity, root.pool_sell_liquidity)
 
-		        BoxLayout:
-		            orientation: 'vertical'
-
-		            Label:
-		                text: app.get_string("Sell_Side_Liquidity")
-		                size_hint: (1, 0.3)
-		                canvas.before:
-                            Color:
-                                rgb: 0.18725, 0.17157, 0.17549
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-
-		            Label:
-		                id: pool_sell_side
-		                size_hint: (1, 0.7)
-		                font_size: 18
-
-		        BoxLayout:
+                BoxLayout:
                     orientation: 'vertical'
 
-		            Label:
-		                text: app.get_string("Num_Users")
-		                size_hint: (1, 0.3)
-		                canvas.before:
+                    Label:
+                        text: app.get_string("Sell_Side_Liquidity")
+                        size_hint: (1, 0.3)
+                        canvas.before:
                             Color:
                                 rgb: 0.18725, 0.17157, 0.17549
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
 
-		            Label:
-		                id: pool_num_users
-		                size_hint: (1, 0.7)
-		                font_size: 16
+                    Label:
+                        id: pool_sell_side
+                        size_hint: (1, 0.7)
+                        font_size: 22
+                        markup: True
+                        color: (0, 0.45490, 0.62745, 1)
+                        on_ref_press: root.draw_liquidity_chart(app.get_string('Pool_Liquidity'), root.pool_buy_liquidity, root.pool_sell_liquidity, True)
 
-		        BoxLayout:
-		            orientation: 'vertical'
-
-		            Label:
-		                text: app.get_string("Sampling")
-		                size_hint: (1, 0.3)
-		                canvas.before:
-                            Color:
-                                rgb: 0.18725, 0.17157, 0.17549
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-
-		            Label:
-		                id: pool_sampling
-		                size_hint: (1, 0.7)
-		                font_size: 16
-
-		    BoxLayout:
-		        size_hint: (1, 0.05)
+            BoxLayout:
+                size_hint: (1, 0.05)
 
             Label:
                 size_hint: (1, 0.2)
-                text: app.get_string("Exchange_Stats")
+                text: "[ref='exchange_info']%s[/ref]" % app.get_string("Exchange_Stats")
                 font_size: 20
+                markup: True
                 canvas.before:
                     Color:
                         rgb: 0.23725, 0.22157, 0.22549
                     Rectangle:
                         pos: self.pos
                         size: self.size
+                on_ref_press:
+                    if root.primary_exchange in root.stats: \
+                    root.show_info("%s %s" % (app.get_string(root.primary_exchange), app.get_string("Info")),
+                    {'Fee': root.stats[root.primary_exchange][root.primary_currency]['fee'] if root.primary_currency in root.stats[root.primary_exchange] else app.get_string('No_Data'),
+                    'Rate': root.stats[root.primary_exchange][root.primary_currency]['rate'] if root.primary_currency in root.stats[root.primary_exchange] else app.get_string('No_Data'),
+                    'Target': root.stats[root.primary_exchange][root.primary_currency]['target'] if root.primary_currency in root.stats[root.primary_exchange] else app.get_string('No_Data')})
+                    else: root.show_info("%s %s" % (app.get_string(root.primary_exchange), app.get_string("Info")),
+                    {'Fee': app.get_string('No_Data'), 'Rate': app.get_string('No_Data'), 'Target': app.get_string('No_Data')})
 
             BoxLayout:
-                size_hint: (1, 0.35)
+                size_hint: (1, 0.30)
                 orientation: 'horizontal'
                 padding: 5
 
@@ -180,58 +165,67 @@
                 BoxLayout:
                     orientation: 'vertical'
 
-		            Label:
-		                text: app.get_string("Rate")
-		                size_hint: (1, 0.3)
-		                canvas.before:
+                    Label:
+                        text: app.get_string("Buy_Side_Liquidity")
+                        size_hint: (1, 0.3)
+                        canvas.before:
                             Color:
                                 rgb: 0.18725, 0.17157, 0.17549
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
 
-		            Label:
-		                id: exchange_rate
-		                size_hint: (1, 0.7)
-		                font_size: 16
+                    Label:
+                        id: exchange_buy_side
+                        size_hint: (1, 0.7)
+                        font_size: 18
+                        markup: True
+                        color: (1, 0.72157, 0, 1)
+                        on_ref_press: root.draw_liquidity_chart(app.get_string('Exchange_Liquidity'), root.exchange_buy_liquidity[root.primary_exchange], root.exchange_sell_liquidity[root.primary_exchange])
 
-		        BoxLayout:
+
+                BoxLayout:
                     orientation: 'vertical'
 
-		            Label:
-		                text: app.get_string("Fee")
-		                size_hint: (1, 0.3)
-		                canvas.before:
+                    Label:
+                        text: app.get_string("Sell_Side_Liquidity")
+                        size_hint: (1, 0.3)
+                        canvas.before:
                             Color:
                                 rgb: 0.18725, 0.17157, 0.17549
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
 
-		            Label:
-		                id: exchange_fee
-		                size_hint: (1, 0.7)
-		                font_size: 16
+                    Label:
+                        id: exchange_sell_side
+                        size_hint: (1, 0.7)
+                        font_size: 18
+                        markup: True
+                        color: (0, 0.45490, 0.62745, 1)
+                        on_ref_press: root.draw_liquidity_chart(app.get_string('Exchange_Liquidity'), root.exchange_buy_liquidity[root.primary_exchange], root.exchange_sell_liquidity[root.primary_exchange], True)
 
-		        BoxLayout:
+                BoxLayout:
                     orientation: 'vertical'
 
-		            Label:
-		                text: app.get_string("Target")
-		                size_hint: (1, 0.3)
-		                canvas.before:
+                    Label:
+                        text: app.get_string("Valid_Submissions")
+                        size_hint: (1, 0.3)
+                        canvas.before:
                             Color:
                                 rgb: 0.18725, 0.17157, 0.17549
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
 
-		            Label:
-		                id: exchange_target
-		                size_hint: (1, 0.7)
-		                font_size: 16
+                    Label:
+                        id: exchange_valid
+                        size_hint: (1, 0.7)
+                        font_size: 16
+                        markup: True
+                        on_ref_press: root.draw_chart(app.get_string('Valid_Submissions'), app.get_string('Valid_Submissions'), root.exchange_valid_submissions[root.primary_exchange])
 
-            #Second Row of Exchange stats
+           #Second Row of Exchange stats
             GridLayout:
                 cols: 4
                 size_hint: (1, 0.4)
@@ -240,98 +234,86 @@
                     orientation: 'vertical'
 
                     Label:
-		                text: app.get_string("Balance")
-		                size_hint: (1, 0.3)
-		                canvas.before:
+                        text: app.get_string("Balance")
+                        size_hint: (1, 0.3)
+                        canvas.before:
                             Color:
                                 rgb: 0.18725, 0.17157, 0.17549
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
 
-		            Label:
-		                id: exchange_balance
-		                size_hint: (1, 0.7)
-		                font_size: 18
+                    Label:
+                        id: exchange_balance
+                        size_hint: (1, 0.7)
+                        font_size: 18
+                        markup: True
+                        on_ref_press: root.draw_chart(app.get_string('Balance'), app.get_string('Balance'), root.exchange_balance[root.primary_exchange])
 
-		        BoxLayout:
+                BoxLayout:
                     orientation: 'vertical'
 
-		            Label:
-		                text: app.get_string("Efficiency")
-		                size_hint: (1, 0.3)
-		                canvas.before:
+                    Label:
+                        text: app.get_string("Efficiency")
+                        size_hint: (1, 0.3)
+                        canvas.before:
                             Color:
                                 rgb: 0.18725, 0.17157, 0.17549
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
 
-		            Label:
-		                id: exchange_efficiency
-		                size_hint: (1, 0.7)
-		                font_size: 18
+                    Label:
+                        id: exchange_efficiency
+                        size_hint: (1, 0.7)
+                        font_size: 18
+                        markup: True
+                        on_ref_press: root.draw_chart(app.get_string('Efficiency'), app.get_string('Efficiency'), root.exchange_efficiency[root.primary_exchange])
 
-		        BoxLayout:
+                BoxLayout:
                     orientation: 'vertical'
 
-		            Label:
-		                text: app.get_string("Missing")
-		                size_hint: (1, 0.3)
-		                canvas.before:
+                    Label:
+                        text: app.get_string("Missing")
+                        size_hint: (1, 0.3)
+                        canvas.before:
                             Color:
                                 rgb: 0.18725, 0.17157, 0.17549
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
 
-		            Label:
-		                id: exchange_missing
-		                size_hint: (1, 0.7)
-		                font_size: 16
+                    Label:
+                        id: exchange_missing
+                        size_hint: (1, 0.7)
+                        font_size: 16
+                        markup: True
+                        on_ref_press: root.draw_chart(app.get_string('Missing'), app.get_string('Missing'), root.exchange_missing[root.primary_exchange])
 
-		        BoxLayout:
+                BoxLayout:
                     orientation: 'vertical'
 
-		            Label:
-		                text: app.get_string("Rejects")
-		                size_hint: (1, 0.3)
-		                canvas.before:
+                    Label:
+                        text: app.get_string("Rejects")
+                        size_hint: (1, 0.3)
+                        canvas.before:
                             Color:
                                 rgb: 0.18725, 0.17157, 0.17549
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
 
-		            Label:
-		                id: exchange_rejects
-		                size_hint: (1, 0.7)
-		                font_size: 16
+                    Label:
+                        id: exchange_rejects
+                        size_hint: (1, 0.7)
+                        font_size: 16
+                        markup: True
+                        on_ref_press: root.draw_chart(app.get_string('Rejects'), app.get_string('Rejects'), root.exchange_rejects[root.primary_exchange])
 
             BoxLayout:
-                orientation: 'vertical'
-                size_hint: (1, 0.4)
+                size_hint: (1, 0.05)
 
-                Label:
-                    text: app.get_string("Last_Error")
-                    size_hint: (1, 0.3)
-                    canvas.before:
-                        Color:
-                            rgb: 0.18725, 0.17157, 0.17549
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-
-                Label:
-                    id: exchange_last_error
-                    size_hint: (1, 0.7)
-                    font_size: 15
-                    color: (0.93725, 0.21176, 0.07843, 1)
-
-            BoxLayout:
-		        size_hint: (1, 0.05)
-
-		    Label:
+            Label:
                 size_hint: (1, 0.2)
                 text: app.get_string("Personal_Stats")
                 font_size: 20
@@ -349,84 +331,95 @@
                 BoxLayout:
                     orientation: 'vertical'
 
-		            Label:
-		                text: app.get_string("Buy_Side_Liquidity")
-		                size_hint: (1, 0.3)
-		                canvas.before:
+                    Label:
+                        text: app.get_string("Buy_Side_Liquidity")
+                        size_hint: (1, 0.3)
+                        canvas.before:
                             Color:
                                 rgb: 0.18725, 0.17157, 0.17549
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
 
-		            Label:
-		                id: personal_buy_side
-		                size_hint: (1, 0.7)
-		                font_size: 18
+                    Label:
+                        id: personal_buy_side
+                        size_hint: (1, 0.7)
+                        font_size: 18
+                        color: (1, 0.72157, 0, 1)
+                        markup: True
+                        on_ref_press: root.draw_liquidity_chart(app.get_string('Total_Liquidity'), root.total_buy_liquidity, root.total_sell_liquidity)
 
-		        BoxLayout:
+                BoxLayout:
                     orientation: 'vertical'
 
-		            Label:
-		                text: app.get_string("Sell_Side_Liquidity")
-		                size_hint: (1, 0.3)
-		                canvas.before:
+                    Label:
+                        text: app.get_string("Sell_Side_Liquidity")
+                        size_hint: (1, 0.3)
+                        canvas.before:
                             Color:
                                 rgb: 0.18725, 0.17157, 0.17549
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
 
-		            Label:
-		                id: personal_sell_side
-		                size_hint: (1, 0.7)
-		                font_size: 18
+                    Label:
+                        id: personal_sell_side
+                        size_hint: (1, 0.7)
+                        font_size: 18
+                        color: (0, 0.45490, 0.62745, 1)
+                        markup: True
+                        on_ref_press: root.draw_liquidity_chart(app.get_string('Total_Liquidity'), root.total_buy_liquidity, root.total_sell_liquidity, True)
 
-		        BoxLayout:
+                BoxLayout:
                     orientation: 'vertical'
 
-		            Label:
-		                text: app.get_string("Efficiency")
-		                size_hint: (1, 0.3)
-		                canvas.before:
+                    Label:
+                        text: app.get_string("Efficiency")
+                        size_hint: (1, 0.3)
+                        canvas.before:
                             Color:
                                 rgb: 0.18725, 0.17157, 0.17549
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
 
-		            Label:
-		                id: personal_efficiency
-		                size_hint: (1, 0.7)
-		                font_size: 18
+                    Label:
+                        id: personal_efficiency
+                        size_hint: (1, 0.7)
+                        font_size: 18
+                        markup: True
+                        on_ref_press: root.draw_chart(app.get_string('Efficiency'), app.get_string('Efficiency'), root.total_efficiency_list)
 
-		        BoxLayout:
+                BoxLayout:
                     orientation: 'vertical'
 
-		            Label:
-		                text: app.get_string("Balance")
-		                size_hint: (1, 0.3)
-		                canvas.before:
+                    Label:
+                        text: app.get_string("Balance")
+                        size_hint: (1, 0.3)
+                        canvas.before:
                             Color:
                                 rgb: 0.18725, 0.17157, 0.17549
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
 
-		            Label:
-		                id: personal_balance
-		                size_hint: (1, 0.7)
-		                font_size: 18
+                    Label:
+                        id: personal_balance
+                        size_hint: (1, 0.7)
+                        font_size: 18
+                        markup: True
+                        on_ref_press: root.draw_chart(app.get_string('Balance'), app.get_string('Balance'), root.total_balance_list)
 
-		#Run Section
-		BoxLayout:
-		    size_hint: (1, 0.35)
-		    orientation: 'vertical'
+        #Run Section
+        BoxLayout:
+            id: run_layout
+            size_hint: (1, 0.35)
+            orientation: 'vertical'
 
-		    BoxLayout:
-		        orientation: 'horizontal'
-		        size_hint: (1, 0.2)
-		        padding: 10
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint: (1, 0.2)
+                padding: 10
 
                 Button:
                     id: start_button
@@ -452,8 +445,3 @@
                 foreground_color: [1, 1, 1, 1]
                 readonly: True
                 font_size: 11
-
-
-
-
-

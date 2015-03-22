@@ -25,6 +25,13 @@
     "key": "period"
   },
   {
+    "type": "bool",
+    "title": "Monitor",
+    "desc": "Use Plunge to monitor your pool account instead of running the client.",
+    "section": "server",
+    "key": "monitor"
+  },
+  {
     "type": "title",
     "title": "Configuration"
   },
@@ -92,5 +99,12 @@
     "desc": "Choose whether to start Plunge in the minimised view",
     "section": "standard",
     "key": "start_min"
+  },
+  {
+    "type": "numeric",
+    "title": "Data to keep",
+    "desc": "How many data points to keep for display on the charts (0 keeps all data)",
+    "section": "standard",
+    "key": "data"
   }
 ]

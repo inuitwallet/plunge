@@ -19,6 +19,9 @@
   "bter": "BTER",
 
   "OK": "OK",
+  "Close": "Close",
+  "Info": "Information",
+  "No_Data": "No Data",
   "Config_Error": "Configuration Error",
   "No_Address": "There is no payment address set for %s",
   "Invalid_Address": "The payment address supplied for %s is not valid",
@@ -36,20 +39,26 @@
   "Stopped": "Stopped",
 
   "Pool_Stats": "Pool Stats",
-  "Buy_Side_Liquidity": "Buy Side Liquidity (NBT)",
-  "Sell_Side_Liquidity": "Sell Side Liquidity (NBT)",
-  "Num_Users": "Number of Users",
+  "Pool_Liquidity": "Pool Liquidity",
+  "Buy_Side_Liquidity": "Buy Side Liquidity",
+  "Sell_Side_Liquidity": "Sell Side Liquidity",
+  "Total_Liquidity": "Total Liquidity",
+  "Num_Users": "Users",
   "Sampling": "Sampling",
+  "Pool_Info": "Pool Information",
 
   "Exchange_Stats": "Exchange Stats",
+  "Exchange_Liquidity": "Exchange Liquidity",
   "Rate": "Rate",
   "Fee": "Fee",
   "Target": "Target",
+  "Valid_Submissions": "Valid Submissions",
   "Balance": "Balance",
   "Efficiency": "Efficiency",
   "Missing": "Missing",
   "Rejects": "Rejects",
   "Last_Error": "Last Error",
 
-  "Personal_Stats": "Personal Stats"
+  "Personal_Stats": "Personal Stats",
+  "Total_Liquidity": "Total Liquidity"
 }
