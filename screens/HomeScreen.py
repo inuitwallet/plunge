@@ -1,7 +1,7 @@
 from kivy.clock import Clock
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
-from kivy.garden.graph import Graph, SmoothLinePlot, MeshStemPlot
+from kivy.garden.graph import Graph, MeshLinePlot, MeshStemPlot
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
@@ -435,7 +435,7 @@ class HomeScreen(Screen):
         for point in points:
             tuple_points.append((x, point))
             x += 1
-        plot = SmoothLinePlot(color=[0.93725, 0.21176, 0.07843, 1])
+        plot = MeshLinePlot(color=[0.93725, 0.21176, 0.07843, 1])
         plot.points = tuple_points
         self.graph.add_plot(plot)
         self.show_graph_popup(title)
@@ -451,7 +451,7 @@ class HomeScreen(Screen):
         if stem is True:
             buy_plot = MeshStemPlot(color=[1, 0.72157, 0, 1])
         else:
-            buy_plot = SmoothLinePlot(color=[1, 0.72157, 0, 1])
+            buy_plot = MeshLinePlot(color=[1, 0.72157, 0, 1])
         points = []
         x = 0
         for point in buy_points:
@@ -462,7 +462,7 @@ class HomeScreen(Screen):
         if stem is True:
             sell_plot = MeshStemPlot(color=[0, 0.45490, 0.62745, 1])
         else:
-            sell_plot = SmoothLinePlot(color=[0, 0.45490, 0.62745, 1])
+            sell_plot = MeshLinePlot(color=[0, 0.45490, 0.62745, 1])
         points = []
         x = 0
         for point in sell_points:

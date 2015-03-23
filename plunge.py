@@ -153,7 +153,10 @@ class TopActionBar(ActionBar):
             self.PlungeApp.homeScreen.add_widget(self.PlungeApp.homeScreen.min_layout)
             self.PlungeApp.is_min = True
         else:
-            Window.size = (1000, 1000)
+            if self.PlungeApp.config.getint('server', 'monitor') == 1:
+                Window.size = (1000, 800)
+            else:
+                Window.size = (1000, 1000)
             height = self.height
             self.height = 2 * height if height != self.standard_height else height
             self.top_size_button.text = self.PlungeApp.get_string("Minimise")
