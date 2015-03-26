@@ -12,7 +12,6 @@ import signal
 from Queue import Queue, Empty
 from threading import Thread
 import sys
-from decimal import Decimal
 
 __author__ = 'woolly_sammoth'
 
@@ -154,20 +153,19 @@ class HomeScreen(Screen):
                                                 self.PlungeApp.config.get('server', 'port'))))
         
         if 'error' not in status:
-            self.PlungeApp.logger.info("Server returned %s" % status)
+            self.PlungeApp.logger.info("Server returned OK")
             self.pool = {}
             self.pool['buy_liquidity'] = status['liquidity'][0]
             self.pool['sell_liquidity'] = status['liquidity'][1]
             self.pool['num_users'] = status['users']
             self.pool['sampling'] = status['sampling']
-            self.PlungeApp.logger.info("Pool stats - %s" % str(self.pool))
 
             self.update_lists(self.pool['buy_liquidity'], self.pool_buy_liquidity)
             self.update_lists(self.pool['sell_liquidity'], self.pool_sell_liquidity)
 
             self.update_pool_stats()
         else:
-            self.PlungeApp.logger.error("%d - %s" % (status['code'], status['message']))
+            self.PlungeApp.logger.warn("%d - %s" % (status['code'], status['message']))
 
     def get_exchange_stats(self):
         # get the exchange status
@@ -177,22 +175,13 @@ class HomeScreen(Screen):
                                                    self.PlungeApp.config.get('server', 'port'))))
 
         if 'error' not in exchanges:
-            self.PlungeApp.logger.info("Server returned %s" % exchanges)
-            self.stats = {}
-            for exchange in self.PlungeApp.active_exchanges:
-                self.stats[exchange] = {}
-                for currency in self.PlungeApp.active_currencies:
-                    if currency in exchanges[exchange]:
-                        self.stats[exchange][currency] = {}
-                        self.stats[exchange][currency]['rate'] = str(round(exchanges[exchange][currency]['rate'], 4))
-                        self.stats[exchange][currency]['fee'] = str(round(exchanges[exchange][currency]['fee'], 4))
-                        self.stats[exchange][currency]['target'] = str(round(exchanges[exchange][currency]['target'], 4))
-            self.PlungeApp.logger.info("Exchange Stats - %s" % str(self.stats))
+            self.PlungeApp.logger.info("Server returned OK")
+            self.stats = exchanges
         else:
-            self.PlungeApp.logger.error("%d - %s" % (exchanges['code'], exchanges['message']))
+            self.PlungeApp.logger.warn("%d - %s" % (exchanges['code'], exchanges['message']))
 
     def get_personal_stats(self):
-        #get the individual status for each acccount
+        # get the individual status for each account
         self.user = {}
         for exchange in self.PlungeApp.active_exchanges:
             self.PlungeApp.logger.info("Get Personal Stats for %s" % exchange)
@@ -201,12 +190,8 @@ class HomeScreen(Screen):
                                                   self.PlungeApp.config.get('server', 'port'),
                                                   self.PlungeApp.config.get(exchange, 'public'))))
             if 'error' not in user:
-                self.PlungeApp.logger.info("Server returned %s" % user)
-                self.user[exchange] = {}
-                self.user[exchange]['efficiency'] = user['efficiency']
-                self.user[exchange]['balance'] = user['balance']
-                self.user[exchange]['missing'] = user['missing']
-                self.user[exchange]['rejects'] = user['rejects']
+                self.PlungeApp.logger.info("Server returned OK")
+                self.user[exchange] = user
                 # update the graph data lists
                 if exchange not in self.exchange_efficiency:
                     self.exchange_efficiency[exchange] = []
@@ -222,24 +207,17 @@ class HomeScreen(Screen):
                 self.update_lists(self.user[exchange]['rejects'], self.exchange_rejects[exchange])
                 for currency in self.PlungeApp.active_currencies:
                     if currency in user['units']:
-                        self.user[exchange][currency] = {}
-                        self.user[exchange][currency]['ask_orders'] = user['units'][currency]['ask']
-                        self.user[exchange][currency]['bid_orders'] = user['units'][currency]['bid']
-                        self.user[exchange][currency]['last_error'] = user['units'][currency]['last_error']
-                        self.user[exchange][currency]['rejects'] = user['units'][currency]['rejects']
-                        self.user[exchange][currency]['missing'] = user['units'][currency]['missing']
-                    else:
-                        self.PlungeApp.logger.error("%s not found in server return" % currency)
+                        self.user[exchange][currency] = user['units'][currency]
             else:
-                self.PlungeApp.logger.error("%d - %s" % (user['code'], user['message']))
+                self.PlungeApp.logger.warn("%d - %s" % (user['code'], user['message']))
         self.PlungeApp.logger.info("Personal Stats - %s" % str(self.user))
         if self.primary_exchange in self.user:
             if self.primary_currency in self.user[self.primary_exchange]:
                 self.update_personal_stats()
             else:
-                self.PlungeApp.logger.error("%s not found in personal stats" % self.primary_currency)
+                self.PlungeApp.logger.warn("%s not found in personal stats" % self.primary_currency)
         else:
-            self.PlungeApp.logger.error("%s not found in personal stats" % self.primary_exchange)
+            self.PlungeApp.logger.warn("%s not found in personal stats" % self.primary_exchange)
 
     def update_pool_stats(self):
         self.PlungeApp.logger.info("Update Pool stats")
@@ -247,24 +225,37 @@ class HomeScreen(Screen):
         self.pool_sell_side.text = "[ref='pool_sell_side']%.4f[/ref]" % self.pool['sell_liquidity']
 
     def update_personal_stats(self):
-        self.PlungeApp.logger.info("Update stats")
-        self.exchange_balance_label.text = "[ref='exchange_balance']%.4f[/ref]" % self.user[self.primary_exchange]['balance']
-        self.exchange_efficiency_label.text = "[ref='exchange_efficiency']%.2f%%[/ref]" % (self.user[self.primary_exchange]['efficiency'] * 100)
-        self.exchange_missing_label.text = "[ref='exchange_missing']%d[/ref]" % self.user[self.primary_exchange]['missing']
-        self.exchange_rejects_label.text = "[ref='exchange_rejects']%d[/ref]" % self.user[self.primary_exchange]['rejects']
+        self.PlungeApp.logger.info("Update Personal stats")
+        self.exchange_balance_label.text = "[ref='exchange_balance']%.4f[/ref]" % \
+                                           self.user[self.primary_exchange]['balance']
+        self.exchange_efficiency_label.text = "[ref='exchange_efficiency']%.2f%%[/ref]" % \
+                                              (self.user[self.primary_exchange]['efficiency'] * 100)
+        self.exchange_missing_label.text = "[ref='exchange_missing']%d[/ref]" % \
+                                           self.user[self.primary_exchange]['missing']
+        self.exchange_rejects_label.text = "[ref='exchange_rejects']%d[/ref]" %\
+                                           self.user[self.primary_exchange]['rejects']
 
         self.calculations()
 
-        self.exchange_buy_side_label.text = "[ref='exchange_buy_side']%.4f[/ref]" % self.exchange_buy_side[self.primary_exchange]
-        self.exchange_sell_side_label.text = "[ref='exchange_sell_side']%.4f[/ref]" % self.exchange_sell_side[self.primary_exchange]
-        self.exchange_valid_label.text = "[ref='exchange_valid']%d[/ref]" % self.exchange_valid[self.primary_exchange]
+        self.exchange_buy_side_label.text = "[ref='exchange_buy_side']%.4f[/ref]" % \
+                                            self.exchange_buy_side[self.primary_exchange]
+        self.exchange_sell_side_label.text = "[ref='exchange_sell_side']%.4f[/ref]" % \
+                                             self.exchange_sell_side[self.primary_exchange]
+        self.exchange_valid_label.text = "[ref='exchange_valid']%d[/ref]" % \
+                                         self.exchange_valid[self.primary_exchange]
 
-        self.personal_buy_side.text = "[ref='total_buy_side']%.4f[/ref]" % self.total_buy_side
-        self.personal_sell_side.text = "[ref='total_sell_side']%.4f[/ref]" % self.total_sell_side
-        self.personal_efficiency.text = "[ref='total_efficiency']%.2f%%[/ref]" % (self.total_efficiency * 100)
-        self.min_efficiency.text = "%.2f%%" % (self.total_efficiency * 100)
-        self.personal_balance.text = "[ref='total_balance']%.4f[/ref]" % self.total_balance
-        self.min_balance.text = "%.4f" % self.total_balance
+        self.personal_buy_side.text = "[ref='total_buy_side']%.4f[/ref]" % \
+                                      self.total_buy_side
+        self.personal_sell_side.text = "[ref='total_sell_side']%.4f[/ref]" % \
+                                       self.total_sell_side
+        self.personal_efficiency.text = "[ref='total_efficiency']%.2f%%[/ref]" % \
+                                        (self.total_efficiency * 100)
+        self.min_efficiency.text = "%.2f%%" % \
+                                   (self.total_efficiency * 100)
+        self.personal_balance.text = "[ref='total_balance']%.4f[/ref]" % \
+                                     self.total_balance
+        self.min_balance.text = "%.4f" %\
+                                self.total_balance
 
     def calculations(self):
         # total buy side liquidity

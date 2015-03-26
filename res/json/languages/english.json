@@ -30,7 +30,7 @@
 
   "Popup_Error": "Error",
   "Client_Run_Error": "The was a problem in starting the client.",
-  "No_Exchanges": "No exchanges have been enabled.\nPlease enable at least one in the settings",
+  "No_Exchanges": "There are no valid users for any exchange.\n\nPlease add at least one user.",
   "No_Currencies": "There are no enabled pairs for %s.\nPlease enable at least on in the settings",
 
   "Client_Stopped": "No client is running.",

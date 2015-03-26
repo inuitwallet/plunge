@@ -18,68 +18,36 @@
     "key": "port"
   },
   {
-    "type": "numeric",
-    "title": "Check Period",
-    "desc": "The number of seconds between data requests from the server\n(doesn't affect the client)",
-    "section": "server",
-    "key": "period"
-  },
-  {
-    "type": "bool",
-    "title": "Monitor",
-    "desc": "Use Plunge to monitor your pool account instead of running the client.",
-    "section": "server",
-    "key": "monitor"
-  },
-  {
     "type": "title",
-    "title": "Configuration"
+    "title": "Exchanges"
   },
   {
-    "type": "path",
-    "title": "Config File",
-    "desc": "The path to the configuration file that will be used to start the client.",
-    "section": "config",
-    "key": "file"
-  },
-  {
-    "type": "bool",
-    "title": "Override",
-    "desc": "Override the current settings using the file specified above",
-    "section": "config",
-    "key": "override"
-  },
-  {
-    "type": "title",
-    "title": "Active Exchanges"
-  },
-  {
-    "type": "bool",
-    "title": "CCEDK",
-    "desc": "Enable or Disable CCEDK",
+    "type": "string_exchange",
+    "title": "BTER",
+    "desc": "Add users for BTER - The number indicates the number of valid users",
     "section": "exchanges",
-    "key": "ccedk"
+    "key": "bter"
   },
   {
-    "type": "bool",
-    "title": "Poloniex",
-    "desc": "Enable or Disable Poloniex",
-    "section": "exchanges",
-    "key": "poloniex"
-  },
-  {
-    "type": "bool",
+    "type": "string_exchange",
     "title": "Bitcoin Indonesia",
-    "desc": "Enable or Disable Bitcoin Indonesia",
+    "desc": "Add users for Bitcoin Indonesia - The number indicates the number of valid users",
     "section": "exchanges",
     "key": "bitcoincoid"
   },
   {
-    "type": "bool",
-    "title": "BTER",
-    "desc": "Enable or Disable BTER",
+    "type": "string_exchange",
+    "title": "CCEDK",
+    "desc": "Add users for CCEDK - The number indicates the number of valid users",
     "section": "exchanges",
-    "key": "bter"
+    "key": "ccedk"
+  },
+  {
+    "type": "string_exchange",
+    "title": "Poloniex",
+    "desc": "Add users for Poloniex - The number indicates the number of valid users",
+    "section": "exchanges",
+    "key": "poloniex"
   },
   {
     "type": "title",
@@ -94,6 +62,20 @@
     "key": "language"
   },
   {
+    "type": "numeric",
+    "title": "Check Period",
+    "desc": "The number of seconds between data requests from the server\n(doesn't affect the client)",
+    "section": "standard",
+    "key": "period"
+  },
+  {
+    "type": "bool",
+    "title": "Monitor",
+    "desc": "Use Plunge to monitor your pool account instead of running the client.",
+    "section": "standard",
+    "key": "monitor"
+  },
+  {
     "type": "bool",
     "title": "Start Minimised",
     "desc": "Choose whether to start Plunge in the minimised view",
@@ -102,8 +84,8 @@
   },
   {
     "type": "numeric",
-    "title": "Data to keep",
-    "desc": "How many data points to keep for display on the charts (0 keeps all data)",
+    "title": "Data to Display",
+    "desc": "How many data points to display on the charts (0 shows all data)",
     "section": "standard",
     "key": "data"
   }

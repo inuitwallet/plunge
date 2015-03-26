@@ -53,7 +53,7 @@ class utils:
         return b'\x00' * pad + res
 
     def get(self, url):
-        self.PlungeApp.logger.info("Request sent to %s" % url)
+        # self.PlungeApp.logger.info("Request sent to %s" % url)
         try:
             r = requests.get(url, timeout=10)
             if r.status_code != requests.codes.OK:
@@ -65,7 +65,7 @@ class utils:
             return {'error': True, 'code': 500, 'message': 'connection refused'}
 
     def post(self, url, data={}):
-        self.PlungeApp.logger.info("Request sent to %s with data %s" % (url, str(data)))
+        # self.PlungeApp.logger.info("Request sent to %s with data %s" % (url, str(data)))
         try:
             headers = {"Content-type": "application/x-www-form-urlencoded"}
             r = requests.post(url, data=data, headers=headers, timeout=10)
@@ -80,7 +80,7 @@ class utils:
     def get_active_exchanges(self):
         exchanges = []
         for exchange in self.PlungeApp.exchanges:
-            if self.PlungeApp.config.getint('exchanges', exchange) == 1:
+            if self.PlungeApp.config.getint('exchanges', exchange) > 0:
                 exchanges.append(exchange)
         self.PlungeApp.logger.info("Got active exchanges - %s" % str(exchanges))
         return exchanges
@@ -88,7 +88,7 @@ class utils:
     def get_active_currencies(self, exchange):
         currencies = []
         for currency in self.PlungeApp.currencies:
-            if self.PlungeApp.config.getdefaultint(exchange, currency, 0) == 1:
+            if self.PlungeApp.config.getdefaultint(exchange, currency, 0) > 0:
                 currencies.append(currency)
         self.PlungeApp.logger.info("Got active currencies - %s" % str(currencies))
         return currencies

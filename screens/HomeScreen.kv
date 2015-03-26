@@ -137,11 +137,10 @@
                 on_ref_press:
                     if root.primary_exchange in root.stats: \
                     root.show_info("%s %s" % (app.get_string(root.primary_exchange), app.get_string("Info")),
-                    {'Fee': root.stats[root.primary_exchange][root.primary_currency]['fee'] if root.primary_currency in root.stats[root.primary_exchange] else app.get_string('No_Data'),
-                    'Rate': root.stats[root.primary_exchange][root.primary_currency]['rate'] if root.primary_currency in root.stats[root.primary_exchange] else app.get_string('No_Data'),
+                    {'Rate': root.stats[root.primary_exchange][root.primary_currency]['rate'] if root.primary_currency in root.stats[root.primary_exchange] else app.get_string('No_Data'),
                     'Target': root.stats[root.primary_exchange][root.primary_currency]['target'] if root.primary_currency in root.stats[root.primary_exchange] else app.get_string('No_Data')})
                     else: root.show_info("%s %s" % (app.get_string(root.primary_exchange), app.get_string("Info")),
-                    {'Fee': app.get_string('No_Data'), 'Rate': app.get_string('No_Data'), 'Target': app.get_string('No_Data')})
+                    {'Rate': app.get_string('No_Data'), 'Target': app.get_string('No_Data')})
 
             BoxLayout:
                 size_hint: (1, 0.30)

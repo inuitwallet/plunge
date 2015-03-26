@@ -1,6 +1,3 @@
-import sys
-import traceback
-
 __author__ = 'woolly_sammoth'
 
 from kivy.config import Config
@@ -23,10 +20,7 @@ from kivy.uix.popup import Popup
 from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.metrics import dp
-from kivy.uix.settings import SettingString, SettingSpacer, SettingNumeric
-from kivy.uix.textinput import TextInput
-from kivy.uix.widget import Widget
+
 
 import logging
 import time
@@ -34,86 +28,10 @@ import utils
 import os
 import json
 import socketlogger
+import sys
 
 import screens.HomeScreen as HomeScreen
-
-
-class SettingStringFocus(SettingString):
-
-    def _create_popup(self, instance):
-        # create popup layout
-        content = BoxLayout(orientation='vertical', spacing='5dp')
-        popup_width = min(0.95 * Window.width, dp(500))
-        self.popup = popup = Popup(
-            title=self.title, content=content, size_hint=(None, None),
-            size=(popup_width, '250dp'))
-
-        # create the textinput used for numeric input
-        self.textinput = textinput = TextInput(
-            text=self.value, font_size='24sp', multiline=False,
-            size_hint_y=None, height='42sp')
-        textinput.bind(on_text_validate=self._validate)
-        self.textinput = textinput
-
-        # construct the content, widget are used as a spacer
-        content.add_widget(Widget())
-        content.add_widget(textinput)
-        content.add_widget(Widget())
-        content.add_widget(SettingSpacer())
-
-        # 2 buttons are created for acept or cancel the current value
-        btnlayout = BoxLayout(size_hint_y=None, height='50dp', spacing='5dp')
-        btn = Button(text='Ok')
-        btn.bind(on_release=self._validate)
-        btnlayout.add_widget(btn)
-        btn = Button(text='Cancel')
-        btn.bind(on_release=self._dismiss)
-        btnlayout.add_widget(btn)
-        content.add_widget(btnlayout)
-
-        # all done, open the popup !
-        popup.open()
-        textinput.focus = True
-        textinput.cursor = (1, 3000)
-
-
-class SettingNumericFocus(SettingNumeric):
-
-    def _create_popup(self, instance):
-        # create popup layout
-        content = BoxLayout(orientation='vertical', spacing='5dp')
-        popup_width = min(0.95 * Window.width, dp(500))
-        self.popup = popup = Popup(
-            title=self.title, content=content, size_hint=(None, None),
-            size=(popup_width, '250dp'))
-
-        # create the textinput used for numeric input
-        self.textinput = textinput = TextInput(
-            text=self.value, font_size='24sp', multiline=False,
-            size_hint_y=None, height='42sp')
-        textinput.bind(on_text_validate=self._validate)
-        self.textinput = textinput
-
-        # construct the content, widget are used as a spacer
-        content.add_widget(Widget())
-        content.add_widget(textinput)
-        content.add_widget(Widget())
-        content.add_widget(SettingSpacer())
-
-        # 2 buttons are created for acept or cancel the current value
-        btnlayout = BoxLayout(size_hint_y=None, height='50dp', spacing='5dp')
-        btn = Button(text='Ok')
-        btn.bind(on_release=self._validate)
-        btnlayout.add_widget(btn)
-        btn = Button(text='Cancel')
-        btn.bind(on_release=self._dismiss)
-        btnlayout.add_widget(btn)
-        content.add_widget(btnlayout)
-
-        # all done, open the popup !
-        popup.open()
-        textinput.focus = True
-        textinput.cursor = (1, 3000)
+import overrides
 
 
 class TopActionBar(ActionBar):
@@ -178,7 +96,7 @@ class PlungeApp(App):
         super(PlungeApp, self).__init__(**kwargs)
         self.isPopup = False
         self.use_kivy_settings = False
-        self.settings_cls = 'Settings'
+        self.settings_cls = overrides.SettingsWithCloseButton
         self.utils = utils.utils(self)
         self.exchanges = ['ccedk', 'poloniex', 'bitcoincoid', 'bter']
         self.active_exchanges = []
@@ -201,7 +119,7 @@ class PlungeApp(App):
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
         self.logger_socket = socketlogger.start_logging_receiver('Plunge')
-        #sys.excepthook = self.log_uncaught_exceptions
+        sys.excepthook = self.log_uncaught_exceptions
         return
 
 
@@ -248,7 +166,7 @@ class PlungeApp(App):
     def set_monitor(self):
         if self.is_min is False:
             self.homeScreen.max_layout.remove_widget(self.homeScreen.run_layout)
-            if self.config.getint('server', 'monitor') == 1:
+            if self.config.getint('standard', 'monitor') == 1:
                 Window.size = (1000, 800)
             else:
                 self.homeScreen.max_layout.add_widget(self.homeScreen.run_layout)
@@ -264,41 +182,30 @@ class PlungeApp(App):
         return return_string
 
     def build_config(self, config):
-        config.setdefaults('server', {'host': "104.245.36.10", 'port': 2019, 'period': 30, 'monitor': 0})
-        config.setdefaults('config', {'file': os.getcwd() + "/users.dat", 'override': 0, 'remote': 0,
-                                      'remote_server': '', 'remote_port': ''})
+        config.setdefaults('server', {'host': "104.245.36.10", 'port': 2019})
         config.setdefaults('exchanges', {'ccedk': 0, 'poloniex': 0, 'bitcoincoid': 0, 'bter': 0})
-        config.setdefaults('ccedk',
-                           {'address': '', 'public': '', 'secret': '', 'nubot': 0,
-                            'btc': 0, 'ltc': 0, 'ppc': 0, 'usd': 0, 'eur': 0})
-        config.setdefaults('poloniex',
-                           {'address': '', 'public': '', 'secret': '', 'nubot': 0, "btc": 0})
-        config.setdefaults('bitcoincoid',
-                           {'address': '', 'public': '', 'secret': '', 'nubot': 0, "btc": 0})
-        config.setdefaults('bter',
-                           {'address': '', 'public': '', 'secret': '', 'nubot': 0, "btc": 0})
-        config.setdefaults('standard', {'language': 'English', 'start_min': 0, 'data': 0})
+        config.setdefaults('standard', {'language': 'English', 'period': 30, 'monitor': 0, 'start_min': 0, 'data': 0})
 
     def build_settings(self, settings):
-        settings.register_type('string', SettingStringFocus)
-        settings.register_type('numeric', SettingNumericFocus)
+        settings.register_type('string', overrides.SettingStringFocus)
+        settings.register_type('numeric', overrides.SettingNumericFocus)
+        settings.register_type('string_exchange', overrides.SettingStringExchange)
+        with open('user_data.json', 'a+') as user_data:
+            try:
+                saved_data = json.load(user_data)
+            except ValueError:
+                saved_data = []
+        user_data.close()
+        for exchange in self.exchanges:
+            if exchange not in saved_data:
+                self.config.set('exchanges', exchange, 0)
+                continue
+            self.config.set('exchanges', exchange, len(saved_data[exchange]))
         settings.add_json_panel(self.get_string('Plunge_Configuration'), self.config, 'settings/plunge.json')
-        if self.config.getint('exchanges', 'ccedk') == 1:
-            settings.add_json_panel(self.get_string('CCEDK_Settings'), self.config, 'settings/ccedk.json')
-        if self.config.getint('exchanges', 'poloniex') == 1:
-            settings.add_json_panel(self.get_string('Poloniex_Settings'), self.config, 'settings/poloniex.json')
-        if self.config.getint('exchanges', 'bitcoincoid') == 1:
-            settings.add_json_panel(self.get_string('BitcoinCoId_Settings'), self.config, 'settings/bitcoincoid.json')
-        if self.config.getint('exchanges', 'bter') == 1:
-            settings.add_json_panel(self.get_string('Bter_Settings'), self.config, 'settings/bter.json')
 
     def on_config_change(self, config, section, key, value):
-        if section == "exchanges":
-            self.logger.info("%s/%s config changed to %s" % (section, key, value))
-            self.close_settings()
-            self.destroy_settings()
-            self.open_settings()
-        if section == "server":
+        print "%s - %s" % (section, key)
+        if section == "standard":
             if key == "period":
                 Clock.unschedule(self.homeScreen.get_stats)
                 self.logger.info("Setting refresh Period to %s" % self.config.get('server', 'period'))
@@ -312,12 +219,17 @@ class PlungeApp(App):
 
     def show_popup(self, title, text):
         content = BoxLayout(orientation='vertical')
-        content.add_widget(Label(text=text, size_hint=(1, .9)))
-        button = Button(text=self.get_string('OK'), size_hint=(None, None), width=250, height=50)
-        content.add_widget(button)
-        self.popup = Popup(title=title, content=content, auto_dismiss=False, size_hint=(None, None), size=(500, 200))
+        content.add_widget(Label(text=text, size_hint=(1, 0.8), font_size=16))
+        content.add_widget(BoxLayout(size_hint=(1, 0.1)))
+        button_layout = BoxLayout(size_hint=(1, 0.1))
+        button = Button(text=self.get_string('OK'), size_hint=(None, None), size=(250, 50))
         button.bind(on_press=self.close_popup)
+        button_layout.add_widget(button)
+        content.add_widget(button_layout)
+        self.popup = Popup(title=title, content=content, auto_dismiss=False, size_hint=(None, None), size=(500, 300))
         self.popup.open()
+        padding = ((self.popup.width - button.width) / 2)
+        button_layout.padding = (padding, 0, padding, 0)
         self.isPopup = True
         return
 
