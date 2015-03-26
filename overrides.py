@@ -173,12 +173,15 @@ class SettingStringExchange(SettingString):
             this_row['public'] = public
             this_row['secret'] = secret
             this_row['address'] = self.address[x].text
-            print this_row['address']
             if not self.utils.check_checksum(this_row['address']) or not this_row['address'][:1] == 'B':
                 self.logger.warn("Invalid payout address %s" % this_row['address'])
                 continue
             this_row['unit'] = self.unit[x].text.lower()
-            rate = self.rates[x].text.split(' | ')
+            rates = self.rates[x].text
+            if "|" not in rates:
+                self.logger.warn("no rates set")
+                continue
+            rate = rates.split(' | ')
             this_row['ask'] = rate[0]
             this_row['bid'] = rate[1]
             if this_row['ask'] == 0.00 or this_row['bid'] == 0.00:
@@ -189,7 +192,6 @@ class SettingStringExchange(SettingString):
                 continue
             saved_data[self.exchange].append(this_row)
             good_records += 1
-        print str(saved_data)
         with open('user_data.json', 'w') as user_data:
             user_data.write(json.dumps(saved_data))
         user_data.close()
@@ -323,6 +325,8 @@ class SettingStringExchange(SettingString):
         self.enter_keys_popup = Popup(title='API Keys', content=content, auto_dismiss=False,
                                       size_hint=(None, None), size=(popup_width, '250dp'))
         self.update_api_spinners()
+        if instance.text != 'Set Keys':
+            self.api_key_spinner.text = instance.text
         self.enter_keys_popup.open()
 
     def enable_edit(self, instance, value):
@@ -451,7 +455,7 @@ class SettingStringExchange(SettingString):
         :param instance:
         :return:
         """
-        if instance.text == "Ok":
+        if instance.text == "Ok" and self.api_key_spinner.text != '':
             self.calling_keys_button.text = self.chosen_api_key_pair
         self.chosen_api_key_pair = None
         self.enter_keys_popup.dismiss()
@@ -466,7 +470,6 @@ class SettingStringExchange(SettingString):
         if instance.text == "Cancel":
             self.add_keys_popup.dismiss()
             return
-
         api_keys = self.fetch_api_keys_from_file()
         if self.edit_public is not None and self.edit_secret is not None:
             for key_set in api_keys:
@@ -595,7 +598,6 @@ class SettingStringExchange(SettingString):
             bid_layout.add_widget(self.bid_value)
             content.add_widget(bid_layout)
             if instance.text != 'Set Rates':
-                print("here")
                 rates = instance.text.split(' | ')
                 self.ask_slider.value = float(rates[0])
                 self.bid_slider.value = float(rates[1])

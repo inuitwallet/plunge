@@ -119,7 +119,7 @@ class PlungeApp(App):
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
         self.logger_socket = socketlogger.start_logging_receiver('Plunge')
-        sys.excepthook = self.log_uncaught_exceptions
+        # sys.excepthook = self.log_uncaught_exceptions
         return
 
 
@@ -204,7 +204,6 @@ class PlungeApp(App):
         settings.add_json_panel(self.get_string('Plunge_Configuration'), self.config, 'settings/plunge.json')
 
     def on_config_change(self, config, section, key, value):
-        print "%s - %s" % (section, key)
         if section == "standard":
             if key == "period":
                 Clock.unschedule(self.homeScreen.get_stats)
