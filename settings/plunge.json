@@ -23,50 +23,14 @@
   },
   {
     "type": "string_exchange",
-    "title": "BTER",
-    "desc": "Add users for BTER - The number indicates the number of valid users",
+    "title": "Bittrex",
+    "desc": "Add users for Bittrex - The number indicates the number of valid users",
     "section": "exchanges",
-    "key": "bter"
-  },
-  {
-    "type": "string_exchange",
-    "title": "Bitcoin Indonesia",
-    "desc": "Add users for Bitcoin Indonesia - The number indicates the number of valid users",
-    "section": "exchanges",
-    "key": "bitcoincoid"
-  },
-  {
-    "type": "string_exchange",
-    "title": "CCEDK",
-    "desc": "Add users for CCEDK - The number indicates the number of valid users",
-    "section": "exchanges",
-    "key": "ccedk"
-  },
-  {
-    "type": "string_exchange",
-    "title": "Poloniex",
-    "desc": "Add users for Poloniex - The number indicates the number of valid users",
-    "section": "exchanges",
-    "key": "poloniex"
+    "key": "bittrex"
   },
   {
     "type": "title",
     "title": "Settings"
-  },
-  {
-    "type": "options",
-    "title": "Choose Language",
-    "desc": "Set the language file to use\n(Doesn't affect this settings menu)",
-    "options": ["English"],
-    "section": "standard",
-    "key": "language"
-  },
-  {
-    "type": "numeric",
-    "title": "Check Period",
-    "desc": "The number of seconds between data requests from the server\n(doesn't affect the client)",
-    "section": "standard",
-    "key": "period"
   },
   {
     "type": "bool",
@@ -81,12 +45,5 @@
     "desc": "Choose whether to start Plunge in the minimised view",
     "section": "standard",
     "key": "start_min"
-  },
-  {
-    "type": "numeric",
-    "title": "Data to Display",
-    "desc": "How many data points to display on the charts (0 shows all data)",
-    "section": "standard",
-    "key": "data"
   }
 ]

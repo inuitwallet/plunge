@@ -1,3 +1,5 @@
+import json
+
 __author__ = 'woolly_sammoth'
 
 import hashlib
@@ -53,7 +55,7 @@ class utils:
         return b'\x00' * pad + res
 
     def get(self, url):
-        # self.PlungeApp.logger.info("Request sent to %s" % url)
+        self.PlungeApp.logger.info("Request sent to %s" % url)
         try:
             r = requests.get(url, timeout=10)
             if r.status_code != requests.codes.OK:
@@ -79,8 +81,14 @@ class utils:
 
     def get_active_exchanges(self):
         exchanges = []
-        for exchange in self.PlungeApp.exchanges:
-            if self.PlungeApp.config.getint('exchanges', exchange) > 0:
+        with open('api_keys.json') as api_keys_file:
+            api_keys = json.load(api_keys_file)
+        api_keys_file.close()
+        for set in api_keys:
+            exchange = set['exchange']
+            if exchange in exchanges:
+                continue
+            else:
                 exchanges.append(exchange)
         self.PlungeApp.logger.info("Got active exchanges - %s" % str(exchanges))
         return exchanges
@@ -88,6 +96,8 @@ class utils:
     def get_active_currencies(self, exchange):
         currencies = []
         for currency in self.PlungeApp.currencies:
+            if currency in currencies:
+                continue
             if self.PlungeApp.config.getdefaultint(exchange, currency, 0) > 0:
                 currencies.append(currency)
         self.PlungeApp.logger.info("Got active currencies - %s" % str(currencies))

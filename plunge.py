@@ -50,7 +50,7 @@ class TopActionBar(ActionBar):
     def minimise(self, override=None):
         min = self.top_size_button.text if override is None else override
         if min == self.PlungeApp.get_string("Minimise"):
-            Window.size = (350, 100)
+            Window.size = (300, 180)
             height = self.height
             self.height = 0.5 * height if height == self.standard_height else height
             self.top_size_button.text = self.PlungeApp.get_string("Maximise")
@@ -71,7 +71,7 @@ class TopActionBar(ActionBar):
             self.PlungeApp.homeScreen.add_widget(self.PlungeApp.homeScreen.min_layout)
             self.PlungeApp.is_min = True
         else:
-            if self.PlungeApp.config.getint('server', 'monitor') == 1:
+            if self.PlungeApp.config.getint('standard', 'monitor') == 1:
                 Window.size = (1000, 800)
             else:
                 Window.size = (1000, 1000)
@@ -98,7 +98,7 @@ class PlungeApp(App):
         self.use_kivy_settings = False
         self.settings_cls = overrides.SettingsWithCloseButton
         self.utils = utils.utils(self)
-        self.exchanges = ['ccedk', 'poloniex', 'bitcoincoid', 'bter']
+        self.exchanges = ['ccedk', 'poloniex', 'bitcoincoid', 'bter', 'bittrex']
         self.active_exchanges = []
         self.currencies = ['btc', 'ltc', 'eur', 'usd', 'ppc']
         self.active_currencies = []
@@ -182,8 +182,8 @@ class PlungeApp(App):
         return return_string
 
     def build_config(self, config):
-        config.setdefaults('server', {'host': "104.245.36.10", 'port': 2019})
-        config.setdefaults('exchanges', {'ccedk': 0, 'poloniex': 0, 'bitcoincoid': 0, 'bter': 0})
+        config.setdefaults('server', {'host': "beta.nupool.eu", 'port': 80})
+        config.setdefaults('exchanges', {'ccedk': 0, 'poloniex': 0, 'bitcoincoid': 0, 'bter': 0, 'bittrex': 0})
         config.setdefaults('standard', {'language': 'English', 'period': 30, 'monitor': 0, 'start_min': 0, 'data': 0})
 
     def build_settings(self, settings):

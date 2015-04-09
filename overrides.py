@@ -134,8 +134,10 @@ class SettingStringExchange(SettingString):
     address = []
     unit = []
     rates = []
+    bot = []
     logger = logging.getLogger('Plunge')
-    currencies = ['BTC']
+    currencies = ['btc']
+    bots = ['nubot', 'pybot', 'none']
 
     def on_panel(self, instance, value):
         if value is None:
@@ -153,6 +155,7 @@ class SettingStringExchange(SettingString):
         self.address = []
         self.unit = []
         self.rates = []
+        self.bot = []
 
     def _validate(self, instance):
         with open('user_data.json', 'a+') as user_data:
@@ -164,7 +167,7 @@ class SettingStringExchange(SettingString):
         saved_data[self.exchange] = []
         good_records = 0
         for x in range(0, self.num_rows, 1):
-            self.logger.info("saving row %d for %s" % (x, self.exchange))
+            self.logger.info("saving row %d for %s" % (x+1, self.exchange))
             this_row = {}
             public, secret = self.get_keys(self.keys_button[x].text)
             if public is None or secret is None:
@@ -176,7 +179,7 @@ class SettingStringExchange(SettingString):
             if not self.utils.check_checksum(this_row['address']) or not this_row['address'][:1] == 'B':
                 self.logger.warn("Invalid payout address %s" % this_row['address'])
                 continue
-            this_row['unit'] = self.unit[x].text.lower()
+            this_row['unit'] = self.unit[x].text
             rates = self.rates[x].text
             if "|" not in rates:
                 self.logger.warn("no rates set")
@@ -187,11 +190,13 @@ class SettingStringExchange(SettingString):
             if this_row['ask'] == 0.00 or this_row['bid'] == 0.00:
                 self.logger.warn("ask or bid minimal rate set to 0")
                 continue
+            this_row['bot'] = self.bot[x].text
             if this_row in saved_data[self.exchange]:
                 self.logger.warn("data already exists")
                 continue
             saved_data[self.exchange].append(this_row)
             good_records += 1
+            self.logger.info(str(this_row))
         with open('user_data.json', 'w') as user_data:
             user_data.write(json.dumps(saved_data))
         user_data.close()
@@ -208,12 +213,14 @@ class SettingStringExchange(SettingString):
         self.exchange = self.key
         main_layout = BoxLayout(orientation='vertical', spacing='5dp')
         scroll_view = ScrollView(do_scroll_x=False)
-        header = GridLayout(cols=4, spacing='5dp', row_default_height='50dp', row_force_default=True, size_hint_y=None, height='50dp')
+        header = GridLayout(cols=5, spacing='5dp', row_default_height='50dp', row_force_default=True,
+                            size_hint_y=None, height='50dp')
         header.add_widget(Label(text='API Keys', valign='top', size_hint_x=0.2))
         header.add_widget(Label(text='Payout Address (valid NBT)', valign='top', size_hint_x=0.4))
-        header.add_widget(Label(text='Unit', valign='top', size_hint_x=0.2))
+        header.add_widget(Label(text='Unit', valign='top', size_hint_x=0.1))
         header.add_widget(Label(text='Minimum interest rates', valign='top', size_hint_x=0.2))
-        self.content = GridLayout(cols=4, spacing='5dp', row_default_height='50dp', row_force_default=True,
+        header.add_widget(Label(text='Bot', valign='top', size_hint_x=0.1))
+        self.content = GridLayout(cols=5, spacing='5dp', row_default_height='50dp', row_force_default=True,
                                   size_hint_x=1, size_hint_y=None)
         self.content.bind(minimum_height=self.content.setter('height'))
         main_layout.add_widget(header)
@@ -275,7 +282,7 @@ class SettingStringExchange(SettingString):
         address.bind(text=self.check_address)
         self.content.add_widget(address)
         self.address.append(address)
-        unit = Spinner(values=self.currencies, text=self.currencies[0], size_hint_x=0.2, id='%d' % self.num_rows)
+        unit = Spinner(values=self.currencies, text=self.currencies[0], size_hint_x=0.1, id='%d' % self.num_rows)
         self.selected_unit = self.currencies[0]
         unit.bind(text=self.set_unit)
         self.content.add_widget(unit)
@@ -284,11 +291,18 @@ class SettingStringExchange(SettingString):
         rates.bind(on_release=self.enter_rates)
         self.content.add_widget(rates)
         self.rates.append(rates)
+        bot = Spinner(values=self.bots, text=self.bots[0], size_hint_x=0.1, id='%d' % self.num_rows)
+        self.selected_bot = self.bots[0]
+        bot.bind(text=self.set_bot)
+        self.content.add_widget(bot)
+        self.bot.append(bot)
+
         if isinstance(instance, dict):
             keys_button.text = instance['public'][:8] + ' / ' + instance['secret'][:8]
             address.text = instance['address']
             unit.text = instance['unit']
             rates.text = instance['ask'] + ' | ' + instance['bid']
+            bot.text = instance['bot']
 
     def enter_keys(self, instance):
         """
@@ -514,6 +528,9 @@ class SettingStringExchange(SettingString):
             api_keys_file.write(json.dumps(new_api_keys))
             api_keys_file.close()
 
+        if self.calling_keys_button.text == self.edit_public[:8] + " / " + self.edit_secret[:8]:
+            self.calling_keys_button.text = 'Set Keys'
+
         self.chosen_api_key_pair = None
         self.update_api_spinners()
         self.add_keys_popup.dismiss()
@@ -557,6 +574,9 @@ class SettingStringExchange(SettingString):
 
     def set_unit(self, instance, value):
         self.selected_unit = value
+
+    def set_bot(self, instance, value):
+        self.selected_bot = value
 
     def enter_rates(self, instance):
         """

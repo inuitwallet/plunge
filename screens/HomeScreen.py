@@ -1,3 +1,5 @@
+from itertools import izip_longest
+import json
 from kivy.clock import Clock
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
@@ -5,6 +7,7 @@ from kivy.garden.graph import Graph, MeshLinePlot, MeshStemPlot
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
+from kivy.uix.scrollview import ScrollView
 import os
 from platform import system
 import subprocess
@@ -17,6 +20,13 @@ __author__ = 'woolly_sammoth'
 
 from kivy.uix.screenmanager import Screen
 
+
+class HeadingLabel(Label):
+    pass
+
+
+class SubHeadingLabel(Label):
+    pass
 
 class HomeScreen(Screen):
 
@@ -37,15 +47,18 @@ class HomeScreen(Screen):
         self.currency_spinner = self.ids.currency_spinner.__self__
         self.exchange_buy_side_label = self.ids.exchange_buy_side.__self__
         self.exchange_sell_side_label = self.ids.exchange_sell_side.__self__
-        self.exchange_valid_label = self.ids.exchange_valid.__self__
         self.exchange_balance_label = self.ids.exchange_balance.__self__
+        self.exchange_ask_rate_label = self.ids.exchange_ask_rate.__self__
+        self.exchange_bid_rate_label = self.ids.exchange_bid_rate.__self__
         self.exchange_efficiency_label = self.ids.exchange_efficiency.__self__
-        self.exchange_missing_label = self.ids.exchange_missing.__self__
-        self.exchange_rejects_label = self.ids.exchange_rejects.__self__
         self.personal_buy_side = self.ids.personal_buy_side.__self__
         self.personal_sell_side = self.ids.personal_sell_side.__self__
+        self.personal_buy_side_rate = self.ids.personal_buy_side_rate.__self__
+        self.personal_sell_side_rate = self.ids.personal_sell_side_rate.__self__
         self.personal_efficiency = self.ids.personal_efficiency.__self__
         self.personal_balance = self.ids.personal_balance.__self__
+        self.min_liquidity = self.ids.min_liquidity.__self__
+        self.min_rate = self.ids.min_rate.__self__
         self.min_efficiency = self.ids.min_efficiency.__self__
         self.min_balance = self.ids.min_balance.__self__
 
@@ -54,17 +67,21 @@ class HomeScreen(Screen):
         self.primary_exchange = None
         self.num_users = None
         self.sampling = None
-        self.total_buy_side = None
-        self.total_sell_side = None
+        self.total_ask_liquidity = None
+        self.total_bid_liquidity = None
         self.total_efficiency = None
         self.total_balance = None
+        self.total_ask_rate = None
+        self.total_bid_rate = None
+        self.total_liquidity = None
+        self.total_rate = None
 
         self.exchange_buy_side = {}
         self.exchange_sell_side = {}
         self.exchange_valid = {}
         for exchange in self.PlungeApp.active_exchanges:
-            self.exchange_buy_side[exchange] = None
-            self.exchange_sell_side[exchange] = None
+            self.exchange_buy_side[exchange] = {}
+            self.exchange_sell_side[exchange] = {}
             self.exchange_valid[exchange] = None
 
         # set up the dictionaries that hold the returned server data
@@ -82,16 +99,21 @@ class HomeScreen(Screen):
         self.exchange_buy_liquidity = {}
         self.exchange_sell_liquidity = {}
         self.exchange_valid_submissions = {}
+        self.exchange_ask_rate = {}
+        self.exchange_bid_rate = {}
         self.total_buy_liquidity = []
         self.total_sell_liquidity = []
         self.total_efficiency_list = []
         self.total_balance_list = []
+        self.total_rate_list = []
 
         # set up UI and start timers
+        self.getting_pool_stats = False
+        self.getting_exchange_stats = False
+        self.getting_personal_stats = False
         self.set_exchange_spinners()
         self.PlungeApp.logger.info("Setting refresh Period to %s" % self.PlungeApp.config.get('server', 'period'))
         Clock.schedule_interval(self.get_stats, self.PlungeApp.config.getint('server', 'period'))
-        self.get_stats(0)
         return
 
     def set_exchange_spinners(self):
@@ -114,6 +136,7 @@ class HomeScreen(Screen):
                                                 exchange in self.PlungeApp.active_exchanges]
                 self.primary_exchange = self.PlungeApp.active_exchanges[0]
                 self.exchange_spinner.text = self.PlungeApp.get_string(self.primary_exchange)
+                self.PlungeApp.logger.info("Set Primary Exchange to %s" % self.primary_exchange)
             else:
                 self.PlungeApp.show_popup(self.PlungeApp.get_string('Popup_Error'),
                                           self.PlungeApp.get_string('No_Exchanges'))
@@ -147,13 +170,16 @@ class HomeScreen(Screen):
 
     def get_pool_stats(self):
         # get the pool status
+        if self.getting_pool_stats is True:
+            return
+        self.getting_pool_stats = True
         self.PlungeApp.logger.info("Get the Pool Stats")
         status = dict(self.PlungeApp.utils.get("http://%s:%s/status" %
                                                (self.PlungeApp.config.get('server', 'host'),
                                                 self.PlungeApp.config.get('server', 'port'))))
         
         if 'error' not in status:
-            self.PlungeApp.logger.info("Server returned OK")
+            self.PlungeApp.logger.info("Pool stats returned OK")
             self.pool = {}
             self.pool['buy_liquidity'] = status['liquidity'][0]
             self.pool['sell_liquidity'] = status['liquidity'][1]
@@ -166,51 +192,77 @@ class HomeScreen(Screen):
             self.update_pool_stats()
         else:
             self.PlungeApp.logger.warn("%d - %s" % (status['code'], status['message']))
+        self.getting_pool_stats = False
 
     def get_exchange_stats(self):
         # get the exchange status
+        if self.getting_exchange_stats is True:
+            return
+        self.getting_exchange_stats = True
         self.PlungeApp.logger.info("Get the Exchange Stats")
         exchanges = dict(self.PlungeApp.utils.get("http://%s:%s/exchanges" %
                                                   (self.PlungeApp.config.get('server', 'host'),
                                                    self.PlungeApp.config.get('server', 'port'))))
 
         if 'error' not in exchanges:
-            self.PlungeApp.logger.info("Server returned OK")
+            self.PlungeApp.logger.info("Exchange stats returned OK")
             self.stats = exchanges
         else:
             self.PlungeApp.logger.warn("%d - %s" % (exchanges['code'], exchanges['message']))
+        self.getting_exchange_stats = False
 
     def get_personal_stats(self):
         # get the individual status for each account
+        if self.getting_personal_stats is True:
+            return
+        self.getting_personal_stats = True
         self.user = {}
+        with open('api_keys.json') as api_keys_file:
+            api_keys = json.load(api_keys_file)
+        api_keys_file.close()
         for exchange in self.PlungeApp.active_exchanges:
-            self.PlungeApp.logger.info("Get Personal Stats for %s" % exchange)
-            user = dict(self.PlungeApp.utils.get("http://%s:%s/%s" %
-                                                 (self.PlungeApp.config.get('server', 'host'),
-                                                  self.PlungeApp.config.get('server', 'port'),
-                                                  self.PlungeApp.config.get(exchange, 'public'))))
-            if 'error' not in user:
-                self.PlungeApp.logger.info("Server returned OK")
-                self.user[exchange] = user
-                # update the graph data lists
-                if exchange not in self.exchange_efficiency:
-                    self.exchange_efficiency[exchange] = []
-                self.update_lists((self.user[exchange]['efficiency'] * 100), self.exchange_efficiency[exchange])
-                if exchange not in self.exchange_balance:
-                    self.exchange_balance[exchange] = []
-                self.update_lists(self.user[exchange]['balance'], self.exchange_balance[exchange])
-                if exchange not in self.exchange_missing:
-                    self.exchange_missing[exchange] = []
-                self.update_lists(self.user[exchange]['missing'], self.exchange_missing[exchange])
-                if exchange not in self.exchange_rejects:
-                    self.exchange_rejects[exchange] = []
-                self.update_lists(self.user[exchange]['rejects'], self.exchange_rejects[exchange])
-                for currency in self.PlungeApp.active_currencies:
-                    if currency in user['units']:
-                        self.user[exchange][currency] = user['units'][currency]
-            else:
-                self.PlungeApp.logger.warn("%d - %s" % (user['code'], user['message']))
-        self.PlungeApp.logger.info("Personal Stats - %s" % str(self.user))
+            self.user[exchange] = {'balance': 0, 'num_keys': 0, 'efficiency': 0}
+            for currency in self.PlungeApp.currencies:
+                self.user[exchange][currency] = {'ask_liquidity': 0, 'bid_liquidity': 0, 'ask_rate': 0, 'bid_rate': 0}
+            for set in api_keys:
+                if set['exchange'] == exchange:
+                    self.PlungeApp.logger.info("Get Personal Stats for %s - %s" % (exchange, set['public']))
+                    user = dict(self.PlungeApp.utils.get("http://%s:%s/%s" %
+                                (self.PlungeApp.config.get('server', 'host'),
+                                 self.PlungeApp.config.get('server', 'port'),
+                                 set['public'])))
+                    if 'error' not in user:
+                        self.PlungeApp.logger.info("Personal stats returned OK")
+                        self.user[exchange]['balance'] += user['balance']
+                        self.user[exchange]['num_keys'] += 1
+                        self.user[exchange]['efficiency'] += user['efficiency']
+                        for currency in self.PlungeApp.currencies:
+                            if currency in user['units']:
+                                for order in user['units'][currency]['ask']:
+                                    self.user[exchange][currency]['ask_liquidity'] += order['amount']
+                                for order in user['units'][currency]['bid']:
+                                    self.user[exchange][currency]['bid_liquidity'] += order['amount']
+                                self.user[exchange][currency]['ask_rate'] += user['units'][currency]['rate']['ask']
+                                self.user[exchange][currency]['bid_rate'] += user['units'][currency]['rate']['bid']
+
+                                #  update the graph data lists
+                                self.ensure_lists(self.exchange_buy_liquidity, exchange, currency)
+                                self.update_lists(self.user[exchange][currency]['bid_liquidity'],
+                                                  self.exchange_buy_liquidity[exchange][currency])
+                                self.ensure_lists(self.exchange_sell_liquidity, exchange, currency)
+                                self.update_lists(self.user[exchange][currency]['ask_liquidity'],
+                                                  self.exchange_sell_liquidity[exchange][currency])
+                    else:
+                        self.PlungeApp.logger.warn("%d - %s" % (user['code'], user['message']))
+            if self.user[exchange]['num_keys'] > 0:
+                self.user[exchange]['efficiency'] /= self.user[exchange]['num_keys']
+
+            # update the graph data lists
+            self.ensure_lists(self.exchange_efficiency, exchange)
+            self.update_lists((self.user[exchange]['efficiency'] * 100), self.exchange_efficiency[exchange])
+            self.ensure_lists(self.exchange_balance, exchange)
+            self.update_lists(self.user[exchange]['balance'], self.exchange_balance[exchange])
+
         if self.primary_exchange in self.user:
             if self.primary_currency in self.user[self.primary_exchange]:
                 self.update_personal_stats()
@@ -218,6 +270,20 @@ class HomeScreen(Screen):
                 self.PlungeApp.logger.warn("%s not found in personal stats" % self.primary_currency)
         else:
             self.PlungeApp.logger.warn("%s not found in personal stats" % self.primary_exchange)
+        self.getting_personal_stats = False
+
+    @staticmethod
+    def ensure_lists(list_name, exchange, currency=None):
+        if exchange not in list_name:
+            if currency is None:
+                list_name[exchange] = []
+                return
+            else:
+                list_name[exchange] = {}
+        if currency is not None:
+            if currency not in list_name[exchange]:
+                list_name[exchange][currency] = []
+
 
     def update_pool_stats(self):
         self.PlungeApp.logger.info("Update Pool stats")
@@ -226,79 +292,79 @@ class HomeScreen(Screen):
 
     def update_personal_stats(self):
         self.PlungeApp.logger.info("Update Personal stats")
-        self.exchange_balance_label.text = "[ref='exchange_balance']%.4f[/ref]" % \
+        self.exchange_balance_label.text = "[ref='exchange_balance']%.8f[/ref]" % \
                                            self.user[self.primary_exchange]['balance']
         self.exchange_efficiency_label.text = "[ref='exchange_efficiency']%.2f%%[/ref]" % \
                                               (self.user[self.primary_exchange]['efficiency'] * 100)
-        self.exchange_missing_label.text = "[ref='exchange_missing']%d[/ref]" % \
-                                           self.user[self.primary_exchange]['missing']
-        self.exchange_rejects_label.text = "[ref='exchange_rejects']%d[/ref]" %\
-                                           self.user[self.primary_exchange]['rejects']
+        ask_rate = (self.user[self.primary_exchange][self.primary_currency]['ask_rate'] * 100)
+        self.exchange_ask_rate_label.text = "[ref='exchange_missing']%.2f%%[/ref]" % ask_rate
+        bid_rate = (self.user[self.primary_exchange][self.primary_currency]['bid_rate'] * 100)
+        self.exchange_bid_rate_label.text = "[ref='exchange_rejects']%.2f%%[/ref]" % bid_rate
 
         self.calculations()
 
         self.exchange_buy_side_label.text = "[ref='exchange_buy_side']%.4f[/ref]" % \
-                                            self.exchange_buy_side[self.primary_exchange]
+                                            self.user[self.primary_exchange][self.primary_currency]['bid_liquidity']
         self.exchange_sell_side_label.text = "[ref='exchange_sell_side']%.4f[/ref]" % \
-                                             self.exchange_sell_side[self.primary_exchange]
-        self.exchange_valid_label.text = "[ref='exchange_valid']%d[/ref]" % \
-                                         self.exchange_valid[self.primary_exchange]
-
+                                             self.user[self.primary_exchange][self.primary_currency]['ask_liquidity']
         self.personal_buy_side.text = "[ref='total_buy_side']%.4f[/ref]" % \
-                                      self.total_buy_side
+                                      self.total_bid_liquidity
+        self.personal_buy_side_rate.text = "[ref='total_buy_side_rate']%.2f%%[/ref]" % (self.total_bid_rate * 100)
         self.personal_sell_side.text = "[ref='total_sell_side']%.4f[/ref]" % \
-                                       self.total_sell_side
+                                       self.total_ask_liquidity
+        self.personal_sell_side_rate.text = "[ref='total_sell_side_rate']%.2f%%[/ref]" % (self.total_ask_rate * 100)
         self.personal_efficiency.text = "[ref='total_efficiency']%.2f%%[/ref]" % \
                                         (self.total_efficiency * 100)
         self.min_efficiency.text = "%.2f%%" % \
                                    (self.total_efficiency * 100)
-        self.personal_balance.text = "[ref='total_balance']%.4f[/ref]" % \
+        self.personal_balance.text = "[ref='total_balance']%.8f[/ref]" % \
                                      self.total_balance
         self.min_balance.text = "%.4f" %\
                                 self.total_balance
+        self.min_liquidity.text = "%.4f" % self.total_liquidity
+        self.min_rate.text = "%.2f%%" % (self.total_rate * 100)
 
     def calculations(self):
         # total buy side liquidity
-        self.total_buy_side = 0
-        self.total_sell_side = 0
+        self.total_ask_liquidity = 0
+        self.total_bid_liquidity = 0
+        self.total_ask_rate = 0
+        ask_rate_sum = 0
+        self.total_bid_rate = 0
+        bid_rate_sum = 0
         self.total_efficiency = 0
         self.total_balance = 0
+        self.total_liquidity = 0
+        self.total_rate = 0
         self.PlungeApp.logger.info("Calculations")
-        for exchange in self.PlungeApp.active_exchanges:
-            self.exchange_buy_side[exchange] = 0
-            self.exchange_sell_side[exchange] = 0
-            if exchange in self.user:
-                self.exchange_valid[exchange] = self.pool['sampling'] - (self.user[exchange]['missing'] + self.user[exchange]['rejects'])
-                self.total_efficiency += self.user[exchange]['efficiency']
-                self.total_balance += self.user[exchange]['balance']
-                for currency in self.PlungeApp.active_currencies:
-                    if currency in self.user[exchange]:
-                        for order in self.user[exchange][currency]['bid_orders']:
-                            self.total_buy_side += order[1]
-                            self.exchange_buy_side[exchange] += order[1]
-                        for order in self.user[exchange][currency]['ask_orders']:
-                            self.total_sell_side += order[1]
-                            self.exchange_sell_side[exchange] += order[1]
-                    else:
-                        self.PlungeApp.logger.error("%s not found in personal stats" % currency)
-                # update exchange graphing lists
-                if exchange not in self.exchange_buy_liquidity:
-                    self.exchange_buy_liquidity[exchange] = []
-                self.update_lists(self.exchange_buy_side[exchange], self.exchange_buy_liquidity[exchange])
-                if exchange not in self.exchange_sell_liquidity:
-                    self.exchange_sell_liquidity[exchange] = []
-                self.update_lists(self.exchange_sell_side[exchange], self.exchange_sell_liquidity[exchange])
-                if exchange not in self.exchange_valid_submissions:
-                    self.exchange_valid_submissions[exchange] = []
-                self.update_lists(self.exchange_valid[exchange], self.exchange_valid_submissions[exchange])
-            else:
-                self.PlungeApp.logger.error("%s not found in personal stats" % exchange)
 
-        self.total_efficiency /= len(self.PlungeApp.active_exchanges)
+        num_exchanges = 0
+
+        for exchange in self.PlungeApp.exchanges:
+            if exchange not in self.user:
+                continue
+            num_exchanges += 1
+            self.total_efficiency += self.user[exchange]['efficiency']
+            self.total_balance += self.user[exchange]['balance']
+            for currency in self.PlungeApp.currencies:
+                if currency not in self.user[exchange]:
+                    continue
+                self.total_ask_liquidity += self.user[exchange][currency]['ask_liquidity']
+                self.total_bid_liquidity += self.user[exchange][currency]['bid_liquidity']
+                ask_rate_sum += (self.user[exchange][currency]['ask_liquidity'] * self.user[exchange][currency]['ask_rate'])
+                bid_rate_sum += (self.user[exchange][currency]['bid_liquidity'] * self.user[exchange][currency]['bid_rate'])
+
+        self.total_efficiency /= num_exchanges
+
+        self.total_ask_rate = (ask_rate_sum / self.total_ask_liquidity) if ask_rate_sum > 0 else 0
+        self.total_bid_rate = (bid_rate_sum / self.total_bid_liquidity) if bid_rate_sum > 0 else 0
+        self.total_liquidity = self.total_ask_liquidity + self.total_bid_liquidity
+        total_rate_sum = ask_rate_sum + bid_rate_sum
+        self.total_rate = (total_rate_sum / self.total_liquidity) if total_rate_sum > 0 else 0
 
         # update the total graphing lists
-        self.update_lists(self.total_buy_side, self.total_buy_liquidity)
-        self.update_lists(self.total_sell_side, self.total_sell_liquidity)
+        self.update_lists(self.total_bid_liquidity, self.total_buy_liquidity)
+        self.update_lists(self.total_ask_liquidity, self.total_sell_liquidity)
         self.update_lists((self.total_efficiency * 100), self.total_efficiency_list)
         self.update_lists(self.total_balance, self.total_balance_list)
 
@@ -432,17 +498,15 @@ class HomeScreen(Screen):
         self.show_graph_popup(title)
 
     def draw_liquidity_chart(self, title, buy_points, sell_points, stem=False):
-        print(buy_points)
-        print(sell_points)
         y_min = min(buy_points, sell_points)
         y_max = max(buy_points, sell_points)
         self.graph = Graph(ylabel='NBT', x_ticks_minor=5, x_ticks_major=25, y_ticks_major=5,
                       y_grid_label=True, x_grid_label=True, padding=5, x_grid=True, y_grid=True, xmin=0,
                       xmax=len(y_max), ymin=(min(y_min)-10), ymax=(max(y_max)+20))
         if stem is True:
-            buy_plot = MeshStemPlot(color=[1, 0.72157, 0, 1])
+            buy_plot = MeshStemPlot(color=[0, 0.65490, 0.82745, 1])
         else:
-            buy_plot = MeshLinePlot(color=[1, 0.72157, 0, 1])
+            buy_plot = MeshLinePlot(color=[0, 0.65490, 0.82745, 1])
         points = []
         x = 0
         for point in buy_points:
@@ -451,9 +515,9 @@ class HomeScreen(Screen):
         buy_plot.points = points
         self.graph.add_plot(buy_plot)
         if stem is True:
-            sell_plot = MeshStemPlot(color=[0, 0.45490, 0.62745, 1])
+            sell_plot = MeshStemPlot(color=[1, 0.72157, 0, 1])
         else:
-            sell_plot = MeshLinePlot(color=[0, 0.45490, 0.62745, 1])
+            sell_plot = MeshLinePlot(color=[1, 0.72157, 0, 1])
         points = []
         x = 0
         for point in sell_points:
@@ -471,7 +535,7 @@ class HomeScreen(Screen):
         button = Button(text=self.PlungeApp.get_string('Close'), size_hint=(None, None), size=(250, 50))
         button_layout.add_widget(button)
         content.add_widget(button_layout)
-        self.graph_popup = Popup(title=title, content=content, auto_dismiss=False)
+        self.graph_popup = Popup(title=title, content=content, auto_dismiss=False, size_hint=(.9, .9))
         button.bind(on_press=self.close_graph_popup)
         self.graph_popup.open()
         padding = ((self.graph_popup.width - button.width) / 2)
@@ -483,19 +547,85 @@ class HomeScreen(Screen):
         self.graph = None
         return
 
-    def show_info(self, title, data):
+    def show_pool_info(self):
+        data = [('Total_Liquidity', (self.pool['buy_liquidity'] + self.pool['sell_liquidity'])),
+                ('Num_Users', self.pool['num_users']),
+                ('Sampling', self.pool['sampling'])]
         content = BoxLayout(orientation='vertical')
         grid = GridLayout(cols=2, size_hint=(1, 0.8))
         for d in data:
-            grid.add_widget(Label(text=self.PlungeApp.get_string(d) + ":", font_size=18, halign='right', markup=True))
-            grid.add_widget(Label(text=str(data[d]), font_size=18, halign='left', markup=True))
+            grid.add_widget(Label(text=self.PlungeApp.get_string(d[0]) + ":", font_size=18,
+                                  halign='right', markup=True))
+            grid.add_widget(Label(text=str(d[1]), font_size=18, halign='left', markup=True))
         content.add_widget(grid)
         content.add_widget(BoxLayout(size_hint=(1, 0.1)))
         button_layout = BoxLayout(size_hint=(1, 0.1))
         button = Button(text=self.PlungeApp.get_string('Close'), size_hint=(1, None), height=50)
         button_layout.add_widget(button)
         content.add_widget(button_layout)
-        self.info = Popup(title=title, content=content, auto_dismiss=False, size_hint=(None, None), size=(300, 400))
+        self.info = Popup(title=self.PlungeApp.get_string('Pool_Info'), content=content, auto_dismiss=False,
+                          size_hint=(None, None), size=(350, 300))
+        button.bind(on_press=self.close_info)
+        self.info.open()
+        return
+
+    def show_exchange_info(self):
+        content = BoxLayout(orientation='vertical')
+        scroll_view = ScrollView(do_scroll_x=False)
+        top_grid = GridLayout(cols=2, spacing='5dp', size_hint=(1, 0.4))
+        data = [(self.PlungeApp.get_string('Target'), self.PlungeApp.get_string('No_Data')),
+                (self.PlungeApp.get_string('Maximal_Rate'), self.PlungeApp.get_string('No_Data')),
+                (self.PlungeApp.get_string('Low'), self.PlungeApp.get_string('No_Data')),
+                (self.PlungeApp.get_string('High'), self.PlungeApp.get_string('No_Data'))]
+        if self.primary_exchange in self.stats:
+            if self.primary_currency in self.stats[self.primary_exchange]:
+                stats = self.stats[self.primary_exchange][self.primary_currency]
+                data = [(self.PlungeApp.get_string('Target'), '%.2f / %.2f' % (stats['ask']['target'], stats['bid']['target'])),
+                        (self.PlungeApp.get_string('Maximal_Rate'), '%.4f / %.4f' % (stats['ask']['rate'], stats['bid']['rate'])),
+                        (self.PlungeApp.get_string('Low'), '%.4f / %.4f' % (stats['ask']['low'], stats['bid']['low'])),
+                        (self.PlungeApp.get_string('High'), '%.4f / %.4f' % (stats['ask']['high'], stats['bid']['high']))]
+        for d in data:
+            top_grid.add_widget(Label(text=str(d[0]), font_size=18, halign='right', markup=True))
+            top_grid.add_widget(Label(text=str(d[1]), font_size=18, halign='left', markup=True))
+        bottom_layout = GridLayout(cols=1, spacing='5dp', size_hint_x=1, size_hint_y=None,
+                                   row_default_height='30dp', row_force_default=True)
+        bottom_layout.bind(minimum_height=bottom_layout.setter('height'))
+        if self.primary_exchange in self.stats:
+            if self.primary_currency in self.stats[self.primary_exchange]:
+                stats = self.stats[self.primary_exchange][self.primary_currency]
+                for x in range(1, (len(stats['ask']['orders'])+1)):
+                    bottom_layout.add_widget(HeadingLabel(text='%s %d' % (self.PlungeApp.get_string('Order_Group'), x),
+                                                          font_size=22))
+                    side_layout = BoxLayout(orientation='horizontal')
+                    side_layout.add_widget(HeadingLabel(text=self.PlungeApp.get_string('Ask'), font_size=20))
+                    side_layout.add_widget(HeadingLabel(text=self.PlungeApp.get_string('Bid'), font_size=20))
+                    bottom_layout.add_widget(side_layout)
+                    column_layout = BoxLayout(orientation='horizontal')
+                    column_layout.add_widget(SubHeadingLabel(text=self.PlungeApp.get_string('Amount'), font_size=18))
+                    column_layout.add_widget(SubHeadingLabel(text=self.PlungeApp.get_string('Rate'), font_size=18))
+                    column_layout.add_widget(SubHeadingLabel(text=self.PlungeApp.get_string('Amount'), font_size=18))
+                    column_layout.add_widget(SubHeadingLabel(text=self.PlungeApp.get_string('Rate'), font_size=18))
+                    bottom_layout.add_widget(column_layout)
+                    orders = izip_longest(stats['ask']['orders'][x-1], stats['bid']['orders'][x-1],
+                                          fillvalue={'amount': 0, 'cost': 0})
+                    for order in orders:
+                        order_grid = BoxLayout(orientation='horizontal')
+                        order_grid.add_widget(Label(text='%.8f' % order[0]['amount'] if order[0]['amount'] > 0 else '%d' % order[0]['amount'], font_size=16))
+                        order_grid.add_widget(Label(text='%.4f' % order[0]['cost'] if order[0]['cost'] > 0 else '%d' % order[0]['cost'], font_size=16))
+                        order_grid.add_widget(Label(text='%.8f' % order[1]['amount'] if order[1]['amount'] > 0 else '%d' % order[1]['amount'], font_size=16))
+                        order_grid.add_widget(Label(text='%.4f' % order[1]['cost'] if order[1]['cost'] > 0 else '%d' % order[1]['cost'], font_size=16))
+                        bottom_layout.add_widget(order_grid)
+        scroll_view.add_widget(bottom_layout)
+        content.add_widget(top_grid)
+        content.add_widget(BoxLayout(size_hint=(1, 0.05)))
+        content.add_widget(scroll_view)
+        content.add_widget(BoxLayout(size_hint=(1, 0.1)))
+        button_layout = BoxLayout(size_hint=(1, 0.1))
+        button = Button(text=self.PlungeApp.get_string('Close'), size_hint=(1, None), height=50)
+        button_layout.add_widget(button)
+        content.add_widget(button_layout)
+        title = "%s %s ( ask / bid )" % (self.PlungeApp.get_string(self.primary_exchange), self.PlungeApp.get_string("Info"))
+        self.info = Popup(title=title, content=content, auto_dismiss=False, size_hint=(.9, .9))
         button.bind(on_press=self.close_info)
         self.info.open()
         return

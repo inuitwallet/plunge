@@ -17,6 +17,7 @@
   "poloniex": "Poloniex",
   "bitcoincoid": "Bitcoin Indonesia",
   "bter": "BTER",
+  "bittrex": "Bittrex",
 
   "OK": "OK",
   "Close": "Close",
@@ -40,8 +41,8 @@
 
   "Pool_Stats": "Pool Stats",
   "Pool_Liquidity": "Pool Liquidity",
-  "Buy_Side_Liquidity": "Buy Side Liquidity",
-  "Sell_Side_Liquidity": "Sell Side Liquidity",
+  "Buy_Side_Liquidity": "Bid Liquidity",
+  "Sell_Side_Liquidity": "Ask Liquidity",
   "Total_Liquidity": "Total Liquidity",
   "Num_Users": "Users",
   "Sampling": "Sampling",
@@ -49,8 +50,18 @@
 
   "Exchange_Stats": "Exchange Stats",
   "Exchange_Liquidity": "Exchange Liquidity",
+  "Maximal_Rate": "Maximum Rate",
   "Rate": "Rate",
+  "Ask_Rate": "Ask Rate",
+  "Bid_Rate": "Bid Rate",
   "Fee": "Fee",
+  "Orders": "Orders",
+  "Amount": "Amount",
+  "Ask": "Ask",
+  "Bid": "Bid",
+  "Low": "Low",
+  "High": "High",
+  "Order_Group": "Order Group",
   "Target": "Target",
   "Valid_Submissions": "Valid Submissions",
   "Balance": "Balance",
@@ -60,5 +71,8 @@
   "Last_Error": "Last Error",
 
   "Personal_Stats": "Personal Stats",
-  "Total_Liquidity": "Total Liquidity"
+  "Total_Liquidity": "Total Liquidity",
+  "Total_Rate": "Total Rate",
+  "Liquidity": "Liquidity",
+  "Rate": "Rate"
 }
