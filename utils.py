@@ -55,7 +55,7 @@ class utils:
         return b'\x00' * pad + res
 
     def get(self, url):
-        self.PlungeApp.logger.info("Request sent to %s" % url)
+        # self.PlungeApp.logger.info("Request sent to %s" % url)
         try:
             r = requests.get(url, timeout=10)
             if r.status_code != requests.codes.OK:
