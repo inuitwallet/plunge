@@ -8,6 +8,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
+import logging
 import os
 from platform import system
 import subprocess
@@ -15,6 +16,8 @@ import signal
 from Queue import Queue, Empty
 from threading import Thread
 import sys
+from decimal import Decimal
+import client.client
 
 __author__ = 'woolly_sammoth'
 
@@ -378,102 +381,36 @@ class HomeScreen(Screen):
             self.stop_client()
 
     def start_client(self):
-        override = self.PlungeApp.config.getint('config', 'override')
-        config_file = self.PlungeApp.config.get('config', 'file')
-        if os.path.isfile(config_file):
-            if override == 1:
-                self.PlungeApp.logger.info("Starting client without building config file")
-                self.run_client()
-                return
-            else:
-                os.remove(config_file)
-        if self.build_config_file():
-            self.run_client()
-
-    def build_config_file(self):
-        self.PlungeApp.logger.info("Building config file")
-        with open(self.PlungeApp.config.get('config', 'file'), "w+") as config_file:
-            for exchange in self.PlungeApp.exchanges:
-                self.PlungeApp.logger.info("Setting config for %s" % exchange)
-                active = self.PlungeApp.config.getint('exchanges', exchange)
-                if active == 0:
-                    continue
-                address = self.PlungeApp.config.get(exchange, 'address')
-                if address == "":
-                    self.PlungeApp.logger.error("No Payout Address set")
-                    self.PlungeApp.show_popup(self.PlungeApp.get_string("Config_Error"),
-                                              self.PlungeApp.get_string("No_Address") %
-                                              self.PlungeApp.get_string(exchange))
-                    return False
-                if not self.PlungeApp.utils.check_checksum(address):
-                    self.PlungeApp.logger.error("Invalid Payout Address")
-                    self.PlungeApp.show_popup(self.PlungeApp.get_string("Config_Error"),
-                                              self.PlungeApp.get_string("Invalid_Address") %
-                                              self.PlungeApp.get_string(exchange))
-                    return False
-                public = self.PlungeApp.config.get(exchange, 'public')
-                if public == "":
-                    self.PlungeApp.logger.error("No Public API Key set")
-                    self.PlungeApp.show_popup(self.PlungeApp.get_string("Config_Error"),
-                                              self.PlungeApp.get_string("No_Public") %
-                                              self.PlungeApp.get_string(exchange))
-                    return False
-                secret = self.PlungeApp.config.get(exchange, 'secret')
-                if secret == "":
-                    self.PlungeApp.logger.error("No Secret API Key set")
-                    self.PlungeApp.show_popup(self.PlungeApp.get_string("Config_Error"),
-                                              self.PlungeApp.get_string("No_Secret") %
-                                              self.PlungeApp.get_string(exchange))
-                    return False
-                nubot = "nubot" if self.PlungeApp.config.getint(exchange, 'nubot') == 1 else ""
-                for currency in self.PlungeApp.currencies:
-                    active = self.PlungeApp.config.getdefaultint(exchange, currency, 0)
-                    if active == 1:
-                        config_file.write("%s %s %s %s %s %s\n" % (address, currency.upper(), exchange, public, secret, nubot))
-        config_file.close()
-        self.PlungeApp.logger.info("Config file built")
-        return True
-
-    def enqueue_output(self, out, queue):
-        for line in iter(out.readline, b''):
-            queue.put(line)
-        out.close()
-
-    def run_client(self):
         host = self.PlungeApp.config.get('server', 'host')
-        ip = self.PlungeApp.config.get('server', 'port')
-        config_file = self.PlungeApp.config.get('config', 'file')
-        command = ""
-        ON_POSIX = 'posix' in sys.builtin_module_names
-        if system() == 'Linux':
-            command = ["python", "%s/client/client.py" % os.getcwd(), "%s:%s" % (host, ip), "%s" % config_file]
-        self.PlungeApp.logger.info("Running client with command %s" % command)
-        try:
-            self.output = subprocess.Popen(command, stderr=subprocess.PIPE, bufsize=1, close_fds=ON_POSIX)
-            self.q = Queue()
-            self.t = Thread(target=self.enqueue_output, args=(self.output.stderr, self.q))
-            self.t.daemon = True
-            self.t.start()
-        except OSError as e:
-            self.PlungeApp.show_popup(self.PlungeApp.get_string('Popup_Error'),
-                                      "%s\n\n%s" % (self.PlungeApp.get_string('Client_Run_Error'), e.strerror))
-            return
-        Clock.schedule_interval(self.read_output, 0.2)
+        port = self.PlungeApp.config.get('server', 'port')
+        self.client = client.client.Client('%s:%s' % (host, port))
+        with open('user_data.json') as user_file:
+            user_data = json.load(user_file)
+        user_file.close()
+        for exchange in user_data:
+            for d in user_data[exchange]:
+                self.client.set(str(d['public']), str(d['secret']), str(d['address']), str(exchange), str(d['unit']),
+                                (float(d['bid']) / 100), (float(d['ask']) / 100), str(d['bot']))
+        self.client.start()
+        self.client_logger = client.client.getlogger()
+        log_handler = logging.StreamHandler(self.redirect_logger(self.log_output))
+        self.client_logger.addHandler(log_handler)
         self.PlungeApp.client_running = True
         self.running_label.color = (0, 1, 0.28235, 1)
         self.running_label.text = self.PlungeApp.get_string("Client_Started")
         self.start_button.text = self.PlungeApp.get_string('Stop')
 
-    def read_output(self, dt):
-        try:
-            line = self.q.get_nowait()
-        except Empty:
-            return
-        else:
-            self.log_output.text += line
+    class redirect_logger(object):
+
+        def __init__(self, text_display):
+            self.out = text_display
+
+        def write(self, string):
+            self.out.text = self.out.text + string
 
     def stop_client(self):
-        self.output.send_signal(signal.SIGTERM)
+        self.client.stop()
+        self.client.join()
         self.log_output.text += 'Stopped!\n'
         self.PlungeApp.client_running = False
         self.running_label.color = (0.93725, 0.21176, 0.07843, 1)

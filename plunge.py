@@ -1,3 +1,9 @@
+import sys
+from os import environ
+from os.path import join, dirname, realpath
+exec_dir = dirname(realpath(sys.argv[0]))
+#environ['KIVY_DATA_DIR'] = join(exec_dir, 'data')
+
 __author__ = 'woolly_sammoth'
 
 from kivy.config import Config
@@ -118,7 +124,7 @@ class PlungeApp(App):
         ch.setFormatter(formatter)
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
-        self.logger_socket = socketlogger.start_logging_receiver('Plunge')
+        # self.logger_socket = socketlogger.start_logging_receiver('Client')
         # sys.excepthook = self.log_uncaught_exceptions
         return
 
