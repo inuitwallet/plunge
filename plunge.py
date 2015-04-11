@@ -10,7 +10,7 @@ from kivy.config import Config
 
 Config.set('graphics', 'borderless', '0')
 Config.set('graphics', 'resizable', '1')
-Config.set('graphics', 'fullscreen', '0')
+Config.set('graphics', 'fullscreen', '1')
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
 from kivy.app import App
@@ -76,9 +76,9 @@ class TopActionBar(ActionBar):
             self.PlungeApp.is_min = True
         else:
             if self.PlungeApp.config.getint('standard', 'monitor') == 1:
-                Window.size = (1000, 800)
+                Window.size = (1000, (self.PlungeApp.win_height - 200))
             else:
-                Window.size = (1000, 1000)
+                Window.size = (1000, self.PlungeApp.win_height)
             height = self.height
             self.height = 2 * height if height != self.standard_height else height
             self.top_size_button.text = self.PlungeApp.get_string("Minimise")
@@ -108,6 +108,7 @@ class PlungeApp(App):
         self.active_currencies = []
         self.client_running = False
         self.is_min = False
+        self.win_height = 1000
 
         if not os.path.isdir('logs'):
             os.makedirs('logs')
@@ -176,8 +177,19 @@ class PlungeApp(App):
             self.topActionBar.minimise(self.get_string("Maximise"))
             self.is_min = False
             self.set_monitor()
+        Clock.schedule_once(self.resize_window, 0.1)
         Clock.schedule_once(self.show_disclaimer, 1)
         return self.root
+
+    def resize_window(self, dt):
+        height = Window.height
+        Window.fullscreen = 0
+        if height < 1050:
+            self.win_height = (height-50)
+        else:
+            self.win_height = 1000
+
+
 
     def show_disclaimer(self, dt):
         print 'here'
@@ -205,10 +217,10 @@ class PlungeApp(App):
         if self.is_min is False:
             self.homeScreen.max_layout.remove_widget(self.homeScreen.run_layout)
             if self.config.getint('standard', 'monitor') == 1:
-                Window.size = (1000, 800)
+                Window.size = (1000, (self.win_height - 200))
             else:
                 self.homeScreen.max_layout.add_widget(self.homeScreen.run_layout)
-                Window.size = (1000, 1000)
+                Window.size = (1000, self.win_height)
 
     def get_string(self, text):
         try:
