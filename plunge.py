@@ -4,7 +4,7 @@ from kivy.config import Config
 
 Config.set('graphics', 'borderless', '0')
 Config.set('graphics', 'resizable', '1')
-Config.set('graphics', 'fullscreen', '1')
+Config.set('graphics', 'fullscreen', '0')
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
 from kivy.app import App
@@ -69,9 +69,9 @@ class TopActionBar(ActionBar):
             self.PlungeApp.is_min = True
         else:
             if self.PlungeApp.config.getint('standard', 'monitor') == 1:
-                Window.size = (1000, (self.PlungeApp.win_height - 200))
+                Window.size = (1000, 800)
             else:
-                Window.size = (1000, self.PlungeApp.win_height)
+                Window.size = (1000, 1000)
             height = self.height
             self.height = 2 * height if height != self.standard_height else height
             self.top_size_button.text = self.PlungeApp.get_string("Minimise")
@@ -101,7 +101,6 @@ class PlungeApp(App):
         self.active_currencies = []
         self.client_running = False
         self.is_min = False
-        self.win_height = 1000
 
         if not os.path.isdir('logs'):
             os.makedirs('logs')
@@ -170,23 +169,12 @@ class PlungeApp(App):
             self.topActionBar.minimise(self.get_string("Maximise"))
             self.is_min = False
             self.set_monitor()
-        Clock.schedule_once(self.resize_window, 0.1)
         Clock.schedule_once(self.show_disclaimer, 1)
         return self.root
 
-    def resize_window(self, dt):
-        height = Window.height
-        Window.fullscreen = 0
-        if height < 1000:
-            self.win_height = (height-200)
-        else:
-            self.win_height = 1000
-
-
-
     def show_disclaimer(self, dt):
         content = BoxLayout(orientation='vertical')
-        content.add_widget(Label(text=self.get_string('Disclaimer_Text') + str(self.win_height), size_hint=(1, 0.8), font_size=16,
+        content.add_widget(Label(text=self.get_string('Disclaimer_Text'), size_hint=(1, 0.8), font_size=16,
                                  text_size=(500, 250)))
         content.add_widget(BoxLayout(size_hint=(1, 0.1)))
         button_layout = BoxLayout(size_hint=(1, 0.1), spacing='20dp')
@@ -209,10 +197,10 @@ class PlungeApp(App):
         if self.is_min is False:
             self.homeScreen.max_layout.remove_widget(self.homeScreen.run_layout)
             if self.config.getint('standard', 'monitor') == 1:
-                Window.size = (1000, (self.win_height - 200))
+                Window.size = (1000, 800)
             else:
                 self.homeScreen.max_layout.add_widget(self.homeScreen.run_layout)
-                Window.size = (1000, self.win_height)
+                Window.size = (1000, 1000)
 
     def get_string(self, text):
         try:

@@ -94,12 +94,12 @@ class utils:
         return exchanges
 
     def get_active_currencies(self, exchange):
-        currencies = []
-        for currency in self.PlungeApp.currencies:
-            if currency in currencies:
-                continue
-            if self.PlungeApp.config.getdefaultint(exchange, currency, 0) > 0:
-                currencies.append(currency)
+        currencies = self.PlungeApp.currencies
+        #for currency in self.PlungeApp.currencies:
+        #    if currency in currencies:
+        #        continue
+        #    if self.PlungeApp.config.getdefaultint(exchange, currency, 0) > 0:
+        #        currencies.append(currency)
         self.PlungeApp.logger.info("Got active currencies - %s" % str(currencies))
         return currencies
 
