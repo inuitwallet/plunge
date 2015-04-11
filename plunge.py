@@ -1,9 +1,3 @@
-import sys
-from os import environ
-from os.path import join, dirname, realpath
-exec_dir = dirname(realpath(sys.argv[0]))
-#environ['KIVY_DATA_DIR'] = join(exec_dir, 'data')
-
 __author__ = 'woolly_sammoth'
 
 from kivy.config import Config
@@ -31,7 +25,6 @@ import time
 import utils
 import os
 import json
-import socketlogger
 import sys
 
 import screens.HomeScreen as HomeScreen
@@ -184,7 +177,7 @@ class PlungeApp(App):
     def resize_window(self, dt):
         height = Window.height
         Window.fullscreen = 0
-        if height < 1050:
+        if height < 1000:
             self.win_height = (height-50)
         else:
             self.win_height = 1000
@@ -192,9 +185,8 @@ class PlungeApp(App):
 
 
     def show_disclaimer(self, dt):
-        print 'here'
         content = BoxLayout(orientation='vertical')
-        content.add_widget(Label(text=self.get_string('Disclaimer_Text'), size_hint=(1, 0.8), font_size=16,
+        content.add_widget(Label(text=self.get_string('Disclaimer_Text') + str(self.win_height), size_hint=(1, 0.8), font_size=16,
                                  text_size=(500, 250)))
         content.add_widget(BoxLayout(size_hint=(1, 0.1)))
         button_layout = BoxLayout(size_hint=(1, 0.1), spacing='20dp')
