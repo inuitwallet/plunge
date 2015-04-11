@@ -178,7 +178,7 @@ class PlungeApp(App):
         height = Window.height
         Window.fullscreen = 0
         if height < 1000:
-            self.win_height = (height-50)
+            self.win_height = (height-200)
         else:
             self.win_height = 1000
 
