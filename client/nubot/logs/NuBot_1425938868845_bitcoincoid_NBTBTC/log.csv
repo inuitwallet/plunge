@@ -1,0 +1,21 @@
+message,level,source,method,time
+Setting up  NuBot version : 0.1.5b,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.853 UTC
+Init logging system,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.872 UTC
+Set up SSL certificates,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.873 UTC
+Load options from 1 files : /tmp/tmpduFT1X,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.874 UTC
+Wrap the keys into a new ApiKeys object,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.875 UTC
+Creating an Exchange object,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.876 UTC
+Create e ExchangeLiveData object to accomodate liveData from the exchange,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.890 UTC
+Create a new TradeInterface object,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.891 UTC
+Swapped pair mode : false,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.892 UTC
+The bot detected a 0 TX fee : forcing a priceOffset of 0.1% [if required],WARNING,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.894 UTC
+Create a TaskManager ,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.894 UTC
+Starting task : Check connection with exchange,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.903 UTC
+Waiting  a for the connectionThreads to detect connection,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.904 UTC
+Configuring NuBot for Dual-Side strategy,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:51.911 UTC
+Start trading Strategy specific for nbtbtc,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:51.920 UTC
+Options : {<br>dualSide=true<br> submitLiquidity=false<br> executeOrders=true<br> verbose=false<br> sendHipchat=false<br> apiKey=T1WBB90W-JCSM19QI-5BA7YIPJ-C1AQYC47-XCROLSCS<br> nubitAddress=<br> rpcUser=<br> nudIp=127.0.0.1<br> nudPort=9091<br> priceIncrement=3.0E-4<br> txFee=0.2<br> exchangeName=bitcoincoid<br> pair=nbtbtc<br> executeStrategyInterval=41<br> sendLiquidityInterval=130<br> sendMails=false<br> mailRecipient=null<br> emergencyTimeoutMinutes 60<br> keepProceeds=0.0<br> aggregate=false <br><br>SecondaryPegOptionsJSON : <br>backupFeedNames [blockchain  coinbase  bitstamp] <br>distanceThreshold 10.0<br>mainFeed bitfinex <br>spread 0.1 <br>wallchangeThreshold 0.3},INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:51.921 UTC
+Updated Froozen Balances file (res/frozen/nbt_btc-bitcoincoid-frozen.json) : 0 BTC,INFO,com.nubits.nubot.utils.FrozenBalancesManager,updateFrozenFilesystem,Mar 09 2015 22:07:51.963 UTC
+Forcing a 0.9% minimum spread to protect from collisions,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:51.970 UTC
+NuBot will be start running in 69 seconds  to sync with remote NTP and place walls during next wall shift window.,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:52.036 UTC
+Bot shutting down..,INFO,com.nubits.nubot.launch.NuBot$1,run,Mar 09 2015 22:07:55.065 UTC

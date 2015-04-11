@@ -1,0 +1,39 @@
+message,level,source,method,time
+Setting up  NuBot version : 0.1.5b,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:04.595 UTC
+Init logging system,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:04.624 UTC
+Set up SSL certificates,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:04.626 UTC
+Load options from 1 files : /tmp/tmp4mE7rG,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:04.627 UTC
+Wrap the keys into a new ApiKeys object,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:04.629 UTC
+Creating an Exchange object,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:04.630 UTC
+Create e ExchangeLiveData object to accomodate liveData from the exchange,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:04.653 UTC
+Create a new TradeInterface object,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:04.655 UTC
+Swapped pair mode : false,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:04.656 UTC
+The bot detected a 0 TX fee : forcing a priceOffset of 0.1% [if required],WARNING,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:04.658 UTC
+Create a TaskManager ,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:04.659 UTC
+Starting task : Check connection with exchange,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:04.672 UTC
+Waiting  a for the connectionThreads to detect connection,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:04.674 UTC
+Configuring NuBot for Dual-Side strategy,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:07.681 UTC
+Start trading Strategy specific for nbtbtc,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:07.683 UTC
+Options : {<br>dualSide=true<br> submitLiquidity=false<br> executeOrders=true<br> verbose=false<br> sendHipchat=false<br> apiKey=T1WBB90W-JCSM19QI-5BA7YIPJ-C1AQYC47-XCROLSCS<br> nubitAddress=<br> rpcUser=<br> nudIp=127.0.0.1<br> nudPort=9091<br> priceIncrement=3.0E-4<br> txFee=0.2<br> exchangeName=bitcoincoid<br> pair=nbtbtc<br> executeStrategyInterval=41<br> sendLiquidityInterval=130<br> sendMails=false<br> mailRecipient=null<br> emergencyTimeoutMinutes 60<br> keepProceeds=0.0<br> aggregate=false <br><br>SecondaryPegOptionsJSON : <br>backupFeedNames [blockchain  coinbase  bitstamp] <br>distanceThreshold 10.0<br>mainFeed bitfinex <br>spread 0.1 <br>wallchangeThreshold 0.3},INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:07.686 UTC
+Forcing a 0.9% minimum spread to protect from collisions,INFO,com.nubits.nubot.launch.NuBot,execute,Apr 07 2015 14:12:07.697 UTC
+Problem with timeserver ntp.xs4all.nl
+java.net.SocketTimeoutException: Receive timed out,WARNING,com.nubits.nubot.NTP.NTPClient,getTime,Apr 07 2015 14:12:17.825 UTC
+Trying next server,INFO,com.nubits.nubot.NTP.NTPClient,getTime,Apr 07 2015 14:12:17.827 UTC
+Problem with timeserver nist1-pa.ustiming.org
+java.net.SocketTimeoutException: Receive timed out,WARNING,com.nubits.nubot.NTP.NTPClient,getTime,Apr 07 2015 14:12:27.883 UTC
+Trying next server,INFO,com.nubits.nubot.NTP.NTPClient,getTime,Apr 07 2015 14:12:27.884 UTC
+Problem with timeserver nist-time-server.eoni.com
+java.net.SocketTimeoutException: Receive timed out,WARNING,com.nubits.nubot.NTP.NTPClient,getTime,Apr 07 2015 14:12:38.016 UTC
+Trying next server,INFO,com.nubits.nubot.NTP.NTPClient,getTime,Apr 07 2015 14:12:38.018 UTC
+Liquidity is not being sent : orders are not yet initialized,WARNING,com.nubits.nubot.tasks.SubmitLiquidityinfoTask,checkOrders,Apr 07 2015 14:12:46.682 UTC
+Problem with timeserver time.nist.gov
+java.net.SocketTimeoutException: Receive timed out,WARNING,com.nubits.nubot.NTP.NTPClient,getTime,Apr 07 2015 14:12:48.505 UTC
+Trying next server,INFO,com.nubits.nubot.NTP.NTPClient,getTime,Apr 07 2015 14:12:48.506 UTC
+Problem with timeserver utcnist.colorado.edu
+java.net.SocketTimeoutException: Receive timed out,WARNING,com.nubits.nubot.NTP.NTPClient,getTime,Apr 07 2015 14:12:58.980 UTC
+Trying next server,INFO,com.nubits.nubot.NTP.NTPClient,getTime,Apr 07 2015 14:12:58.981 UTC
+Problem with timeserver nist.time.nosc.us
+java.net.SocketTimeoutException: Receive timed out,WARNING,com.nubits.nubot.NTP.NTPClient,getTime,Apr 07 2015 14:13:09.044 UTC
+Cannot update time after querying 6 timeservers. ,SEVERE,com.nubits.nubot.NTP.NTPClient,getTime,Apr 07 2015 14:13:09.045 UTC
+Bot shutting down..,INFO,com.nubits.nubot.launch.NuBot$1,run,Apr 07 2015 14:13:09.047 UTC
+Clearing out active orders ... ,INFO,com.nubits.nubot.launch.NuBot$1,run,Apr 07 2015 14:13:09.048 UTC

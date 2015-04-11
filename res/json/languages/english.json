@@ -7,6 +7,9 @@
   "Start": "Start",
   "Stop": "Stop",
 
+  "Disclaimer": "Disclaimer",
+  "Disclaimer_Text": "PLEASE BE AWARE THAT AUTOMATED TRADING WITH THIS SOFTWARE MAY BE RISKY, ADDICTIVE, UNETHICAL OR ILLEGAL.\nITS MISUSE MAY ALSO CAUSE FINANCIAL LOSS.\nNONE OF THE AUTHORS, CONTRIBUTORS, ADMINISTRATORS, OR ANYONE ELSE CONNECTED WITH NUBITS, IN ANY WAY WHATSOEVER, CAN BE RESPONSIBLE FOR THE USE YOU MAKE OF THIS SOFTWARE\n\nBy using Plunge you declare to have accepted the mentioned risks.",
+
   "Plunge_Configuration": "Plunge Configuration",
   "CCEDK_Settings": "CCEDK Settings",
   "Poloniex_Settings": "Poloniex Settings",
@@ -20,6 +23,7 @@
   "bittrex": "Bittrex",
 
   "OK": "OK",
+  "Cancel": "Cancel",
   "Close": "Close",
   "Info": "Information",
   "No_Data": "No Data",

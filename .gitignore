@@ -1,6 +1,10 @@
-client/*
 *.pyc
 logs/*
 .idea
 users.dat
 plunge.ini
+api_keys.json
+user_data.json
+plunge.dist
+plunge.build
+DODO

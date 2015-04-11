@@ -1,0 +1,123 @@
+message,level,source,method,time
+Setting up  NuBot version : 0.1.5b,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:11.128 UTC
+Init logging system,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:11.146 UTC
+Set up SSL certificates,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:11.147 UTC
+Load options from 1 files : /tmp/tmp_najQk,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:11.148 UTC
+Wrap the keys into a new ApiKeys object,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:11.149 UTC
+Creating an Exchange object,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:11.150 UTC
+Create e ExchangeLiveData object to accomodate liveData from the exchange,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:11.164 UTC
+Create a new TradeInterface object,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:11.165 UTC
+Swapped pair mode : false,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:11.166 UTC
+CCEDK uses global TX fee  currency pair not supported.now calling getTxFee(),WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,getTxFee,Mar 09 2015 21:43:11.167 UTC
+Create a TaskManager ,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:11.168 UTC
+Starting task : Check connection with exchange,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:11.176 UTC
+Waiting  a for the connectionThreads to detect connection,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:11.177 UTC
+Configuring NuBot for Dual-Side strategy,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:14.184 UTC
+Start trading Strategy specific for nbtbtc,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:14.192 UTC
+Options : {<br>dualSide=true<br> submitLiquidity=false<br> executeOrders=true<br> verbose=false<br> sendHipchat=false<br> apiKey=2CQ4QB8AHNKT96QE0G6Y51YI7WOG0H6L2955KWR86TPU4R0KCVJY4LYWHGWLPE74<br> nubitAddress=<br> rpcUser=<br> nudIp=127.0.0.1<br> nudPort=9091<br> priceIncrement=3.0E-4<br> txFee=0.2<br> exchangeName=ccedk<br> pair=nbtbtc<br> executeStrategyInterval=41<br> sendLiquidityInterval=130<br> sendMails=false<br> mailRecipient=null<br> emergencyTimeoutMinutes 60<br> keepProceeds=0.0<br> aggregate=false <br><br>SecondaryPegOptionsJSON : <br>backupFeedNames [blockchain  coinbase  bitstamp] <br>distanceThreshold 10.0<br>mainFeed bitfinex <br>spread 0.0 <br>wallchangeThreshold 0.3},INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:14.193 UTC
+Updated Froozen Balances file (res/frozen/nbt_btc-ccedk-frozen.json) : 0 BTC,INFO,com.nubits.nubot.utils.FrozenBalancesManager,updateFrozenFilesystem,Mar 09 2015 21:43:14.235 UTC
+Forcing a 0.9% minimum spread to protect from collisions,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:14.241 UTC
+NuBot will be start running in 106 seconds  to sync with remote NTP and place walls during next wall shift window.,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:43:14.330 UTC
+Liquidity is not being sent : orders are not yet initialized,WARNING,com.nubits.nubot.tasks.SubmitLiquidityinfoTask,checkOrders,Mar 09 2015 21:43:53.184 UTC
+javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target,SEVERE,com.nubits.nubot.pricefeeds.CoinbasePriceFeed,getLastPrice,Mar 09 2015 21:45:01.064 UTC
+Error while updating BTC price from coinbase,WARNING,com.nubits.nubot.pricefeeds.PriceFeedManager,getLastPrices,Mar 09 2015 21:45:01.065 UTC
+CCEDK uses global TX fee  currency pair not supported.now calling getTxFee(),WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,getTxFee,Mar 09 2015 21:45:01.235 UTC
+Computing USD prices with spread 0.9%  : sell @ 1.0065 buy @ 0.9935,INFO,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,initStrategy,Mar 09 2015 21:45:01.237 UTC
+Converted price (using 1 BTC = 287.93 USD) : sell @ 0.00349564 BTC; buy @ 0.00345049 BTC,INFO,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,initStrategy,Mar 09 2015 21:45:01.238 UTC
+Initializing strategy,INFO,com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask,run,Mar 09 2015 21:45:01.239 UTC
+Frozen funds already in balance (not proceeds) updated : 0.0 Currency{fiat=false  code=BTC  extendedName=Bitcoin},INFO,com.nubits.nubot.utils.FrozenBalancesManager,setBalanceAlreadyThere,Mar 09 2015 21:45:04.036 UTC
+CCEDK uses global TX fee  currency pair not supported.now calling getTxFee(),WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,getTxFee,Mar 09 2015 21:45:04.806 UTC
+Strategy - Submit order : SELL side order :  SELL 1.5 NBT @ 0.00349564 BTC,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:45:04.808 UTC
+Strategy - SELL Response1 = 3186824,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:45:05.746 UTC
+Strategy - Submit order : SELL side order :  SELL 1.5 NBT @ 0.00349564 BTC,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:45:11.157 UTC
+Strategy : SELL Response2 = 3186827,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:45:11.577 UTC
+Initial walls placed,INFO,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,placeInitialWalls,Mar 09 2015 21:45:11.994 UTC
+
+,INFO,com.nubits.nubot.tasks.SubmitLiquidityinfoTask,checkOrders,Mar 09 2015 21:46:04.390 UTC
+javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target,SEVERE,com.nubits.nubot.pricefeeds.CoinbasePriceFeed,getLastPrice,Mar 09 2015 21:48:00.756 UTC
+Error while updating BTC price from coinbase,WARNING,com.nubits.nubot.pricefeeds.PriceFeedManager,getLastPrices,Mar 09 2015 21:48:00.757 UTC
+Walls needs to be shifted,INFO,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,verifyPegPrices,Mar 09 2015 21:48:00.884 UTC
+Sell Price 0.00349795  | Buy Price  0.00345277,INFO,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,computeNewPrices,Mar 09 2015 21:48:00.885 UTC
+Strategy received a price change notification.,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask,notifyPriceChanged,Mar 09 2015 21:48:00.886 UTC
+Shift needed on ccedk
+Reason : 3 minutes elapsed since last shift,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask,notifyPriceChanged,Mar 09 2015 21:48:00.887 UTC
+Immediately try to cancel all orders,INFO,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,shiftWalls,Mar 09 2015 21:48:00.888 UTC
+Order 3186827 deleted succesfully,WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,clearOrders,Mar 09 2015 21:48:01.822 UTC
+Order 3186824 deleted succesfully,WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,clearOrders,Mar 09 2015 21:48:02.887 UTC
+CCEDK uses global TX fee  currency pair not supported.now calling getTxFee(),WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,getTxFee,Mar 09 2015 21:48:03.802 UTC
+Strategy - Submit order : SELL side order :  SELL 1.5 NBT @ 0.00349795 BTC,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:48:03.803 UTC
+Strategy - SELL Response1 = 3186855,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:48:04.607 UTC
+Strategy - Submit order : SELL side order :  SELL 1.5 NBT @ 0.00349795 BTC,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:48:10.272 UTC
+Strategy : SELL Response2 = 3186858,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:48:10.876 UTC
+Liquidity is not being sent  a wall shift is happening. Will send on next execution.,WARNING,com.nubits.nubot.tasks.SubmitLiquidityinfoTask,checkOrders,Mar 09 2015 21:48:13.185 UTC
+Wall shift successful,INFO,com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask,notifyPriceChanged,Mar 09 2015 21:48:17.415 UTC
+javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target,SEVERE,com.nubits.nubot.pricefeeds.CoinbasePriceFeed,getLastPrice,Mar 09 2015 21:48:17.512 UTC
+Error while updating BTC price from coinbase,WARNING,com.nubits.nubot.pricefeeds.PriceFeedManager,getLastPrices,Mar 09 2015 21:48:17.513 UTC
+Mon Mar 09 21:48:17 GMT 2015 blockchain BTC 287.74 USD 0.00349795 0.00345277 ,WARNING,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,computeNewPrices,Mar 09 2015 21:48:17.514 UTC
+
+,INFO,com.nubits.nubot.tasks.SubmitLiquidityinfoTask,checkOrders,Mar 09 2015 21:50:24.069 UTC
+javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target,SEVERE,com.nubits.nubot.pricefeeds.CoinbasePriceFeed,getLastPrice,Mar 09 2015 21:51:01.008 UTC
+Error while updating BTC price from coinbase,WARNING,com.nubits.nubot.pricefeeds.PriceFeedManager,getLastPrices,Mar 09 2015 21:51:01.009 UTC
+Walls needs to be shifted,INFO,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,verifyPegPrices,Mar 09 2015 21:51:01.172 UTC
+Sell Price 0.00349856  | Buy Price  0.00345337,INFO,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,computeNewPrices,Mar 09 2015 21:51:01.175 UTC
+Strategy received a price change notification.,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask,notifyPriceChanged,Mar 09 2015 21:51:01.176 UTC
+Shift needed on ccedk
+Reason : 3 minutes elapsed since last shift,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask,notifyPriceChanged,Mar 09 2015 21:51:01.177 UTC
+Immediately try to cancel all orders,INFO,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,shiftWalls,Mar 09 2015 21:51:01.178 UTC
+Order 3186858 deleted succesfully,WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,clearOrders,Mar 09 2015 21:51:02.163 UTC
+Order 3186855 deleted succesfully,WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,clearOrders,Mar 09 2015 21:51:03.187 UTC
+CCEDK uses global TX fee  currency pair not supported.now calling getTxFee(),WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,getTxFee,Mar 09 2015 21:51:04.169 UTC
+Strategy - Submit order : SELL side order :  SELL 1.5 NBT @ 0.00349856 BTC,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:51:04.170 UTC
+Strategy - SELL Response1 = 3186885,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:51:04.618 UTC
+Strategy - Submit order : SELL side order :  SELL 1.5 NBT @ 0.00349856 BTC,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:51:10.008 UTC
+Strategy : SELL Response2 = 3186888,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:51:10.439 UTC
+Wall shift successful,INFO,com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask,notifyPriceChanged,Mar 09 2015 21:51:16.873 UTC
+javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target,SEVERE,com.nubits.nubot.pricefeeds.CoinbasePriceFeed,getLastPrice,Mar 09 2015 21:51:16.976 UTC
+Error while updating BTC price from coinbase,WARNING,com.nubits.nubot.pricefeeds.PriceFeedManager,getLastPrices,Mar 09 2015 21:51:16.977 UTC
+Mon Mar 09 21:51:16 GMT 2015 blockchain BTC 287.69 USD 0.00349856 0.00345337 ,WARNING,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,computeNewPrices,Mar 09 2015 21:51:16.978 UTC
+
+,INFO,com.nubits.nubot.tasks.SubmitLiquidityinfoTask,checkOrders,Mar 09 2015 21:52:34.021 UTC
+javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target,SEVERE,com.nubits.nubot.pricefeeds.CoinbasePriceFeed,getLastPrice,Mar 09 2015 21:54:00.882 UTC
+Error while updating BTC price from coinbase,WARNING,com.nubits.nubot.pricefeeds.PriceFeedManager,getLastPrices,Mar 09 2015 21:54:00.883 UTC
+Walls needs to be shifted,INFO,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,verifyPegPrices,Mar 09 2015 21:54:01.013 UTC
+Sell Price 0.00351003  | Buy Price  0.00346469,INFO,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,computeNewPrices,Mar 09 2015 21:54:01.014 UTC
+Strategy received a price change notification.,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask,notifyPriceChanged,Mar 09 2015 21:54:01.014 UTC
+Shift needed on ccedk
+Reason : 3 minutes elapsed since last shift,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask,notifyPriceChanged,Mar 09 2015 21:54:01.015 UTC
+Immediately try to cancel all orders,INFO,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,shiftWalls,Mar 09 2015 21:54:01.015 UTC
+Order 3186888 deleted succesfully,WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,clearOrders,Mar 09 2015 21:54:01.836 UTC
+Order 3186885 deleted succesfully,WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,clearOrders,Mar 09 2015 21:54:02.813 UTC
+CCEDK uses global TX fee  currency pair not supported.now calling getTxFee(),WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,getTxFee,Mar 09 2015 21:54:08.859 UTC
+Strategy - Submit order : SELL side order :  SELL 1.5 NBT @ 0.00351003 BTC,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:54:08.861 UTC
+Strategy - SELL Response1 = 3186916,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:54:09.270 UTC
+Strategy - Submit order : SELL side order :  SELL 1.5 NBT @ 0.00351003 BTC,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:54:14.675 UTC
+Strategy : SELL Response2 = 3186926,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:54:15.065 UTC
+Wall shift successful,INFO,com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask,notifyPriceChanged,Mar 09 2015 21:54:21.515 UTC
+javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target,SEVERE,com.nubits.nubot.pricefeeds.CoinbasePriceFeed,getLastPrice,Mar 09 2015 21:54:21.604 UTC
+Error while updating BTC price from coinbase,WARNING,com.nubits.nubot.pricefeeds.PriceFeedManager,getLastPrices,Mar 09 2015 21:54:21.605 UTC
+Mon Mar 09 21:54:21 GMT 2015 blockchain BTC 286.75 USD 0.00351003 0.00346469 ,WARNING,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,computeNewPrices,Mar 09 2015 21:54:21.606 UTC
+
+,INFO,com.nubits.nubot.tasks.SubmitLiquidityinfoTask,checkOrders,Mar 09 2015 21:54:44.056 UTC
+
+,INFO,com.nubits.nubot.tasks.SubmitLiquidityinfoTask,checkOrders,Mar 09 2015 21:56:54.045 UTC
+javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target,SEVERE,com.nubits.nubot.pricefeeds.CoinbasePriceFeed,getLastPrice,Mar 09 2015 21:57:00.893 UTC
+Error while updating BTC price from coinbase,WARNING,com.nubits.nubot.pricefeeds.PriceFeedManager,getLastPrices,Mar 09 2015 21:57:00.894 UTC
+Walls needs to be shifted,INFO,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,verifyPegPrices,Mar 09 2015 21:57:01.067 UTC
+Sell Price 0.00349686  | Buy Price  0.00345169,INFO,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,computeNewPrices,Mar 09 2015 21:57:01.069 UTC
+Strategy received a price change notification.,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask,notifyPriceChanged,Mar 09 2015 21:57:01.069 UTC
+Shift needed on ccedk
+Reason : 3 minutes elapsed since last shift,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask,notifyPriceChanged,Mar 09 2015 21:57:01.070 UTC
+Immediately try to cancel all orders,INFO,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,shiftWalls,Mar 09 2015 21:57:01.071 UTC
+Order 3186926 deleted succesfully,WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,clearOrders,Mar 09 2015 21:57:01.885 UTC
+Order 3186916 deleted succesfully,WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,clearOrders,Mar 09 2015 21:57:02.815 UTC
+CCEDK uses global TX fee  currency pair not supported.now calling getTxFee(),WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,getTxFee,Mar 09 2015 21:57:08.221 UTC
+Strategy - Submit order : SELL side order :  SELL 1.5 NBT @ 0.00349686 BTC,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:57:08.223 UTC
+Strategy - SELL Response1 = 3186947,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:57:08.651 UTC
+Strategy - Submit order : SELL side order :  SELL 1.5 NBT @ 0.00349686 BTC,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:57:14.098 UTC
+Strategy : SELL Response2 = 3186955,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 21:57:14.571 UTC
+Wall shift successful,INFO,com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask,notifyPriceChanged,Mar 09 2015 21:57:20.572 UTC
+javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target,SEVERE,com.nubits.nubot.pricefeeds.CoinbasePriceFeed,getLastPrice,Mar 09 2015 21:57:20.655 UTC
+Error while updating BTC price from coinbase,WARNING,com.nubits.nubot.pricefeeds.PriceFeedManager,getLastPrices,Mar 09 2015 21:57:20.656 UTC
+Mon Mar 09 21:57:20 GMT 2015 blockchain BTC 287.83 USD 0.00349686 0.00345169 ,WARNING,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,computeNewPrices,Mar 09 2015 21:57:20.657 UTC
+Bot shutting down..,INFO,com.nubits.nubot.launch.NuBot$1,run,Mar 09 2015 21:58:30.707 UTC
+Clearing out active orders ... ,INFO,com.nubits.nubot.launch.NuBot$1,run,Mar 09 2015 21:58:30.708 UTC

@@ -1,0 +1,20 @@
+message,level,source,method,time
+Setting up  NuBot version : 0.1.5b,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.486 UTC
+Init logging system,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.505 UTC
+Set up SSL certificates,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.506 UTC
+Load options from 1 files : /tmp/tmp45V0bA,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.507 UTC
+Wrap the keys into a new ApiKeys object,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.508 UTC
+Creating an Exchange object,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.510 UTC
+Create e ExchangeLiveData object to accomodate liveData from the exchange,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.524 UTC
+Create a new TradeInterface object,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.525 UTC
+Swapped pair mode : false,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.526 UTC
+CCEDK uses global TX fee  currency pair not supported.now calling getTxFee(),WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,getTxFee,Mar 09 2015 22:07:48.526 UTC
+Create a TaskManager ,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.528 UTC
+Starting task : Check connection with exchange,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.536 UTC
+Waiting  a for the connectionThreads to detect connection,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:48.537 UTC
+Configuring NuBot for Dual-Side strategy,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:51.543 UTC
+Start trading Strategy specific for nbtbtc,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:51.549 UTC
+Options : {<br>dualSide=true<br> submitLiquidity=false<br> executeOrders=true<br> verbose=false<br> sendHipchat=false<br> apiKey=2CQ4QB8AHNKT96QE0G6Y51YI7WOG0H6L2955KWR86TPU4R0KCVJY4LYWHGWLPE74<br> nubitAddress=<br> rpcUser=<br> nudIp=127.0.0.1<br> nudPort=9091<br> priceIncrement=3.0E-4<br> txFee=0.2<br> exchangeName=ccedk<br> pair=nbtbtc<br> executeStrategyInterval=41<br> sendLiquidityInterval=130<br> sendMails=false<br> mailRecipient=null<br> emergencyTimeoutMinutes 60<br> keepProceeds=0.0<br> aggregate=false <br><br>SecondaryPegOptionsJSON : <br>backupFeedNames [blockchain  coinbase  bitstamp] <br>distanceThreshold 10.0<br>mainFeed bitfinex <br>spread 0.0 <br>wallchangeThreshold 0.3},INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:51.550 UTC
+Forcing a 0.9% minimum spread to protect from collisions,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:51.561 UTC
+NuBot will be start running in 69 seconds  to sync with remote NTP and place walls during next wall shift window.,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 22:07:51.649 UTC
+Bot shutting down..,INFO,com.nubits.nubot.launch.NuBot$1,run,Mar 09 2015 22:07:55.065 UTC

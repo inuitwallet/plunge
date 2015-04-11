@@ -1,0 +1,10 @@
+timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds
+
+Mon Mar 09 21:48:17 GMT 2015,blockchain,BTC,287.74,USD,0.00349795,0.00345277,{"feed":"bitstamp","price":286.55}
+
+Mon Mar 09 21:51:16 GMT 2015,blockchain,BTC,287.69,USD,0.00349856,0.00345337,{"feed":"bitstamp","price":286.94}
+
+Mon Mar 09 21:54:21 GMT 2015,blockchain,BTC,286.75,USD,0.00351003,0.00346469,{"feed":"bitstamp","price":287.83}
+
+Mon Mar 09 21:57:20 GMT 2015,blockchain,BTC,287.83,USD,0.00349686,0.00345169,{"feed":"bitstamp","price":287.7}
+

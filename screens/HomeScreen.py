@@ -115,8 +115,8 @@ class HomeScreen(Screen):
         self.getting_exchange_stats = False
         self.getting_personal_stats = False
         self.set_exchange_spinners()
-        self.PlungeApp.logger.info("Setting refresh Period to %s" % self.PlungeApp.config.get('server', 'period'))
-        Clock.schedule_interval(self.get_stats, self.PlungeApp.config.getint('server', 'period'))
+        self.PlungeApp.logger.info("Setting refresh Period to %s" % self.PlungeApp.config.get('standard', 'period'))
+        Clock.schedule_interval(self.get_stats, self.PlungeApp.config.getint('standard', 'period'))
         return
 
     def set_exchange_spinners(self):

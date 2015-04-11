@@ -9,8 +9,6 @@ __author__ = 'woolly_sammoth'
 from kivy.config import Config
 
 Config.set('graphics', 'borderless', '0')
-#Config.set('graphics', 'width', '1000')
-#Config.set('graphics', 'height', '1000')
 Config.set('graphics', 'resizable', '1')
 Config.set('graphics', 'fullscreen', '0')
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
@@ -113,6 +111,17 @@ class PlungeApp(App):
 
         if not os.path.isdir('logs'):
             os.makedirs('logs')
+        if not os.path.isfile('api_keys.json'):
+            api_keys = []
+            with open('api_keys.json', 'a+') as api_file:
+                api_file.write(json.dumps(api_keys))
+            api_file.close()
+        if not os.path.isfile('user_data.json'):
+            user_data = {exchange: [] for exchange in self.exchanges}
+            with open('user_data.json', 'a+') as user_file:
+                user_file.write(json.dumps(user_data))
+            user_file.close()
+            self.first_run = True
         self.logger = logging.getLogger('Plunge')
         self.logger.setLevel(logging.DEBUG)
         fh = logging.FileHandler('logs/%s_%d.log' % ('Plunge', time.time()))
@@ -167,7 +176,30 @@ class PlungeApp(App):
             self.topActionBar.minimise(self.get_string("Maximise"))
             self.is_min = False
             self.set_monitor()
+        Clock.schedule_once(self.show_disclaimer, 1)
         return self.root
+
+    def show_disclaimer(self, dt):
+        print 'here'
+        content = BoxLayout(orientation='vertical')
+        content.add_widget(Label(text=self.get_string('Disclaimer_Text'), size_hint=(1, 0.8), font_size=16,
+                                 text_size=(500, 250)))
+        content.add_widget(BoxLayout(size_hint=(1, 0.1)))
+        button_layout = BoxLayout(size_hint=(1, 0.1), spacing='20dp')
+        ok_button = Button(text=self.get_string('OK'), size_hint=(None, None), size=(250, 50))
+        cancel_button = Button(text=self.get_string('Cancel'), size_hint=(None, None), size=(250, 50))
+        ok_button.bind(on_press=self.close_popup)
+        cancel_button.bind(on_press=self.exit)
+        button_layout.add_widget(ok_button)
+        button_layout.add_widget(cancel_button)
+        content.add_widget(button_layout)
+        self.popup = Popup(title=self.get_string('Disclaimer'), content=content, auto_dismiss=False,
+                           size_hint=(None, None), size=(550, 450))
+        self.popup.open()
+        return
+
+    def exit(self):
+        sys.exit()
 
     def set_monitor(self):
         if self.is_min is False:
@@ -213,8 +245,8 @@ class PlungeApp(App):
         if section == "standard":
             if key == "period":
                 Clock.unschedule(self.homeScreen.get_stats)
-                self.logger.info("Setting refresh Period to %s" % self.config.get('server', 'period'))
-                Clock.schedule_interval(self.homeScreen.get_stats, self.config.getint('server', 'period'))
+                self.logger.info("Setting refresh Period to %s" % self.config.get('standard', 'period'))
+                Clock.schedule_interval(self.homeScreen.get_stats, self.config.getint('standard', 'period'))
             if key == "monitor":
                 self.set_monitor()
         self.active_exchanges = self.utils.get_active_exchanges()

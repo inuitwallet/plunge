@@ -1,0 +1,336 @@
+timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds
+
+Mon Mar 09 22:12:19 GMT 2015,blockchain,BTC,287.95,USD,0.0034954,0.00345025,{"feed":"bitstamp","price":287.96}
+
+Mon Mar 09 22:15:17 GMT 2015,blockchain,BTC,287.95,USD,0.0034954,0.00345025,{"feed":"bitstamp","price":287.95}
+
+Mon Mar 09 22:18:20 GMT 2015,blockchain,BTC,287.87,USD,0.00349637,0.00345121,{"feed":"bitstamp","price":287.96}
+
+Mon Mar 09 22:21:21 GMT 2015,blockchain,BTC,287.96,USD,0.00349528,0.00345013,{"feed":"bitstamp","price":287.96}
+
+Mon Mar 09 22:24:22 GMT 2015,blockchain,BTC,287.97,USD,0.00349516,0.00345001,{"feed":"bitstamp","price":287.87}
+
+Mon Mar 09 22:27:22 GMT 2015,blockchain,BTC,287.87,USD,0.00349637,0.00345121,{"feed":"bitstamp","price":287.87}
+
+Mon Mar 09 22:30:19 GMT 2015,blockchain,BTC,287.87,USD,0.00349637,0.00345121,{"feed":"bitstamp","price":287.84}
+
+Mon Mar 09 22:33:18 GMT 2015,blockchain,BTC,287.87,USD,0.00349637,0.00345121,{"feed":"bitstamp","price":286.18}
+
+Mon Mar 09 22:36:20 GMT 2015,blockchain,BTC,287.79,USD,0.00349734,0.00345217,{"feed":"bitstamp","price":287.79}
+
+Mon Mar 09 22:39:21 GMT 2015,blockchain,BTC,287.79,USD,0.00349734,0.00345217,{"feed":"bitstamp","price":286.5}
+
+Mon Mar 09 22:42:17 GMT 2015,blockchain,BTC,286.04,USD,0.00351874,0.00347329,{"feed":"bitstamp","price":286.29}
+
+Mon Mar 09 22:45:19 GMT 2015,blockchain,BTC,286.48,USD,0.00351333,0.00346796,{"feed":"bitstamp","price":286.06}
+
+Mon Mar 09 22:48:19 GMT 2015,blockchain,BTC,286.48,USD,0.00351333,0.00346796,{"feed":"bitstamp","price":285.89}
+
+Mon Mar 09 22:51:27 GMT 2015,bitfinex,BTC,288.9,USD,0.0034839,0.00343891,{"feed":"bitstamp","price":285.01}
+
+Mon Mar 09 22:54:31 GMT 2015,bitfinex,BTC,289.69,USD,0.0034744,0.00342953,{"feed":"bitstamp","price":284.02}
+
+Mon Mar 09 22:57:19 GMT 2015,blockchain,BTC,285.56,USD,0.00352465,0.00347913,{"feed":"bitstamp","price":285.98}
+
+Mon Mar 09 23:00:21 GMT 2015,blockchain,BTC,285.98,USD,0.00351948,0.00347402,{"feed":"bitstamp","price":285.72}
+
+Mon Mar 09 23:03:23 GMT 2015,blockchain,BTC,285.5,USD,0.00352539,0.00347986,{"feed":"bitstamp","price":286.47}
+
+Mon Mar 09 23:06:19 GMT 2015,blockchain,BTC,285.5,USD,0.00352539,0.00347986,{"feed":"bitstamp","price":286.75}
+
+Mon Mar 09 23:09:18 GMT 2015,blockchain,BTC,286.73,USD,0.00351027,0.00346493,{"feed":"bitstamp","price":286.29}
+
+Mon Mar 09 23:12:21 GMT 2015,blockchain,BTC,286.48,USD,0.00351333,0.00346796,{"feed":"bitstamp","price":286.04}
+
+Mon Mar 09 23:15:22 GMT 2015,blockchain,BTC,286.06,USD,0.00351849,0.00347305,{"feed":"bitstamp","price":286.26}
+
+Mon Mar 09 23:18:21 GMT 2015,blockchain,BTC,286.16,USD,0.00351726,0.00347183,{"feed":"bitstamp","price":284.81}
+
+Mon Mar 09 23:21:21 GMT 2015,blockchain,BTC,286.15,USD,0.00351739,0.00347196,{"feed":"bitstamp","price":286.48}
+
+Mon Mar 09 23:24:21 GMT 2015,blockchain,BTC,286.5,USD,0.00351309,0.00346771,{"feed":"bitstamp","price":286.84}
+
+Mon Mar 09 23:27:17 GMT 2015,blockchain,BTC,286.37,USD,0.00351468,0.00346929,{"feed":"bitstamp","price":286.69}
+
+Mon Mar 09 23:30:20 GMT 2015,blockchain,BTC,286.37,USD,0.00351468,0.00346929,{"feed":"bitstamp","price":287.0}
+
+Mon Mar 09 23:33:22 GMT 2015,blockchain,BTC,286.99,USD,0.00350709,0.00346179,{"feed":"bitstamp","price":287.0}
+
+Mon Mar 09 23:36:19 GMT 2015,blockchain,BTC,287.13,USD,0.00350538,0.00346011,{"feed":"bitstamp","price":287.0}
+
+Mon Mar 09 23:39:19 GMT 2015,blockchain,BTC,287.13,USD,0.00350538,0.00346011,{"feed":"bitstamp","price":286.99}
+
+Mon Mar 09 23:42:18 GMT 2015,blockchain,BTC,287.0,USD,0.00350697,0.00346167,{"feed":"bitstamp","price":286.98}
+
+Mon Mar 09 23:45:22 GMT 2015,blockchain,BTC,286.95,USD,0.00350758,0.00346228,{"feed":"bitstamp","price":286.95}
+
+Mon Mar 09 23:48:21 GMT 2015,blockchain,BTC,286.95,USD,0.00350758,0.00346228,{"feed":"bitstamp","price":286.9}
+
+Mon Mar 09 23:51:17 GMT 2015,blockchain,BTC,287.24,USD,0.00350404,0.00345878,{"feed":"bitstamp","price":287.23}
+
+Mon Mar 09 23:54:21 GMT 2015,blockchain,BTC,287.24,USD,0.00350404,0.00345878,{"feed":"bitstamp","price":287.23}
+
+Mon Mar 09 23:57:21 GMT 2015,blockchain,BTC,287.01,USD,0.00350685,0.00346155,{"feed":"bitstamp","price":287.16}
+
+Tue Mar 10 00:00:19 GMT 2015,blockchain,BTC,287.15,USD,0.00350514,0.00345986,{"feed":"bitstamp","price":287.12}
+
+Tue Mar 10 00:03:21 GMT 2015,blockchain,BTC,287.12,USD,0.0035055,0.00346023,{"feed":"bitstamp","price":287.17}
+
+Tue Mar 10 00:06:22 GMT 2015,blockchain,BTC,287.12,USD,0.0035055,0.00346023,{"feed":"bitstamp","price":287.14}
+
+Tue Mar 10 00:09:20 GMT 2015,blockchain,BTC,286.25,USD,0.00351616,0.00347074,{"feed":"bitstamp","price":286.25}
+
+Tue Mar 10 00:12:22 GMT 2015,blockchain,BTC,286.25,USD,0.00351616,0.00347074,{"feed":"bitstamp","price":287.21}
+
+Tue Mar 10 00:15:18 GMT 2015,blockchain,BTC,287.21,USD,0.0035044,0.00345914,{"feed":"bitstamp","price":285.36}
+
+Tue Mar 10 00:18:22 GMT 2015,blockchain,BTC,287.11,USD,0.00350563,0.00346035,{"feed":"bitstamp","price":287.11}
+
+Tue Mar 10 00:21:19 GMT 2015,blockchain,BTC,287.09,USD,0.00350587,0.00346059,{"feed":"bitstamp","price":287.08}
+
+Tue Mar 10 00:24:20 GMT 2015,blockchain,BTC,287.09,USD,0.00350587,0.00346059,{"feed":"bitstamp","price":286.15}
+
+Tue Mar 10 00:27:19 GMT 2015,blockchain,BTC,285.44,USD,0.00352614,0.00348059,{"feed":"bitstamp","price":286.4}
+
+Tue Mar 10 00:30:18 GMT 2015,blockchain,BTC,285.44,USD,0.00352614,0.00348059,{"feed":"bitstamp","price":286.3}
+
+Tue Mar 10 00:33:22 GMT 2015,blockchain,BTC,285.96,USD,0.00351972,0.00347426,{"feed":"bitstamp","price":287.11}
+
+Tue Mar 10 00:36:17 GMT 2015,blockchain,BTC,286.59,USD,0.00351199,0.00346662,{"feed":"bitstamp","price":287.88}
+
+Tue Mar 10 00:39:19 GMT 2015,blockchain,BTC,287.5,USD,0.00350087,0.00345565,{"feed":"bitstamp","price":287.98}
+
+Tue Mar 10 00:42:19 GMT 2015,blockchain,BTC,287.97,USD,0.00349516,0.00345001,{"feed":"bitstamp","price":287.76}
+
+Tue Mar 10 00:45:18 GMT 2015,blockchain,BTC,286.78,USD,0.00350966,0.00346433,{"feed":"bitstamp","price":287.96}
+
+Tue Mar 10 00:48:22 GMT 2015,blockchain,BTC,287.98,USD,0.00349503,0.00344989,{"feed":"bitstamp","price":287.93}
+
+Tue Mar 10 00:51:19 GMT 2015,blockchain,BTC,287.97,USD,0.00349516,0.00345001,{"feed":"bitstamp","price":287.98}
+
+Tue Mar 10 00:54:17 GMT 2015,blockchain,BTC,287.97,USD,0.00349516,0.00345001,{"feed":"bitstamp","price":287.96}
+
+Tue Mar 10 00:57:21 GMT 2015,blockchain,BTC,287.97,USD,0.00349516,0.00345001,{"feed":"bitstamp","price":287.96}
+
+Tue Mar 10 01:00:22 GMT 2015,blockchain,BTC,287.97,USD,0.00349516,0.00345001,{"feed":"bitstamp","price":287.39}
+
+Tue Mar 10 01:03:19 GMT 2015,blockchain,BTC,287.48,USD,0.00350111,0.00345589,{"feed":"bitstamp","price":287.37}
+
+Tue Mar 10 01:06:19 GMT 2015,blockchain,BTC,287.01,USD,0.00350685,0.00346155,{"feed":"bitstamp","price":287.36}
+
+Tue Mar 10 01:09:21 GMT 2015,blockchain,BTC,287.01,USD,0.00350685,0.00346155,{"feed":"bitstamp","price":287.3}
+
+Tue Mar 10 01:12:20 GMT 2015,blockchain,BTC,287.29,USD,0.00350343,0.00345818,{"feed":"bitstamp","price":287.29}
+
+Tue Mar 10 01:15:20 GMT 2015,blockchain,BTC,287.29,USD,0.00350343,0.00345818,{"feed":"bitstamp","price":287.39}
+
+Tue Mar 10 01:18:21 GMT 2015,blockchain,BTC,287.86,USD,0.00349649,0.00345133,{"feed":"bitstamp","price":287.86}
+
+Tue Mar 10 01:21:19 GMT 2015,blockchain,BTC,287.86,USD,0.00349649,0.00345133,{"feed":"bitstamp","price":287.86}
+
+Tue Mar 10 01:24:19 GMT 2015,blockchain,BTC,287.86,USD,0.00349649,0.00345133,{"feed":"bitstamp","price":287.86}
+
+Tue Mar 10 01:27:21 GMT 2015,blockchain,BTC,287.86,USD,0.00349649,0.00345133,{"feed":"bitstamp","price":287.86}
+
+Tue Mar 10 01:30:21 GMT 2015,blockchain,BTC,287.86,USD,0.00349649,0.00345133,{"feed":"bitstamp","price":287.95}
+
+Tue Mar 10 01:33:19 GMT 2015,blockchain,BTC,287.95,USD,0.0034954,0.00345025,{"feed":"bitstamp","price":287.95}
+
+Tue Mar 10 01:36:21 GMT 2015,blockchain,BTC,287.95,USD,0.0034954,0.00345025,{"feed":"bitstamp","price":287.94}
+
+Tue Mar 10 01:39:22 GMT 2015,blockchain,BTC,287.94,USD,0.00349552,0.00345037,{"feed":"bitstamp","price":287.5}
+
+Tue Mar 10 01:42:17 GMT 2015,blockchain,BTC,287.94,USD,0.00349552,0.00345037,{"feed":"bitstamp","price":287.94}
+
+Tue Mar 10 01:45:20 GMT 2015,blockchain,BTC,287.95,USD,0.0034954,0.00345025,{"feed":"bitstamp","price":288.0}
+
+Tue Mar 10 01:48:22 GMT 2015,blockchain,BTC,287.95,USD,0.0034954,0.00345025,{"feed":"bitstamp","price":287.62}
+
+Tue Mar 10 01:51:22 GMT 2015,blockchain,BTC,287.67,USD,0.0034988,0.00345361,{"feed":"bitstamp","price":287.67}
+
+Tue Mar 10 01:54:19 GMT 2015,blockchain,BTC,287.67,USD,0.0034988,0.00345361,{"feed":"bitstamp","price":287.67}
+
+Tue Mar 10 01:57:17 GMT 2015,blockchain,BTC,287.67,USD,0.0034988,0.00345361,{"feed":"bitstamp","price":288.0}
+
+Tue Mar 10 02:00:23 GMT 2015,blockchain,BTC,287.67,USD,0.0034988,0.00345361,{"feed":"bitstamp","price":287.93}
+
+Tue Mar 10 02:03:22 GMT 2015,blockchain,BTC,287.89,USD,0.00349613,0.00345097,{"feed":"bitstamp","price":288.0}
+
+Tue Mar 10 02:06:22 GMT 2015,blockchain,BTC,287.89,USD,0.00349613,0.00345097,{"feed":"bitstamp","price":288.0}
+
+Tue Mar 10 02:09:19 GMT 2015,blockchain,BTC,288.0,USD,0.00349479,0.00344965,{"feed":"bitstamp","price":288.0}
+
+Tue Mar 10 02:12:19 GMT 2015,blockchain,BTC,288.0,USD,0.00349479,0.00344965,{"feed":"bitstamp","price":288.0}
+
+Tue Mar 10 02:15:19 GMT 2015,blockchain,BTC,288.0,USD,0.00349479,0.00344965,{"feed":"bitstamp","price":288.0}
+
+Tue Mar 10 02:18:18 GMT 2015,blockchain,BTC,287.98,USD,0.00349503,0.00344989,{"feed":"bitstamp","price":287.99}
+
+Tue Mar 10 02:21:20 GMT 2015,blockchain,BTC,287.99,USD,0.00349491,0.00344977,{"feed":"bitstamp","price":287.99}
+
+Tue Mar 10 02:24:19 GMT 2015,blockchain,BTC,287.99,USD,0.00349491,0.00344977,{"feed":"bitstamp","price":288.3}
+
+Tue Mar 10 02:27:19 GMT 2015,blockchain,BTC,287.99,USD,0.00349491,0.00344977,{"feed":"bitstamp","price":288.99}
+
+Tue Mar 10 02:30:18 GMT 2015,blockchain,BTC,289.0,USD,0.0034827,0.00343772,{"feed":"bitstamp","price":289.0}
+
+Tue Mar 10 02:33:22 GMT 2015,blockchain,BTC,289.0,USD,0.0034827,0.00343772,{"feed":"bitstamp","price":289.13}
+
+Tue Mar 10 02:36:22 GMT 2015,blockchain,BTC,289.21,USD,0.00348017,0.00343522,{"feed":"bitstamp","price":289.71}
+
+Tue Mar 10 02:39:18 GMT 2015,blockchain,BTC,289.91,USD,0.00347177,0.00342693,{"feed":"bitstamp","price":289.91}
+
+Tue Mar 10 02:42:21 GMT 2015,blockchain,BTC,289.99,USD,0.00347081,0.00342598,{"feed":"bitstamp","price":289.99}
+
+Tue Mar 10 02:45:22 GMT 2015,blockchain,BTC,289.99,USD,0.00347081,0.00342598,{"feed":"bitstamp","price":290.73}
+
+Tue Mar 10 02:48:17 GMT 2015,blockchain,BTC,291.17,USD,0.00345674,0.0034121,{"feed":"bitstamp","price":291.34}
+
+Tue Mar 10 02:51:19 GMT 2015,blockchain,BTC,291.17,USD,0.00345674,0.0034121,{"feed":"bitstamp","price":292.62}
+
+Tue Mar 10 02:54:21 GMT 2015,blockchain,BTC,291.31,USD,0.00345508,0.00341046,{"feed":"bitstamp","price":291.96}
+
+Tue Mar 10 02:57:19 GMT 2015,blockchain,BTC,292.0,USD,0.00344692,0.0034024,{"feed":"bitstamp","price":293.24}
+
+Tue Mar 10 03:00:20 GMT 2015,blockchain,BTC,292.0,USD,0.00344692,0.0034024,{"feed":"bitstamp","price":292.98}
+
+Tue Mar 10 03:03:19 GMT 2015,blockchain,BTC,293.14,USD,0.00343351,0.00338917,{"feed":"bitstamp","price":293.24}
+
+Tue Mar 10 03:06:21 GMT 2015,blockchain,BTC,293.14,USD,0.00343351,0.00338917,{"feed":"bitstamp","price":293.49}
+
+Tue Mar 10 03:09:20 GMT 2015,blockchain,BTC,293.3,USD,0.00343164,0.00338732,{"feed":"bitstamp","price":293.7}
+
+Tue Mar 10 03:12:20 GMT 2015,blockchain,BTC,293.7,USD,0.00342697,0.0033827,{"feed":"bitstamp","price":293.94}
+
+Tue Mar 10 03:15:22 GMT 2015,blockchain,BTC,294.0,USD,0.00342347,0.00337925,{"feed":"bitstamp","price":292.59}
+
+Tue Mar 10 03:18:22 GMT 2015,blockchain,BTC,294.0,USD,0.00342347,0.00337925,{"feed":"bitstamp","price":294.01}
+
+Tue Mar 10 03:21:19 GMT 2015,blockchain,BTC,293.75,USD,0.00342638,0.00338213,{"feed":"bitstamp","price":293.35}
+
+Tue Mar 10 03:24:21 GMT 2015,blockchain,BTC,292.02,USD,0.00344668,0.00340216,{"feed":"bitstamp","price":291.92}
+
+Tue Mar 10 03:27:21 GMT 2015,blockchain,BTC,292.02,USD,0.00344668,0.00340216,{"feed":"bitstamp","price":291.5}
+
+Tue Mar 10 03:30:18 GMT 2015,blockchain,BTC,292.0,USD,0.00344692,0.0034024,{"feed":"bitstamp","price":292.0}
+
+Tue Mar 10 03:33:18 GMT 2015,blockchain,BTC,292.0,USD,0.00344692,0.0034024,{"feed":"bitstamp","price":292.0}
+
+Tue Mar 10 03:36:22 GMT 2015,blockchain,BTC,292.0,USD,0.00344692,0.0034024,{"feed":"bitstamp","price":292.01}
+
+Tue Mar 10 03:39:20 GMT 2015,blockchain,BTC,292.03,USD,0.00344656,0.00340205,{"feed":"bitstamp","price":292.03}
+
+Tue Mar 10 03:42:18 GMT 2015,blockchain,BTC,292.03,USD,0.00344656,0.00340205,{"feed":"bitstamp","price":291.99}
+
+Tue Mar 10 03:45:21 GMT 2015,blockchain,BTC,291.47,USD,0.00345319,0.00340858,{"feed":"bitstamp","price":291.29}
+
+Tue Mar 10 03:48:21 GMT 2015,blockchain,BTC,291.45,USD,0.00345342,0.00340882,{"feed":"bitstamp","price":291.92}
+
+Tue Mar 10 03:51:18 GMT 2015,blockchain,BTC,291.82,USD,0.00344904,0.0034045,{"feed":"bitstamp","price":291.77}
+
+Tue Mar 10 03:54:22 GMT 2015,blockchain,BTC,290.79,USD,0.00346126,0.00341655,{"feed":"bitstamp","price":291.62}
+
+Tue Mar 10 03:57:17 GMT 2015,blockchain,BTC,290.79,USD,0.00346126,0.00341655,{"feed":"bitstamp","price":289.98}
+
+Tue Mar 10 04:00:20 GMT 2015,blockchain,BTC,289.98,USD,0.00347093,0.0034261,{"feed":"bitstamp","price":289.98}
+
+Tue Mar 10 04:03:19 GMT 2015,blockchain,BTC,289.98,USD,0.00347093,0.0034261,{"feed":"bitstamp","price":289.98}
+
+Tue Mar 10 04:06:19 GMT 2015,blockchain,BTC,289.98,USD,0.00347093,0.0034261,{"feed":"bitstamp","price":289.98}
+
+Tue Mar 10 04:09:22 GMT 2015,blockchain,BTC,289.95,USD,0.00347129,0.00342645,{"feed":"bitstamp","price":290.33}
+
+Tue Mar 10 04:12:21 GMT 2015,blockchain,BTC,290.93,USD,0.0034596,0.00341491,{"feed":"bitstamp","price":290.9}
+
+Tue Mar 10 04:15:19 GMT 2015,blockchain,BTC,290.33,USD,0.00346674,0.00342197,{"feed":"bitstamp","price":290.9}
+
+Tue Mar 10 04:18:20 GMT 2015,blockchain,BTC,290.86,USD,0.00346043,0.00341573,{"feed":"bitstamp","price":291.16}
+
+Tue Mar 10 04:21:22 GMT 2015,blockchain,BTC,290.68,USD,0.00346257,0.00341785,{"feed":"bitstamp","price":291.57}
+
+Tue Mar 10 04:24:23 GMT 2015,blockchain,BTC,291.44,USD,0.00345354,0.00340893,{"feed":"bitstamp","price":290.0}
+
+Tue Mar 10 04:27:20 GMT 2015,blockchain,BTC,291.0,USD,0.00345876,0.00341409,{"feed":"bitstamp","price":290.85}
+
+Tue Mar 10 04:30:18 GMT 2015,blockchain,BTC,291.0,USD,0.00345876,0.00341409,{"feed":"bitstamp","price":290.83}
+
+Tue Mar 10 04:33:19 GMT 2015,blockchain,BTC,290.6,USD,0.00346352,0.00341879,{"feed":"bitstamp","price":288.99}
+
+Tue Mar 10 04:36:18 GMT 2015,blockchain,BTC,290.63,USD,0.00346317,0.00341844,{"feed":"bitstamp","price":290.33}
+
+Tue Mar 10 04:39:18 GMT 2015,blockchain,BTC,290.63,USD,0.00346317,0.00341844,{"feed":"bitstamp","price":290.16}
+
+Tue Mar 10 04:42:20 GMT 2015,blockchain,BTC,289.3,USD,0.00347909,0.00343415,{"feed":"bitstamp","price":290.07}
+
+Tue Mar 10 04:45:22 GMT 2015,blockchain,BTC,289.45,USD,0.00347728,0.00343237,{"feed":"bitstamp","price":290.47}
+
+Tue Mar 10 04:48:18 GMT 2015,blockchain,BTC,290.07,USD,0.00346985,0.00342504,{"feed":"bitstamp","price":291.0}
+
+Tue Mar 10 04:51:18 GMT 2015,blockchain,BTC,291.99,USD,0.00344704,0.00340251,{"feed":"bitstamp","price":292.0}
+
+Tue Mar 10 04:54:19 GMT 2015,blockchain,BTC,291.94,USD,0.00344763,0.0034031,{"feed":"bitstamp","price":291.91}
+
+Tue Mar 10 04:57:20 GMT 2015,blockchain,BTC,291.94,USD,0.00344763,0.0034031,{"feed":"bitstamp","price":291.96}
+
+Tue Mar 10 05:00:18 GMT 2015,blockchain,BTC,292.13,USD,0.00344538,0.00340088,{"feed":"bitstamp","price":292.89}
+
+Tue Mar 10 05:03:19 GMT 2015,blockchain,BTC,292.89,USD,0.00343644,0.00339206,{"feed":"bitstamp","price":292.13}
+
+Tue Mar 10 05:06:21 GMT 2015,blockchain,BTC,292.11,USD,0.00344562,0.00340112,{"feed":"bitstamp","price":292.11}
+
+Tue Mar 10 05:09:19 GMT 2015,blockchain,BTC,292.11,USD,0.00344562,0.00340112,{"feed":"bitstamp","price":292.18}
+
+Tue Mar 10 05:12:18 GMT 2015,blockchain,BTC,291.94,USD,0.00344763,0.0034031,{"feed":"bitstamp","price":291.94}
+
+Tue Mar 10 05:15:21 GMT 2015,blockchain,BTC,291.94,USD,0.00344763,0.0034031,{"feed":"bitstamp","price":292.17}
+
+Tue Mar 10 05:18:18 GMT 2015,blockchain,BTC,292.17,USD,0.00344491,0.00340042,{"feed":"bitstamp","price":292.79}
+
+Tue Mar 10 05:21:19 GMT 2015,blockchain,BTC,292.78,USD,0.00343773,0.00339333,{"feed":"bitstamp","price":292.02}
+
+Tue Mar 10 05:24:19 GMT 2015,blockchain,BTC,291.82,USD,0.00344904,0.0034045,{"feed":"bitstamp","price":291.63}
+
+Tue Mar 10 05:27:22 GMT 2015,blockchain,BTC,292.49,USD,0.00344114,0.0033967,{"feed":"bitstamp","price":292.0}
+
+Tue Mar 10 05:30:20 GMT 2015,blockchain,BTC,291.86,USD,0.00344857,0.00340403,{"feed":"bitstamp","price":292.0}
+
+Tue Mar 10 05:33:20 GMT 2015,blockchain,BTC,291.86,USD,0.00344857,0.00340403,{"feed":"bitstamp","price":292.4}
+
+Tue Mar 10 05:36:28 GMT 2015,blockchain,BTC,292.77,USD,0.00343785,0.00339345,{"feed":"bitstamp","price":291.89}
+
+Tue Mar 10 05:39:21 GMT 2015,blockchain,BTC,292.77,USD,0.00343785,0.00339345,{"feed":"bitstamp","price":292.73}
+
+Tue Mar 10 05:42:29 GMT 2015,blockchain,BTC,292.73,USD,0.00343832,0.00339391,{"feed":"bitstamp","price":292.67}
+
+Tue Mar 10 05:45:22 GMT 2015,blockchain,BTC,292.0,USD,0.00344692,0.0034024,{"feed":"bitstamp","price":292.0}
+
+Tue Mar 10 05:48:23 GMT 2015,blockchain,BTC,292.0,USD,0.00344692,0.0034024,{"feed":"bitstamp","price":292.5}
+
+Tue Mar 10 05:51:21 GMT 2015,blockchain,BTC,292.49,USD,0.00344114,0.0033967,{"feed":"bitstamp","price":292.38}
+
+Tue Mar 10 05:54:20 GMT 2015,blockchain,BTC,291.71,USD,0.00345034,0.00340578,{"feed":"bitstamp","price":292.34}
+
+Tue Mar 10 05:57:19 GMT 2015,blockchain,BTC,292.5,USD,0.00344103,0.00339658,{"feed":"bitstamp","price":292.5}
+
+Tue Mar 10 06:00:20 GMT 2015,blockchain,BTC,292.5,USD,0.00344103,0.00339658,{"feed":"bitstamp","price":292.72}
+
+Tue Mar 10 06:03:22 GMT 2015,blockchain,BTC,292.5,USD,0.00344103,0.00339658,{"feed":"bitstamp","price":292.72}
+
+Tue Mar 10 06:06:20 GMT 2015,blockchain,BTC,292.72,USD,0.00343844,0.00339403,{"feed":"bitstamp","price":292.71}
+
+Tue Mar 10 06:09:20 GMT 2015,blockchain,BTC,292.1,USD,0.00344574,0.00340123,{"feed":"bitstamp","price":292.71}
+
+Tue Mar 10 06:12:17 GMT 2015,blockchain,BTC,292.71,USD,0.00343856,0.00339414,{"feed":"bitstamp","price":292.71}
+
+Tue Mar 10 06:15:19 GMT 2015,blockchain,BTC,292.7,USD,0.00343867,0.00339426,{"feed":"bitstamp","price":292.19}
+
+Tue Mar 10 06:18:22 GMT 2015,blockchain,BTC,292.7,USD,0.00343867,0.00339426,{"feed":"bitstamp","price":292.09}
+
+Tue Mar 10 06:21:18 GMT 2015,blockchain,BTC,292.09,USD,0.00344586,0.00340135,{"feed":"bitstamp","price":291.86}
+
+Tue Mar 10 06:24:20 GMT 2015,blockchain,BTC,291.81,USD,0.00344916,0.00340461,{"feed":"bitstamp","price":291.86}
+
+Tue Mar 10 06:27:22 GMT 2015,blockchain,BTC,291.86,USD,0.00344857,0.00340403,{"feed":"bitstamp","price":291.96}
+
+Tue Mar 10 06:30:22 GMT 2015,blockchain,BTC,291.86,USD,0.00344857,0.00340403,{"feed":"bitstamp","price":292.0}
+

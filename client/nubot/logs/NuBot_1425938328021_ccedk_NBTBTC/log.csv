@@ -1,0 +1,35 @@
+message,level,source,method,time
+Setting up  NuBot version : 0.1.5b,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:48.030 UTC
+Init logging system,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:48.053 UTC
+Set up SSL certificates,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:48.054 UTC
+Load options from 1 files : /tmp/tmpVQliFy,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:48.055 UTC
+Wrap the keys into a new ApiKeys object,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:48.056 UTC
+Creating an Exchange object,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:48.057 UTC
+Create e ExchangeLiveData object to accomodate liveData from the exchange,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:48.071 UTC
+Create a new TradeInterface object,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:48.072 UTC
+Swapped pair mode : false,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:48.073 UTC
+CCEDK uses global TX fee  currency pair not supported.now calling getTxFee(),WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,getTxFee,Mar 09 2015 21:58:48.074 UTC
+Create a TaskManager ,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:48.075 UTC
+Starting task : Check connection with exchange,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:48.083 UTC
+Waiting  a for the connectionThreads to detect connection,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:48.084 UTC
+Configuring NuBot for Dual-Side strategy,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:51.091 UTC
+Start trading Strategy specific for nbtbtc,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:51.098 UTC
+Options : {<br>dualSide=true<br> submitLiquidity=false<br> executeOrders=true<br> verbose=false<br> sendHipchat=false<br> apiKey=2CQ4QB8AHNKT96QE0G6Y51YI7WOG0H6L2955KWR86TPU4R0KCVJY4LYWHGWLPE74<br> nubitAddress=<br> rpcUser=<br> nudIp=127.0.0.1<br> nudPort=9091<br> priceIncrement=3.0E-4<br> txFee=0.2<br> exchangeName=ccedk<br> pair=nbtbtc<br> executeStrategyInterval=41<br> sendLiquidityInterval=130<br> sendMails=false<br> mailRecipient=null<br> emergencyTimeoutMinutes 60<br> keepProceeds=0.0<br> aggregate=false <br><br>SecondaryPegOptionsJSON : <br>backupFeedNames [blockchain  coinbase  bitstamp] <br>distanceThreshold 10.0<br>mainFeed bitfinex <br>spread 0.0 <br>wallchangeThreshold 0.3},INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:51.100 UTC
+Forcing a 0.9% minimum spread to protect from collisions,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:51.113 UTC
+NuBot will be start running in 69 seconds  to sync with remote NTP and place walls during next wall shift window.,INFO,com.nubits.nubot.launch.NuBot,execute,Mar 09 2015 21:58:51.200 UTC
+Liquidity is not being sent : orders are not yet initialized,WARNING,com.nubits.nubot.tasks.SubmitLiquidityinfoTask,checkOrders,Mar 09 2015 21:59:30.091 UTC
+javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target,SEVERE,com.nubits.nubot.pricefeeds.CoinbasePriceFeed,getLastPrice,Mar 09 2015 22:00:00.847 UTC
+Error while updating BTC price from coinbase,WARNING,com.nubits.nubot.pricefeeds.PriceFeedManager,getLastPrices,Mar 09 2015 22:00:00.848 UTC
+CCEDK uses global TX fee  currency pair not supported.now calling getTxFee(),WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,getTxFee,Mar 09 2015 22:00:01.012 UTC
+Computing USD prices with spread 0.9%  : sell @ 1.0065 buy @ 0.9935,INFO,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,initStrategy,Mar 09 2015 22:00:01.014 UTC
+Converted price (using 1 BTC = 287.83 USD) : sell @ 0.00349686 BTC; buy @ 0.00345169 BTC,INFO,com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask,initStrategy,Mar 09 2015 22:00:01.014 UTC
+Initializing strategy,INFO,com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask,run,Mar 09 2015 22:00:01.015 UTC
+Frozen funds already in balance (not proceeds) updated : 0.0 Currency{fiat=false  code=BTC  extendedName=Bitcoin},INFO,com.nubits.nubot.utils.FrozenBalancesManager,setBalanceAlreadyThere,Mar 09 2015 22:00:04.081 UTC
+CCEDK uses global TX fee  currency pair not supported.now calling getTxFee(),WARNING,com.nubits.nubot.trading.wrappers.CcedkWrapper,getTxFee,Mar 09 2015 22:00:05.007 UTC
+Strategy - Submit order : SELL side order :  SELL 1.5 NBT @ 0.00349686 BTC,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 22:00:05.008 UTC
+Strategy - SELL Response1 = 3186976,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 22:00:05.796 UTC
+Strategy - Submit order : SELL side order :  SELL 1.5 NBT @ 0.00349686 BTC,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 22:00:11.286 UTC
+Strategy : SELL Response2 = 3186979,WARNING,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,initOrders,Mar 09 2015 22:00:11.702 UTC
+Initial walls placed,INFO,com.nubits.nubot.tasks.strategy.StrategySecondaryPegUtils,placeInitialWalls,Mar 09 2015 22:00:12.105 UTC
+Bot shutting down..,INFO,com.nubits.nubot.launch.NuBot$1,run,Mar 09 2015 22:00:33.217 UTC
+Clearing out active orders ... ,INFO,com.nubits.nubot.launch.NuBot$1,run,Mar 09 2015 22:00:33.219 UTC
