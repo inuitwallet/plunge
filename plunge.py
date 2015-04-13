@@ -212,7 +212,7 @@ class PlungeApp(App):
         return return_string
 
     def build_config(self, config):
-        config.setdefaults('server', {'host': "beta.nupool.eu", 'port': 80})
+        config.setdefaults('server', {'host': "eu.nupool.net", 'port': 80})
         config.setdefaults('exchanges', {'ccedk': 0, 'poloniex': 0, 'bitcoincoid': 0, 'bter': 0, 'bittrex': 0})
         config.setdefaults('standard', {'language': 'English', 'period': 30, 'monitor': 0, 'start_min': 0, 'data': 0})
 

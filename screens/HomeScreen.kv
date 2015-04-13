@@ -170,7 +170,7 @@
                         font_size: 18
                         markup: True
                         color: (1, 0.72157, 0, 1)
-                        on_ref_press: root.draw_liquidity_chart(app.get_string('Exchange_Liquidity'), root.exchange_buy_liquidity[root.primary_exchange][root.primary_currency], root.exchange_sell_liquidity[root.primary_exchange][root.primary_currency])
+                        #on_ref_press: root.draw_liquidity_chart(app.get_string('Exchange_Liquidity'), root.exchange_buy_liquidity[root.primary_exchange][root.primary_currency], root.exchange_sell_liquidity[root.primary_exchange][root.primary_currency])
 
 
                 BoxLayout:
@@ -186,7 +186,7 @@
                         font_size: 18
                         markup: True
                         color: (0, 0.65490, 0.82745, 1)
-                        on_ref_press: root.draw_liquidity_chart(app.get_string('Exchange_Liquidity'), root.exchange_buy_liquidity[root.primary_exchange][root.primary_currency], root.exchange_sell_liquidity[root.primary_exchange][root.primary_currency])
+                        #on_ref_press: root.draw_liquidity_chart(app.get_string('Exchange_Liquidity'), root.exchange_buy_liquidity[root.primary_exchange][root.primary_currency], root.exchange_sell_liquidity[root.primary_exchange][root.primary_currency])
 
                 BoxLayout:
                     orientation: 'vertical'
@@ -220,7 +220,7 @@
                         font_size: 18
                         markup: True
                         color: (1, 0.72157, 0, 1)
-                        on_ref_press: root.draw_chart(app.get_string('Ask_Rate'), app.get_string('Ask_Rate'), root.exchange_ask_rate[root.primary_exchange])
+                        #on_ref_press: root.draw_chart(app.get_string('Ask_Rate'), app.get_string('Ask_Rate'), root.exchange_ask_rate[root.primary_exchange])
 
                 BoxLayout:
                     orientation: 'vertical'
@@ -235,7 +235,7 @@
                         font_size: 18
                         markup: True
                         color: (0, 0.65490, 0.82745, 1)
-                        on_ref_press: root.draw_chart(app.get_string('Bid_Rate'), app.get_string('Bid_Rate'), root.exchange_bid_rate[root.primary_exchange])
+                        #on_ref_press: root.draw_chart(app.get_string('Bid_Rate'), app.get_string('Bid_Rate'), root.exchange_bid_rate[root.primary_exchange])
 
                 BoxLayout:
                     orientation: 'vertical'

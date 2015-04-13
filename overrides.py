@@ -6,19 +6,18 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.slider import Slider
-import logging
-
-__author__ = 'woolly_sammoth'
-
 from kivy.metrics import dp
-from kivy.uix.settings import SettingString, SettingSpacer, SettingNumeric, InterfaceWithTabbedPanel, Settings, \
-    ContentPanel, SettingTitle
+from kivy.uix.settings import SettingString, SettingSpacer, SettingNumeric, InterfaceWithTabbedPanel, Settings
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.spinner import Spinner
+from kivy.network.urlrequest import UrlRequest
 import utils
+import logging
+
+__author__ = 'woolly_sammoth'
 
 
 class InterfaceWithCloseButton(InterfaceWithTabbedPanel):
@@ -137,7 +136,7 @@ class SettingStringExchange(SettingString):
     bot = []
     logger = logging.getLogger('Plunge')
     currencies = ['btc']
-    bots = ['nubot', 'pybot', 'none']
+    bots = ['pybot', 'none']
 
     def on_panel(self, instance, value):
         if value is None:
@@ -187,9 +186,10 @@ class SettingStringExchange(SettingString):
             rate = rates.split(' | ')
             this_row['ask'] = rate[0]
             this_row['bid'] = rate[1]
-            if this_row['ask'] == 0.00 or this_row['bid'] == 0.00:
-                self.logger.warn("ask or bid minimal rate set to 0")
-                continue
+            if this_row['ask'] == 0.00:
+                this_row['ask'] = self.ask_max
+            if this_row['bid'] == 0.00:
+                this_row['bid'] = self.bid_max
             this_row['bot'] = self.bot[x].text
             if this_row in saved_data[self.exchange]:
                 self.logger.warn("data already exists")
@@ -578,6 +578,14 @@ class SettingStringExchange(SettingString):
     def set_bot(self, instance, value):
         self.selected_bot = value
 
+    def set_pool_maximum_rate(self, req, result):
+        self.ask_max = (result[self.exchange][self.selected_unit.lower()]['ask']['rate'] * 100)
+        self.bid_max = (result[self.exchange][self.selected_unit.lower()]['bid']['rate'] * 100)
+        self.rates_error = False
+
+    def rates_error(self, req, result):
+        self.rates_error = True
+
     def enter_rates(self, instance):
         """
         Show a pop-up in which minimum interest rates can be entered on sliders
@@ -588,20 +596,16 @@ class SettingStringExchange(SettingString):
         content = BoxLayout(orientation='vertical')
         config = ConfigParser.ConfigParser()
         config.readfp(open('plunge.ini'))
-        exchange_data = dict(self.utils.get("http://%s:%s/exchanges" %
-                                            (config.get('server', 'host'), config.get('server', 'port'))))
-        if 'error' in exchange_data:
-            content.add_widget(Label(text='Unable to get Maximum rate data from the server'))
-            self.rates_error = True
+        url = "http://%s:%s/exchanges" % (config.get('server', 'host'), config.get('server', 'port'))
+        req = UrlRequest(url, self.set_pool_maximum_rate, self.rates_error, self.rates_error)
+        if self.rates_error is True:
+            self.rates_content.add_widget(Label(text='Unable to get Maximum rate data from the server'))
         else:
-            self.rates_error = False
-            ask_max = (exchange_data[self.exchange][self.selected_unit.lower()]['ask']['rate'] * 100)
-            self.ask_slider = Slider(max=ask_max, step=0.01, size_hint=(0.9, 1))
+            self.ask_slider = Slider(max=self.ask_max, step=0.01, size_hint=(0.9, 1))
             self.ask_slider.bind(on_touch_down=self.update_slider_values)
             self.ask_slider.bind(on_touch_up=self.update_slider_values)
             self.ask_slider.bind(on_touch_move=self.update_slider_values)
-            bid_max = (exchange_data[self.exchange][self.selected_unit.lower()]['bid']['rate'] * 100)
-            self.bid_slider = Slider(max=bid_max, step=0.01, size_hint=(0.9, 1))
+            self.bid_slider = Slider(max=self.bid_max, step=0.01, size_hint=(0.9, 1))
             self.bid_slider.bind(on_touch_down=self.update_slider_values)
             self.bid_slider.bind(on_touch_up=self.update_slider_values)
             self.bid_slider.bind(on_touch_move=self.update_slider_values)

@@ -9,14 +9,8 @@ from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 import logging
-import os
-from platform import system
-import subprocess
-import signal
-from Queue import Queue, Empty
+from kivy.network.urlrequest import UrlRequest
 from threading import Thread
-import sys
-from decimal import Decimal
 import client.client
 
 __author__ = 'woolly_sammoth'
@@ -177,41 +171,46 @@ class HomeScreen(Screen):
             return
         self.getting_pool_stats = True
         self.PlungeApp.logger.info("Get the Pool Stats")
-        status = dict(self.PlungeApp.utils.get("http://%s:%s/status" %
-                                               (self.PlungeApp.config.get('server', 'host'),
-                                                self.PlungeApp.config.get('server', 'port'))))
-        
-        if 'error' not in status:
-            self.PlungeApp.logger.info("Pool stats returned OK")
-            self.pool = {}
-            self.pool['buy_liquidity'] = status['liquidity'][0]
-            self.pool['sell_liquidity'] = status['liquidity'][1]
-            self.pool['num_users'] = status['users']
-            self.pool['sampling'] = status['sampling']
+        url = 'http://%s:%s/status' % (self.PlungeApp.config.get('server', 'host'),
+                                       self.PlungeApp.config.get('server', 'port'))
+        req = UrlRequest(url, self.save_pool_stats, self.pool_stats_error, self.pool_stats_error)
 
-            self.update_lists(self.pool['buy_liquidity'], self.pool_buy_liquidity)
-            self.update_lists(self.pool['sell_liquidity'], self.pool_sell_liquidity)
+    def pool_stats_error(self, req, result):
+        self.PlungeApp.logger.warn('Pool stats failed : ' + result)
+        self.getting_pool_stats = False
 
-            self.update_pool_stats()
-        else:
-            self.PlungeApp.logger.warn("%d - %s" % (status['code'], status['message']))
+    def save_pool_stats(self, req, result):
+        self.PlungeApp.logger.info("Pool stats returned OK")
+        self.pool = {}
+        self.pool['buy_liquidity'] = result['liquidity'][0]
+        self.pool['sell_liquidity'] = result['liquidity'][1]
+        self.pool['num_users'] = result['users']
+        self.pool['sampling'] = result['sampling']
+
+        self.update_lists(self.pool['buy_liquidity'], self.pool_buy_liquidity)
+        self.update_lists(self.pool['sell_liquidity'], self.pool_sell_liquidity)
+
+        self.update_pool_stats()
         self.getting_pool_stats = False
 
     def get_exchange_stats(self):
         # get the exchange status
+
         if self.getting_exchange_stats is True:
             return
         self.getting_exchange_stats = True
         self.PlungeApp.logger.info("Get the Exchange Stats")
-        exchanges = dict(self.PlungeApp.utils.get("http://%s:%s/exchanges" %
-                                                  (self.PlungeApp.config.get('server', 'host'),
-                                                   self.PlungeApp.config.get('server', 'port'))))
+        url = "http://%s:%s/exchanges" % (self.PlungeApp.config.get('server', 'host'),
+                                          self.PlungeApp.config.get('server', 'port'))
+        req = UrlRequest(url, self.save_exchange_stats, self.exchange_stats_error, self.exchange_stats_error)
 
-        if 'error' not in exchanges:
-            self.PlungeApp.logger.info("Exchange stats returned OK")
-            self.stats = exchanges
-        else:
-            self.PlungeApp.logger.warn("%d - %s" % (exchanges['code'], exchanges['message']))
+    def exchange_stats_error(self, req, result):
+        self.PlungeApp.logger.warn('Exchange stats failed : ' + result)
+        self.getting_exchange_stats = False
+
+    def save_exchange_stats(self, req, result):
+        self.PlungeApp.logger.info("Exchange stats returned OK")
+        self.stats = result
         self.getting_exchange_stats = False
 
     def get_personal_stats(self):
@@ -223,48 +222,32 @@ class HomeScreen(Screen):
         with open('api_keys.json') as api_keys_file:
             api_keys = json.load(api_keys_file)
         api_keys_file.close()
-        for exchange in self.PlungeApp.active_exchanges:
-            self.user[exchange] = {'balance': 0, 'num_keys': 0, 'efficiency': 0}
+        for self.personal_exchange in self.PlungeApp.active_exchanges:
+            self.user[self.personal_exchange] = {'balance': 0, 'num_keys': 0, 'efficiency': 0}
             for currency in self.PlungeApp.currencies:
-                self.user[exchange][currency] = {'ask_liquidity': 0, 'bid_liquidity': 0, 'ask_rate': 0, 'bid_rate': 0}
+                self.user[self.personal_exchange][currency] = {'ask_liquidity': 0, 'bid_liquidity': 0, 'ask_rate': 0, 'bid_rate': 0}
             for set in api_keys:
-                if set['exchange'] == exchange:
-                    self.PlungeApp.logger.info("Get Personal Stats for %s - %s" % (exchange, set['public']))
-                    user = dict(self.PlungeApp.utils.get("http://%s:%s/%s" %
-                                (self.PlungeApp.config.get('server', 'host'),
-                                 self.PlungeApp.config.get('server', 'port'),
-                                 set['public'])))
-                    if 'error' not in user:
-                        self.PlungeApp.logger.info("Personal stats returned OK")
-                        self.user[exchange]['balance'] += user['balance']
-                        self.user[exchange]['num_keys'] += 1
-                        self.user[exchange]['efficiency'] += user['efficiency']
-                        for currency in self.PlungeApp.currencies:
-                            if currency in user['units']:
-                                for order in user['units'][currency]['ask']:
-                                    self.user[exchange][currency]['ask_liquidity'] += order['amount']
-                                for order in user['units'][currency]['bid']:
-                                    self.user[exchange][currency]['bid_liquidity'] += order['amount']
-                                self.user[exchange][currency]['ask_rate'] += user['units'][currency]['rate']['ask']
-                                self.user[exchange][currency]['bid_rate'] += user['units'][currency]['rate']['bid']
+                if set['exchange'] == self.personal_exchange:
+                    self.public = set['public']
+                    self.PlungeApp.logger.info("Get Personal Stats for %s - %s" % (self.personal_exchange, self.public))
+                    url = "http://%s:%s/%s" % (self.PlungeApp.config.get('server', 'host'),
+                                               self.PlungeApp.config.get('server', 'port'),
+                                               self.public)
+                    self.saving_personal_stats = True
+                    req = UrlRequest(url, self.save_personal_stats, self.personal_stats_error,
+                                     self.personal_stats_error)
+        if self.user[self.personal_exchange]['num_keys'] > 0:
+            self.user[self.personal_exchange]['efficiency'] /= self.user[self.personal_exchange]['num_keys']
 
-                                #  update the graph data lists
-                                self.ensure_lists(self.exchange_buy_liquidity, exchange, currency)
-                                self.update_lists(self.user[exchange][currency]['bid_liquidity'],
-                                                  self.exchange_buy_liquidity[exchange][currency])
-                                self.ensure_lists(self.exchange_sell_liquidity, exchange, currency)
-                                self.update_lists(self.user[exchange][currency]['ask_liquidity'],
-                                                  self.exchange_sell_liquidity[exchange][currency])
-                    else:
-                        self.PlungeApp.logger.warn("%d - %s" % (user['code'], user['message']))
-            if self.user[exchange]['num_keys'] > 0:
-                self.user[exchange]['efficiency'] /= self.user[exchange]['num_keys']
+        while self.saving_personal_stats is True:
+            continue
 
-            # update the graph data lists
-            self.ensure_lists(self.exchange_efficiency, exchange)
-            self.update_lists((self.user[exchange]['efficiency'] * 100), self.exchange_efficiency[exchange])
-            self.ensure_lists(self.exchange_balance, exchange)
-            self.update_lists(self.user[exchange]['balance'], self.exchange_balance[exchange])
+        # update the graph data lists
+        self.ensure_lists(self.exchange_efficiency, self.personal_exchange)
+        self.update_lists((self.user[self.personal_exchange]['efficiency'] * 100),
+                          self.exchange_efficiency[self.personal_exchange])
+        self.ensure_lists(self.exchange_balance, self.personal_exchange)
+        self.update_lists(self.user[self.personal_exchange]['balance'], self.exchange_balance[self.personal_exchange])
 
         if self.primary_exchange in self.user:
             if self.primary_currency in self.user[self.primary_exchange]:
@@ -274,6 +257,35 @@ class HomeScreen(Screen):
         else:
             self.PlungeApp.logger.warn("%s not found in personal stats" % self.primary_exchange)
         self.getting_personal_stats = False
+
+
+    def personal_stats_error(self, req, result):
+        self.PlungeApp.logger.warn('Personal stats failed for %s %s : %s' % (self.personal_exchange,
+                                                                             self.public, result))
+        self.saving_personal_stats = False
+
+    def save_personal_stats(self, req, result):
+        self.PlungeApp.logger.info("Personal stats returned OK")
+        self.user[self.personal_exchange]['balance'] += result['balance']
+        self.user[self.personal_exchange]['num_keys'] += 1
+        self.user[self.personal_exchange]['efficiency'] += result['efficiency']
+        for currency in self.PlungeApp.currencies:
+            if currency in result['units']:
+                for order in result['units'][currency]['ask']:
+                    self.user[self.personal_exchange][currency]['ask_liquidity'] += order['amount']
+                for order in result['units'][currency]['bid']:
+                    self.user[self.personal_exchange][currency]['bid_liquidity'] += order['amount']
+                self.user[self.personal_exchange][currency]['ask_rate'] += result['units'][currency]['rate']['ask']
+                self.user[self.personal_exchange][currency]['bid_rate'] += result['units'][currency]['rate']['bid']
+
+                #  update the graph data lists
+                self.ensure_lists(self.exchange_buy_liquidity, self.personal_exchange, currency)
+                self.update_lists(self.user[self.personal_exchange][currency]['bid_liquidity'],
+                                  self.exchange_buy_liquidity[self.personal_exchange][currency])
+                self.ensure_lists(self.exchange_sell_liquidity, self.personal_exchange, currency)
+                self.update_lists(self.user[self.personal_exchange][currency]['ask_liquidity'],
+                                  self.exchange_sell_liquidity[self.personal_exchange][currency])
+        self.saving_personal_stats = False
 
     @staticmethod
     def ensure_lists(list_name, exchange, currency=None):

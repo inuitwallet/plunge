@@ -1,10 +1,8 @@
 import json
+import hashlib
+from binascii import unhexlify
 
 __author__ = 'woolly_sammoth'
-
-import hashlib
-import requests
-from binascii import unhexlify
 
 
 class utils:
@@ -54,31 +52,6 @@ class utils:
             else: break
         return b'\x00' * pad + res
 
-    def get(self, url):
-        # self.PlungeApp.logger.info("Request sent to %s" % url)
-        try:
-            r = requests.get(url, timeout=10)
-            if r.status_code != requests.codes.OK:
-                return {'error': True, 'code': r.status_code, 'message': r.reason}
-            return r.json()
-        except requests.exceptions.Timeout:
-            return {'error': True, 'code': 408, 'message': 'timeout'}
-        except requests.exceptions.ConnectionError:
-            return {'error': True, 'code': 500, 'message': 'connection refused'}
-
-    def post(self, url, data={}):
-        # self.PlungeApp.logger.info("Request sent to %s with data %s" % (url, str(data)))
-        try:
-            headers = {"Content-type": "application/x-www-form-urlencoded"}
-            r = requests.post(url, data=data, headers=headers, timeout=10)
-            if r.status_code != requests.codes.OK:
-                return {'error': True, 'code': r.status_code, 'message': r.reason}
-            return r.json()
-        except requests.exceptions.Timeout:
-            return {'error': True, 'code': 408, 'message': 'timeout'}
-        except requests.exceptions.ConnectionError:
-            return {'error': True, 'code': 500, 'message': 'connection refused'}
-
     def get_active_exchanges(self):
         exchanges = []
         with open('api_keys.json') as api_keys_file:
@@ -95,11 +68,6 @@ class utils:
 
     def get_active_currencies(self, exchange):
         currencies = self.PlungeApp.currencies
-        #for currency in self.PlungeApp.currencies:
-        #    if currency in currencies:
-        #        continue
-        #    if self.PlungeApp.config.getdefaultint(exchange, currency, 0) > 0:
-        #        currencies.append(currency)
         self.PlungeApp.logger.info("Got active currencies - %s" % str(currencies))
         return currencies
 
