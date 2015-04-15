@@ -1,4 +1,26 @@
-#!/usr/bin/python
+#! /usr/bin/env python
+"""
+The MIT License (MIT)
+Copyright (c) 2015 creon (creon.nu@gmail.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+OR OTHER DEALINGS IN THE SOFTWARE.
+"""
 
 import os
 import sys
@@ -104,6 +126,8 @@ class Client(ConnectionThread):
   def set(self, key, secret, address, name, unit, bid = None, ask = None, bot = 'pybot', ordermatch = False):
     if not name in self.exchangeinfo or not unit in self.exchangeinfo[name]:
       return False
+    key = str(key)
+    secret = str(secret)
     exchange = _wrappers[name]
     cost = { 'bid' : bid if bid else self.exchangeinfo[name][unit]['bid']['rate'],
              'ask' : ask if ask else self.exchangeinfo[name][unit]['ask']['rate'] }
@@ -128,7 +152,6 @@ class Client(ConnectionThread):
       if self.users[key][unit]['order']:
         self.users[key][unit]['order'].start()
     self.lock.release()
-    print locals()
     return True
 
   def shutdown(self, key = None, unit = None, join = True):
@@ -209,7 +232,7 @@ class Client(ConnectionThread):
               response['balance'], effective_rate * 100, effective_rate * total / float(60 * 24), response['efficiency'] * 100, response['rejects'], response['missing'], orderstring, user)
             if not efficiencies:
               efficiencies = [ response['efficiency'] for i in xrange(5) ]
-            if curtime - starttime > 90:
+            if curtime - starttime > 150:
               efficiencies = efficiencies[1:] + [response['efficiency']]
               if sorted(efficiencies)[2] < 0.95:
                 for unit in response['units']:
@@ -226,18 +249,15 @@ class Client(ConnectionThread):
                           self.logger.warning('too many rejected requests for %s on %s, adjusting nonce shift to %d',
                             unit, repr(self.users[user][unit]['request'].exchange), self.users[user][unit]['request'].exchange._shift)
                     else:
-                      if self.users[user][unit]['request'].sampling < 2 * sampling: # just send more requests
+                      if self.users[user][unit]['request'].sampling < 3 * sampling: # just send more requests
                         self.users[user][unit]['request'].sampling = self.users[user][unit]['request'].sampling + 1
                         self.logger.warning('increasing sampling to %d',
                           unit, repr(self.users[user][unit]['request'].exchange), self.users[user][unit]['request'].sampling)
                   if response['units'][unit]['missing'] / float(self.basestatus['sampling']) >= 0.05: # look for missing error and adjust sampling
-                    if self.users[user][unit]['request'].sampling < 2 * self.sampling: # just send more requests
+                    if self.users[user][unit]['request'].sampling < 3 * self.sampling: # just send more requests
                       self.users[user][unit]['request'].sampling = self.users[user][unit]['request'].sampling + 1
                       self.logger.warning('too many missing requests for %s on %s, increasing sampling to %d',
                         unit, repr(self.users[user][unit]['request'].exchange), self.users[user][unit]['request'].sampling)
-                    else: # just wait a little bit
-                      self.logger.warning('too many missing requests, sleeping a short while to synchronize')
-                      curtime += 0.7
       except KeyboardInterrupt: break
       except Exception as e:
         self.logger.error('exception caught in main loop: %s', sys.exc_info()[1])
@@ -294,7 +314,7 @@ if __name__ == "__main__":
             bid = None
             ask = None
           bot = 'pybot' if not 'trading' in configdata else configdata['trading']
-          ordermatch = False if not 'ordermatch' in configdata else configdata['ordermatch']
+          ordermatch = False if not 'ordermatch' in configdata else (configdata['ordermatch'] in ['True', 'true', '1'])
           if 'server' in configdata:
             if 'apikey' in configdata:
               if 'apisecret' in configdata:
@@ -326,8 +346,12 @@ if __name__ == "__main__":
     if not client: sys.exit(1)
     logger.debug('starting liquidity operation with sampling %d' % client.sampling)
     client.start()
+    stop = False
     while True:
-      try: time.sleep(60)
-      except KeyboardInterrupt: break
-    client.stop()
-    client.join()
+      try:
+        if stop:
+          client.stop()
+          client.join()
+          break
+        time.sleep(60)
+      except KeyboardInterrupt: stop = True

@@ -45,5 +45,12 @@
     "desc": "Choose whether to start Plunge in the minimised view",
     "section": "standard",
     "key": "start_min"
+  },
+  {
+    "type": "bool",
+    "title": "Show Disclaimer",
+    "desc": "Choose whether or not to show the disclaimer",
+    "section": "standard",
+    "key": "show_disclaimer"
   }
 ]

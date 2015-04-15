@@ -1,8 +1,11 @@
+import calendar
 from itertools import izip_longest
 import json
 from kivy.clock import Clock
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
+import os
+import time
 from graph import Graph, MeshLinePlot, MeshStemPlot
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
@@ -24,6 +27,7 @@ class HeadingLabel(Label):
 
 class SubHeadingLabel(Label):
     pass
+
 
 class HomeScreen(Screen):
 
@@ -89,20 +93,24 @@ class HomeScreen(Screen):
         # set up the lists that hold the historical data for graphing
         self.pool_buy_liquidity = []
         self.pool_sell_liquidity = []
+        self.pool_total_liquidity = []
         self.exchange_efficiency = {}
         self.exchange_balance = {}
         self.exchange_missing = {}
         self.exchange_rejects = {}
         self.exchange_buy_liquidity = {}
         self.exchange_sell_liquidity = {}
+        self.exchange_total_liquidity = {}
         self.exchange_valid_submissions = {}
         self.exchange_ask_rate = {}
         self.exchange_bid_rate = {}
         self.total_buy_liquidity = []
         self.total_sell_liquidity = []
+        self.total_liquidity_list = []
         self.total_efficiency_list = []
         self.total_balance_list = []
-        self.total_rate_list = []
+        self.total_ask_rate_list = []
+        self.total_bid_rate_list = []
 
         # set up UI and start timers
         self.getting_pool_stats = False
@@ -189,6 +197,7 @@ class HomeScreen(Screen):
 
         self.update_lists(self.pool['buy_liquidity'], self.pool_buy_liquidity)
         self.update_lists(self.pool['sell_liquidity'], self.pool_sell_liquidity)
+        self.update_lists((self.pool['buy_liquidity'] + self.pool['sell_liquidity']), self.pool_total_liquidity)
 
         self.update_pool_stats()
         self.getting_pool_stats = False
@@ -258,7 +267,6 @@ class HomeScreen(Screen):
             self.PlungeApp.logger.warn("%s not found in personal stats" % self.primary_exchange)
         self.getting_personal_stats = False
 
-
     def personal_stats_error(self, req, result):
         self.PlungeApp.logger.warn('Personal stats failed for %s %s : %s' % (self.personal_exchange,
                                                                              self.public, result))
@@ -282,9 +290,23 @@ class HomeScreen(Screen):
                 self.ensure_lists(self.exchange_buy_liquidity, self.personal_exchange, currency)
                 self.update_lists(self.user[self.personal_exchange][currency]['bid_liquidity'],
                                   self.exchange_buy_liquidity[self.personal_exchange][currency])
+
                 self.ensure_lists(self.exchange_sell_liquidity, self.personal_exchange, currency)
                 self.update_lists(self.user[self.personal_exchange][currency]['ask_liquidity'],
                                   self.exchange_sell_liquidity[self.personal_exchange][currency])
+
+                self.ensure_lists(self.exchange_total_liquidity, self.personal_exchange, currency)
+                self.update_lists((self.user[self.personal_exchange][currency]['ask_liquidity'] +
+                                   self.user[self.personal_exchange][currency]['bid_liquidity']),
+                                  self.exchange_total_liquidity[self.personal_exchange][currency])
+
+                self.ensure_lists(self.exchange_ask_rate, self.personal_exchange, currency)
+                self.update_lists(self.user[self.personal_exchange][currency]['ask_rate'],
+                                  self.exchange_ask_rate[self.personal_exchange][currency])
+
+                self.ensure_lists(self.exchange_bid_rate, self.personal_exchange, currency)
+                self.update_lists(self.user[self.personal_exchange][currency]['bid_rate'],
+                                  self.exchange_bid_rate[self.personal_exchange][currency])
         self.saving_personal_stats = False
 
     @staticmethod
@@ -298,7 +320,6 @@ class HomeScreen(Screen):
         if currency is not None:
             if currency not in list_name[exchange]:
                 list_name[exchange][currency] = []
-
 
     def update_pool_stats(self):
         self.PlungeApp.logger.info("Update Pool stats")
@@ -369,6 +390,9 @@ class HomeScreen(Screen):
                 ask_rate_sum += (self.user[exchange][currency]['ask_liquidity'] * self.user[exchange][currency]['ask_rate'])
                 bid_rate_sum += (self.user[exchange][currency]['bid_liquidity'] * self.user[exchange][currency]['bid_rate'])
 
+            # add exchange level lists
+
+
         self.total_efficiency /= num_exchanges
 
         self.total_ask_rate = (ask_rate_sum / self.total_ask_liquidity) if ask_rate_sum > 0 else 0
@@ -380,6 +404,9 @@ class HomeScreen(Screen):
         # update the total graphing lists
         self.update_lists(self.total_bid_liquidity, self.total_buy_liquidity)
         self.update_lists(self.total_ask_liquidity, self.total_sell_liquidity)
+        self.update_lists(self.total_ask_rate, self.total_ask_rate_list)
+        self.update_lists(self.total_bid_rate, self.total_bid_rate_list)
+        self.update_lists(self.total_liquidity, self.total_liquidity_list)
         self.update_lists((self.total_efficiency * 100), self.total_efficiency_list)
         self.update_lists(self.total_balance, self.total_balance_list)
 
@@ -405,14 +432,14 @@ class HomeScreen(Screen):
                                 (float(d['bid']) / 100), (float(d['ask']) / 100), str(d['bot']))
         self.client.start()
         self.client_logger = client.client.getlogger()
-        log_handler = logging.StreamHandler(self.redirect_logger(self.log_output))
+        log_handler = logging.StreamHandler(self.RedirectLogger(self.log_output))
         self.client_logger.addHandler(log_handler)
         self.PlungeApp.client_running = True
         self.running_label.color = (0, 1, 0.28235, 1)
         self.running_label.text = self.PlungeApp.get_string("Client_Started")
         self.start_button.text = self.PlungeApp.get_string('Stop')
 
-    class redirect_logger(object):
+    class RedirectLogger(object):
 
         def __init__(self, text_display):
             self.out = text_display
@@ -480,16 +507,27 @@ class HomeScreen(Screen):
         content = BoxLayout(orientation='vertical')
         content.add_widget(self.graph)
         content.add_widget(BoxLayout(size_hint=(1, 0.1)))
-        button_layout = BoxLayout(size_hint=(1, 0.1))
+        button_layout = BoxLayout(size_hint=(1, 0.1), spacing=150)
         button = Button(text=self.PlungeApp.get_string('Close'), size_hint=(None, None), size=(250, 50))
         button_layout.add_widget(button)
+        capture_button = Button(text=self.PlungeApp.get_string('Capture'), size_hint=(None, None), size=(250, 50))
+        button_layout.add_widget(capture_button)
         content.add_widget(button_layout)
         self.graph_popup = Popup(title=title, content=content, auto_dismiss=False, size_hint=(.9, .9))
         button.bind(on_press=self.close_graph_popup)
+        capture_button.bind(on_press=self.capture_graph)
         self.graph_popup.open()
-        padding = ((self.graph_popup.width - button.width) / 2)
+        padding = ((self.graph_popup.width - ((button.width + capture_button.width) + 150)) / 2)
         button_layout.padding = (padding, 0, padding, 0)
         return
+
+    def capture_graph(self, instance):
+        if not os.path.isdir('saved_charts'):
+            os.makedirs('saved_charts')
+        file_name = 'saved_charts/%s.png' % calendar.timegm(time.gmtime())
+        self.graph.export_to_png(file_name)
+        self.PlungeApp.show_popup(self.PlungeApp.get_string("Graph_Saved"),
+                                  self.PlungeApp.get_string("Graph_Saved_Text") % file_name)
 
     def close_graph_popup(self, instance, value=False):
         self.graph_popup.dismiss()

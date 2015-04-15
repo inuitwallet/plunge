@@ -52,7 +52,7 @@ class TopActionBar(ActionBar):
             self.height = 0.5 * height if height == self.standard_height else height
             self.top_size_button.text = self.PlungeApp.get_string("Maximise")
             self.top_action_previous.title = ''
-            if self.PlungeApp.config.getint('server', 'monitor') == 0:
+            if self.PlungeApp.config.getint('standard', 'monitor') == 0:
                 if self.PlungeApp.client_running is True:
                     self.top_action_previous.title = self.PlungeApp.get_string("Running")
                     self.top_action_previous.color = (0, 1, 0.28235, 1)
@@ -169,7 +169,8 @@ class PlungeApp(App):
             self.topActionBar.minimise(self.get_string("Maximise"))
             self.is_min = False
             self.set_monitor()
-        Clock.schedule_once(self.show_disclaimer, 1)
+        if self.config.getint('standard', 'show_disclaimer') == 1:
+            Clock.schedule_once(self.show_disclaimer, 1)
         return self.root
 
     def show_disclaimer(self, dt):
@@ -214,7 +215,8 @@ class PlungeApp(App):
     def build_config(self, config):
         config.setdefaults('server', {'host': "eu.nupool.net", 'port': 80})
         config.setdefaults('exchanges', {'ccedk': 0, 'poloniex': 0, 'bitcoincoid': 0, 'bter': 0, 'bittrex': 0})
-        config.setdefaults('standard', {'language': 'English', 'period': 30, 'monitor': 0, 'start_min': 0, 'data': 0})
+        config.setdefaults('standard', {'language': 'English', 'period': 30, 'monitor': 0, 'start_min': 0, 'data': 0,
+                                        'show_disclaimer': 1})
 
     def build_settings(self, settings):
         settings.register_type('string', overrides.SettingStringFocus)

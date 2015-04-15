@@ -14,6 +14,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.spinner import Spinner
 from kivy.network.urlrequest import UrlRequest
+import time
 import utils
 import logging
 
@@ -128,6 +129,8 @@ class SettingStringExchange(SettingString):
     num_rows = 0
     exchange = None
     chosen_api_key_pair = None
+    ask_max = None
+    bid_max = None
     utils = utils.utils('')
     keys_button = []
     address = []
@@ -165,23 +168,32 @@ class SettingStringExchange(SettingString):
         user_data.close()
         saved_data[self.exchange] = []
         good_records = 0
+        content = TextInput(multiline=True, text='Saving...', background_color=[0.13725, 0.12157, 0.12549, 0],
+                            foreground_color=[1, 1, 1, 1])
+        popup = Popup(title='Saving Data for %s' % self.exchange, content=content,
+                      size_hint=(None, None), size=(300, 500))
+        popup.open()
         for x in range(0, self.num_rows, 1):
             self.logger.info("saving row %d for %s" % (x+1, self.exchange))
+            content.text = '%s\nSaving row %d' % (content.text, x+1)
             this_row = {}
             public, secret = self.get_keys(self.keys_button[x].text)
             if public is None or secret is None:
                 self.logger.warn("API Keys not set correctly")
+                content.text = '%s\n=> API Keys not set correctly' % content.text
                 continue
             this_row['public'] = public
             this_row['secret'] = secret
             this_row['address'] = self.address[x].text
             if not self.utils.check_checksum(this_row['address']) or not this_row['address'][:1] == 'B':
                 self.logger.warn("Invalid payout address %s" % this_row['address'])
+                content.text = '%s\n=> Invalid payout address' % content.text
                 continue
             this_row['unit'] = self.unit[x].text
             rates = self.rates[x].text
             if "|" not in rates:
                 self.logger.warn("no rates set")
+                content.text = '%s\n=> No rates set' % content.text
                 continue
             rate = rates.split(' | ')
             this_row['ask'] = rate[0]
@@ -193,13 +205,16 @@ class SettingStringExchange(SettingString):
             this_row['bot'] = self.bot[x].text
             if this_row in saved_data[self.exchange]:
                 self.logger.warn("data already exists")
+                content.text = '%s\n=> Data already exists' % content.text
                 continue
             saved_data[self.exchange].append(this_row)
             good_records += 1
+            content.text = '%s\nRow %d saved' % (content.text, x+1)
             self.logger.info(str(this_row))
         with open('user_data.json', 'w') as user_data:
             user_data.write(json.dumps(saved_data))
         user_data.close()
+        content.text = '%s\nData Saved' % content.text
         self._dismiss()
         value = str(good_records)
         self.value = value
@@ -481,7 +496,7 @@ class SettingStringExchange(SettingString):
         :param instance:
         :return:
         """
-        if instance.text == "Cancel":
+        if instance.text == "Cancel" or self.add_public_key.text == "" or self.add_secret_key.text == "":
             self.add_keys_popup.dismiss()
             return
         api_keys = self.fetch_api_keys_from_file()
@@ -581,9 +596,13 @@ class SettingStringExchange(SettingString):
     def set_pool_maximum_rate(self, req, result):
         self.ask_max = (result[self.exchange][self.selected_unit.lower()]['ask']['rate'] * 100)
         self.bid_max = (result[self.exchange][self.selected_unit.lower()]['bid']['rate'] * 100)
+        self.ask_slider.max = self.ask_max
+        self.bid_slider.max = self.bid_max
         self.rates_error = False
 
+
     def rates_error(self, req, result):
+        self.rates_content.add_widget(Label(text='Unable to get Maximum rate data from the server'))
         self.rates_error = True
 
     def enter_rates(self, instance):
@@ -597,35 +616,32 @@ class SettingStringExchange(SettingString):
         config = ConfigParser.ConfigParser()
         config.readfp(open('plunge.ini'))
         url = "http://%s:%s/exchanges" % (config.get('server', 'host'), config.get('server', 'port'))
+        self.ask_slider = Slider(step=0.01, size_hint=(0.9, 1))
+        self.bid_slider = Slider(step=0.01, size_hint=(0.9, 1))
         req = UrlRequest(url, self.set_pool_maximum_rate, self.rates_error, self.rates_error)
-        if self.rates_error is True:
-            self.rates_content.add_widget(Label(text='Unable to get Maximum rate data from the server'))
-        else:
-            self.ask_slider = Slider(max=self.ask_max, step=0.01, size_hint=(0.9, 1))
-            self.ask_slider.bind(on_touch_down=self.update_slider_values)
-            self.ask_slider.bind(on_touch_up=self.update_slider_values)
-            self.ask_slider.bind(on_touch_move=self.update_slider_values)
-            self.bid_slider = Slider(max=self.bid_max, step=0.01, size_hint=(0.9, 1))
-            self.bid_slider.bind(on_touch_down=self.update_slider_values)
-            self.bid_slider.bind(on_touch_up=self.update_slider_values)
-            self.bid_slider.bind(on_touch_move=self.update_slider_values)
-            content.add_widget(Label(text='Minimal Ask Rate'))
-            ask_layout = BoxLayout()
-            ask_layout.add_widget(self.ask_slider)
-            self.ask_value = Label(size_hint=(0.1, 1))
-            ask_layout.add_widget(self.ask_value)
-            content.add_widget(ask_layout)
-            content.add_widget(Label(text='Minimal Bid Rate'))
-            bid_layout = BoxLayout()
-            bid_layout.add_widget(self.bid_slider)
-            self.bid_value = Label(size_hint=(0.1, 1))
-            bid_layout.add_widget(self.bid_value)
-            content.add_widget(bid_layout)
-            if instance.text != 'Set Rates':
-                rates = instance.text.split(' | ')
-                self.ask_slider.value = float(rates[0])
-                self.bid_slider.value = float(rates[1])
-            self.update_slider_values(None, None)
+        self.ask_slider.bind(on_touch_down=self.update_slider_values)
+        self.ask_slider.bind(on_touch_up=self.update_slider_values)
+        self.ask_slider.bind(on_touch_move=self.update_slider_values)
+        self.bid_slider.bind(on_touch_down=self.update_slider_values)
+        self.bid_slider.bind(on_touch_up=self.update_slider_values)
+        self.bid_slider.bind(on_touch_move=self.update_slider_values)
+        content.add_widget(Label(text='Minimal Ask Rate'))
+        ask_layout = BoxLayout()
+        ask_layout.add_widget(self.ask_slider)
+        self.ask_value = Label(size_hint=(0.1, 1))
+        ask_layout.add_widget(self.ask_value)
+        content.add_widget(ask_layout)
+        content.add_widget(Label(text='Minimal Bid Rate'))
+        bid_layout = BoxLayout()
+        bid_layout.add_widget(self.bid_slider)
+        self.bid_value = Label(size_hint=(0.1, 1))
+        bid_layout.add_widget(self.bid_value)
+        content.add_widget(bid_layout)
+        if instance.text != 'Set Rates':
+            rates = instance.text.split(' | ')
+            self.ask_slider.value = float(rates[0])
+            self.bid_slider.value = float(rates[1])
+        self.update_slider_values(None, None)
         btnlayout = BoxLayout(size_hint_y=None, height='50dp', spacing='5dp')
         btn = Button(text='Ok')
         btn.bind(on_release=self.close_rates_popup)

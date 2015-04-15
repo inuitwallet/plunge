@@ -1,3 +1,27 @@
+#! /usr/bin/env python
+"""
+The MIT License (MIT)
+Copyright (c) 2015 creon (creon.nu@gmail.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
 import threading
 import urllib2
 import urllib
@@ -83,8 +107,8 @@ class CheckpointThread(ConnectionThread):
     self.checkpoint = { 'error' : 'no checkpoint received' }
     self.start()
 
-  def collect(self):
-    self.lock.acquire()
+  def collect(self, timeout):
+    self.timeout = timeout
     try: self.trigger.release()
     except thread.error: pass
 
@@ -103,9 +127,15 @@ class CheckpointThread(ConnectionThread):
   def run(self):
     while self.active:
       self.trigger.acquire()
-      self.checkpoint = self.conn.post('checkpoints', { u : 1 for u in self.users }, trials = 1, timeout = 15)
-      if 'error' in self.checkpoint:
-        self.logger.error('unable to retrieve checkpoint from %s: %s', self.conn.server, self.checkpoint['message'])
+      self.lock.acquire()
+      starttime = time.time()
+      while time.time() < starttime + self.timeout > 0:
+        self.checkpoint = self.conn.post('checkpoints', { u : 1 for u in self.users }, trials = 1, timeout = 1)
+        if 'error' in self.checkpoint:
+          time.sleep(0.1)
+          self.logger.error('unable to retrieve checkpoint from %s: %s', self.conn.server, self.checkpoint['error'])
+        else:
+          break
       self.lock.release()
 
 

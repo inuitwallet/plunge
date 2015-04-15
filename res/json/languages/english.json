@@ -25,6 +25,9 @@
   "OK": "OK",
   "Cancel": "Cancel",
   "Close": "Close",
+  "Capture": "Capture Chart",
+  "Graph_Saved": "Chart saved",
+  "Graph_Saved_Text": "The Chart has been saved to\n\n%s",
   "Info": "Information",
   "No_Data": "No Data",
   "Config_Error": "Configuration Error",
@@ -77,6 +80,8 @@
   "Personal_Stats": "Personal Stats",
   "Total_Liquidity": "Total Liquidity",
   "Total_Rate": "Total Rate",
+  "Total_Ask_Rate": "Total Ask Rate",
+  "Total_Bid_Rate": "Total Bid Rate",
   "Liquidity": "Liquidity",
   "Rate": "Rate"
 }

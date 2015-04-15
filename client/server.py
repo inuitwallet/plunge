@@ -1,4 +1,26 @@
 #! /usr/bin/env python
+"""
+The MIT License (MIT)
+Copyright (c) 2015 creon (creon.nu@gmail.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+OR OTHER DEALINGS IN THE SOFTWARE.
+"""
 
 import SimpleHTTPServer
 import SocketServer
@@ -56,6 +78,8 @@ logger.addHandler(fh)
 logger.addHandler(sh)
 _liquidity = []
 _active_users = 0
+_round = 0
+_valflag = False
 master = Connection(config._master, logger) if config._master != "" else None
 slaves = [ CheckpointThread(host, logger) for host in config._slaves ]
 
@@ -167,76 +191,67 @@ class User(threading.Thread):
 
   def set(self, request, bid, ask, sign):
     if len(self.requests) < 10: # don't accept more requests to avoid simple spamming
-      self.lock.acquire()
-      if len(self.requests) < 10: # double check to allow lock acquire above
-        self.requests.append(({ p : v[0] for p,v in request.items() }, sign, { 'bid': bid, 'ask': ask }))
-      self.lock.release()
+      self.requests.append(({ p : v[0] for p,v in request.items() }, sign, { 'bid': bid, 'ask': ask }))
     self.active = True
 
   def run(self):
     while True:
       self.trigger.acquire()
       self.lock.acquire()
-      if self.active:
-        res = 'm'
-        if self.requests:
-          for rid, request in enumerate(self.requests):
-            try:
-              orders = self.exchange.validate_request(self.key, self.unit, request[0], request[1])
-            except:
-              orders = { 'error' : 'exception caught: %s' % sys.exc_info()[1]}
-            if not 'error' in orders:
-              valid = { 'bid': [], 'ask' : [] }
-              price = self.pricefeed.price(self.unit)
-              last_error = ''
-              for order in orders:
-                deviation = 1.0 - min(order['price'], price) / max(order['price'], price)
-                if deviation <= self.tolerance:
-                  span = 60.0 / config._sampling
-                  et = int(time.time())
-                  st = et - span
-                  if 'closed' in order and order['closed'] < et:
-                    et = order['closed']
-                  if 'opened' in order and order['opened'] > st:
-                    st = order['opened']
-                  order['amount'] *= max(0.0, float(et - st) / span)
-                  valid[order['type']].append([order['id'], order['amount'], request[2][order['type']]])
-                else:
-                  self.last_errors.append('unable to validate request: order of deviates too much from current price')
-              for side in [ 'bid', 'ask' ]:
-                del self.liquidity[side][0]
-                self.liquidity[side].append(valid[side])
-              if last_error != "" and len(valid['bid'] + valid['ask']) == 0:
-                res = 'r'
-                self.last_errors.append(last_error)
-                self.logger.debug("unable to validate request %d/%d for user %s at exchange %s on unit %s: orders of deviate too much from current price",
-                  rid + 1, len(self.requests), self.key, repr(self.exchange), self.unit)
-              else:
-                res = 'a'
-                self.last_errors.append("")
-                break
-            else:
-              res = 'r'
-              self.last_errors.append("unable to validate request: " + orders['error'])
-              if rid + 1 == len(self.requests):
-                self.logger.warning("unable to validate request %d/%d for user %s at exchange %s on unit %s: %s",
-                  rid + 1, len(self.requests), self.key, repr(self.exchange), self.unit, orders['error'])
-              for side in [ 'bid', 'ask' ]:
-                del self.liquidity[side][0]
-                self.liquidity[side].append([])
-        else:
-          self.last_errors.append("no request received")
-          for side in [ 'bid', 'ask' ]:
-            del self.liquidity[side][0]
-            self.liquidity[side].append([])
+      res = 'm'
+      if self.requests:
+        requests = self.requests[:]
         self.requests = []
+        for rid, request in enumerate(requests):
+          try:
+            orders = self.exchange.validate_request(self.key, self.unit, request[0], request[1])
+          except:
+            orders = { 'error' : 'exception caught: %s' % sys.exc_info()[1]}
+          if not 'error' in orders:
+            valid = { 'bid': [], 'ask' : [] }
+            price = self.pricefeed.price(self.unit)
+            last_error = ''
+            for order in orders:
+              deviation = 1.0 - min(order['price'], price) / max(order['price'], price)
+              if deviation <= self.tolerance:
+                span = 60.0 / config._sampling
+                et = int(time.time())
+                st = et - span
+                if 'closed' in order and order['closed'] < et:
+                  et = order['closed']
+                if 'opened' in order and order['opened'] > st:
+                  st = order['opened']
+                order['amount'] *= max(0.0, float(et - st) / span)
+                valid[order['type']].append([order['id'], order['amount'], request[2][order['type']]])
+              else:
+                self.last_errors.append('unable to validate request: order of deviates too much from current price')
+            for side in [ 'bid', 'ask' ]:
+              del self.liquidity[side][0]
+              self.liquidity[side].append(valid[side])
+            if last_error != "" and len(valid['bid'] + valid['ask']) == 0:
+              res = 'r'
+              self.last_errors.append(last_error)
+              self.logger.debug("unable to validate request %d/%d for user %s at exchange %s on unit %s: orders of deviate too much from current price",
+                rid + 1, len(self.requests), self.key, repr(self.exchange), self.unit)
+            else:
+              res = 'a'
+              self.last_errors.append("")
+              break
+          else:
+            res = 'r'
+            self.last_errors.append("unable to validate request: " + orders['error'])
+            if rid + 1 == len(self.requests):
+              self.logger.warning("unable to validate request %d/%d for user %s at exchange %s on unit %s: %s",
+                rid + 1, len(self.requests), self.key, repr(self.exchange), self.unit, orders['error'])
+            for side in [ 'bid', 'ask' ]:
+              del self.liquidity[side][0]
+              self.liquidity[side].append([])
       else:
         self.last_errors.append("no request received")
         for side in [ 'bid', 'ask' ]:
           del self.liquidity[side][0]
           self.liquidity[side].append([])
       self.response = self.response[1:] + [res]
-      self.active = self.active or self.liquidity['bid'].count([]) + self.liquidity['ask'].count([]) == 2 * self.sampling
       del self.last_errors[0]
       self.lock.release()
 
@@ -262,7 +277,7 @@ def register(params):
     name = params['name'][0]
     address = params['address'][0]
     if address[0] == 'B': # this is certainly not a proper check
-      if name in _wrappers:
+      if name in config._interest:
         for slave in slaves:
           slave.register(address, user, name)
         if not user in keys:
@@ -305,11 +320,11 @@ def liquidity(params):
   return ret
 
 def poolstats():
-  return { 'liquidity' : ([ (0,0) ] + _liquidity)[-1], 'sampling' : config._sampling, 'users' : _active_users }
+  return { 'liquidity' : ([ (0,0) ] + _liquidity)[-1], 'sampling' : config._sampling, 'users' : _active_users, 'credits' : _round / config._sampling, 'validations' : _round }
 
 critical_message = ""
 def userstats(user):
-  res = { 'balance' : 0.0, 'efficiency' : 1.0, 'rejects': 0, 'missing' : 0, 'message' : critical_message }
+  res = { 'balance' : 0.0, 'efficiency' : 0.0, 'rejects': 0, 'missing' : 0, 'message' : critical_message }
   res['units'] = {}
   for unit in keys[user]:
     checkpoint = keys[user][unit].checkpoint
@@ -344,21 +359,22 @@ def userstats(user):
                              'rate' : keys[user][unit].rate,
                              'rejects' : rejects,
                              'missing' : missing,
+                             'active' : keys[user][unit].active,
                              'last_error' :  last_error }
   if len(res['units']) > 0:
     res['efficiency'] = 1.0 - (res['rejects'] + res['missing']) / float(config._sampling * len(res['units']))
   return res
 
-def collect():
+def collect(timeout):
   for slave in slaves:
-    slave.collect()
+    slave.collect(timeout)
   for slave in slaves:
     checkpoint = slave.finish()
     if not 'error' in checkpoint:
       for user in checkpoint:
         for unit in checkpoint[user]:
           for i in xrange(config._sampling):
-            if not keys[user][unit].active or keys[user][unit].response[i] == 'm':
+            if keys[user][unit].response[i] == 'm':
               keys[user][unit].last_errors[i] = checkpoint[user][unit]['last_errors'][i]
               if checkpoint[user][unit]['response'][i] != 'm':
                 keys[user][unit].response[i] = checkpoint[user][unit]['response'][i]
@@ -368,6 +384,17 @@ def collect():
   for user in keys:
     for unit in keys[user]:
       keys[user][unit].bundle()
+      keys[user][unit].active = keys[user][unit].liquidity['bid'].count([]) + keys[user][unit].liquidity['ask'].count([]) < 2 * keys[user][unit].sampling
+
+def checkpoints(params):
+  ret = {}
+  for user in params:
+    if user in keys:
+      for unit in keys[user]:
+        if keys[user][unit].active:
+          if not user in ret: ret[user] = {}
+          ret[user][unit] = keys[user][unit].checkpoint
+  return ret
 
 def credit():
   for name in config._interest:
@@ -397,7 +424,7 @@ def credit():
             maxlevel = int(ceil(mass / target))
             pricelevels = sorted(list(set( [ order[2] for _,order in orders if order[2] < maxrate ])) + [maxrate, maxrate])
             if sample == 0:
-              logger.debug('pricelevels: %s', " ".join(pricelevels))
+              logger.debug('%s pricelevels: %s', side, " ".join([str(s) for s in pricelevels]))
             if len(pricelevels) < maxlevel + 2:
               pricelevels += [maxrate] * (2 + maxlevel - len(pricelevels))
             # calculate level
@@ -503,19 +530,9 @@ def submit(nud):
   _liquidity.append(curliquidity)
   nud.liquidity(curliquidity[0], curliquidity[1])
 
-def checkpoints(params):
-  ret = {}
-  for user in params:
-    if user in keys:
-      for unit in keys[user]:
-        if keys[user][unit].active:
-          if not user in ret: ret[user] = {}
-          ret[user][unit] = keys[user][unit].checkpoint
-  return ret
-
 def sync():
   ts = int(time.time() * 1000.0)
-  return { 'time' : ts, 'sync' : 15000 }
+  return { 'time' : ts, 'sync' : 15000, 'round' : _round }
 
 class RequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
   def do_POST(self):
@@ -533,7 +550,8 @@ class RequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         elif self.path == 'liquidity':
           ret = liquidity(params)
         elif self.path == 'checkpoints':
-          ret = checkpoints(params)
+          if _valflag: ret = { 'error' : "validation in progress"}
+          else: ret = checkpoints(params)
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.wfile.write("\n")
@@ -631,13 +649,15 @@ if not nud.rpc:
   config._autopayout = False
 httpd = ThreadingServer(("", config._port), RequestHandler)
 sa = httpd.socket.getsockname()
-logger.debug("Serving on %s port %d", sa[0], sa[1])
+logger.debug("serving on %s port %d", sa[0], sa[1])
 start_new_thread(httpd.serve_forever, ())
 
 if master:
+  _round = -1
   ts = int(time.time() * 1000.0)
   ret = master.get('sync', trials = 3, timeout = 15)
   if not 'error' in ret:
+    _round = ret['round']
     delay = (60000 - (ret['time'] % 60000)) - (int(time.time() * 1000.0) - ts) / 2
     if delay <= 0:
       logger.error("unable to synchronize time with master server: time difference to small")
@@ -651,6 +671,7 @@ elif slaves:
     logger.info("waiting %.2f seconds to synchronize with slave servers", delay / 1000.0)
     time.sleep(delay / 1000.0)
 
+lastcheckp = time.time()
 lastcredit = time.time()
 lastpayout = time.time()
 lastsubmit = time.time()
@@ -671,32 +692,44 @@ while True:
     lock.release()
 
     # create checkpoints
-    if curtime - lastcredit >= 60:
-      collect()
+    if not slaves or curtime - lastcheckp >= 60:
+      collect(max(float(60 / config._sampling) - time.time() + curtime, 0.01) / 2.0)
+      lastcheckp = curtime
+    _valflag = False
 
     if not master:
+      _round += 1
       # send liquidity
       if curtime - lastsubmit >= 60:
         submit(nud)
         lastsubmit = curtime
       # credit requests
       if curtime - lastcredit >= 60:
-        collect()
         credit()
         lastcredit = curtime
       # make payout
-      if curtime - lastpayout >= 21600: #3600: #43200:
+      if curtime - lastpayout >= 86400:
         pay(nud)
         lastpayout = curtime
+    else:
+      while True:
+        ret = master.get('sync', trials = 1, timeout = 1)
+        if 'error' in ret or ret['round'] == _round:
+          time.sleep(0.1)
+          continue
+        _round = ret['round']
+        break
 
     # start new validation round
+    _valflag = True
     lock.acquire()
     for user in keys:
       for unit in keys[user]:
         keys[user][unit].validate()
     lock.release()
 
-    time.sleep(max(float(60 / config._sampling) - time.time() + curtime, 0))
+    if not master:
+      time.sleep(max(float(60 / config._sampling) - time.time() + curtime, 0))
   except Exception as e:
     logger.error('exception caught in main loop: %s', sys.exc_info()[1])
     httpd.socket.close()
