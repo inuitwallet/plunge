@@ -51,6 +51,7 @@
   "Buy_Side_Liquidity": "Bid Liquidity",
   "Sell_Side_Liquidity": "Ask Liquidity",
   "Total_Liquidity": "Total Liquidity",
+  "Exchange_Total_Liquidity": "Exchange Total Liquidity",
   "Num_Users": "Users",
   "Sampling": "Sampling",
   "Pool_Info": "Pool Information",

@@ -52,5 +52,12 @@
     "desc": "Choose whether or not to show the disclaimer",
     "section": "standard",
     "key": "show_disclaimer"
+  },
+  {
+    "type": "bool",
+    "title": "SmoothLine Charts",
+    "desc": "Display Charts as SmoothLine. IDisable this if charts don't work",
+    "section": "standard",
+    "key": "smooth_line"
   }
 ]

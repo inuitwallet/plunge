@@ -54,11 +54,7 @@ class utils:
 
     def get_active_exchanges(self):
         exchanges = []
-        with open('api_keys.json') as api_keys_file:
-            api_keys = json.load(api_keys_file)
-        api_keys_file.close()
-        for set in api_keys:
-            exchange = set['exchange']
+        for exchange in self.PlungeApp.homeScreen.stats:
             if exchange in exchanges:
                 continue
             else:
@@ -67,7 +63,11 @@ class utils:
         return exchanges
 
     def get_active_currencies(self, exchange):
-        currencies = self.PlungeApp.currencies
+        currencies = []
+        if exchange in self.PlungeApp.homeScreen.stats:
+            for currency in self.PlungeApp.currencies:
+                if currency in self.PlungeApp.homeScreen.stats[exchange]:
+                    currencies.append(currency)
         self.PlungeApp.logger.info("Got active currencies - %s" % str(currencies))
         return currencies
 

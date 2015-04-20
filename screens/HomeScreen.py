@@ -6,7 +6,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 import os
 import time
-from graph import Graph, MeshLinePlot, MeshStemPlot
+from graph import Graph, MeshLinePlot, MeshStemPlot, SmoothLinePlot
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
@@ -63,6 +63,11 @@ class HomeScreen(Screen):
         self.min_efficiency = self.ids.min_efficiency.__self__
         self.min_balance = self.ids.min_balance.__self__
 
+        self.getting_pool_stats = False
+        self.getting_exchange_stats = False
+        self.getting_personal_stats = False
+        self.set_exchange_spinners()
+
         # set up variables
         self.primary_currency = None
         self.primary_exchange = None
@@ -113,43 +118,47 @@ class HomeScreen(Screen):
         self.total_bid_rate_list = []
 
         # set up UI and start timers
-        self.getting_pool_stats = False
-        self.getting_exchange_stats = False
-        self.getting_personal_stats = False
-        self.set_exchange_spinners()
         self.PlungeApp.logger.info("Setting refresh Period to %s" % self.PlungeApp.config.get('standard', 'period'))
         Clock.schedule_interval(self.get_stats, self.PlungeApp.config.getint('standard', 'period'))
         return
 
     def set_exchange_spinners(self):
-        set_spinners = Thread(target=self._set_exchange_spinners)
-        set_spinners.start()
+        self.PlungeApp.logger.info("getting data for spinners")
+        url = "http://%s:%s/exchanges" % (self.PlungeApp.config.get('server', 'host'),
+                                          self.PlungeApp.config.get('server', 'port'))
+        req = UrlRequest(url, self._set_exchange_spinners, self.exchange_spinner_error, self.exchange_spinner_error)
 
-    def _set_exchange_spinners(self):
+    def exchange_spinner_error(self, req, result):
+        self.PlungeApp.logger.warn(result)
+
+    def _set_exchange_spinners(self, req, result):
         # see if any exchanges are enabled so that we can display the stats
         self.primary_exchange = ''
         self.primary_currency = ''
-        self.PlungeApp.active_exchanges = self.PlungeApp.utils.get_active_exchanges()
-        for exchange in self.PlungeApp.active_exchanges:
+        self.PlungeApp.active_exchanges = []
+        for exchange in result:
+            if exchange in self.PlungeApp.active_exchanges:
+                continue
+            self.PlungeApp.active_exchanges.append(exchange)
             if self.PlungeApp.get_string(exchange) == self.exchange_spinner.text:
                 self.primary_exchange = exchange
-        self.PlungeApp.logger.info("Set Primary Exchange to %s" % self.primary_exchange)
-        if self.primary_exchange == '':
-            self.PlungeApp.active_exchanges = self.PlungeApp.utils.get_active_exchanges()
-            if self.PlungeApp.active_exchanges:
-                self.exchange_spinner.values = [self.PlungeApp.get_string(exchange) for
-                                                exchange in self.PlungeApp.active_exchanges]
-                self.primary_exchange = self.PlungeApp.active_exchanges[0]
-                self.exchange_spinner.text = self.PlungeApp.get_string(self.primary_exchange)
-                self.PlungeApp.logger.info("Set Primary Exchange to %s" % self.primary_exchange)
-            else:
-                self.PlungeApp.show_popup(self.PlungeApp.get_string('Popup_Error'),
-                                          self.PlungeApp.get_string('No_Exchanges'))
-                return
-        self.PlungeApp.active_currencies = self.PlungeApp.utils.get_active_currencies(self.primary_exchange)
-        if self.PlungeApp.active_currencies:
-            self.currency_spinner.values = [currency.upper() for currency in self.PlungeApp.active_currencies]
-            self.primary_currency = self.PlungeApp.active_currencies[0]
+        if self.primary_exchange != '':
+            self.PlungeApp.logger.info("Set Primary Exchange to %s" % self.primary_exchange)
+        else:
+            self.exchange_spinner.values = [self.PlungeApp.get_string(exchange) for
+                                            exchange in self.PlungeApp.active_exchanges]
+            self.primary_exchange = self.PlungeApp.active_exchanges[0]
+            self.exchange_spinner.text = self.PlungeApp.get_string(self.primary_exchange)
+            self.PlungeApp.logger.info("Set Primary Exchange to %s" % self.primary_exchange)
+        self.PlungeApp.active_currencies = []
+        for currency in result[self.primary_exchange]:
+            if currency in self.PlungeApp.active_currencies:
+                continue
+            self.PlungeApp.active_currencies.append(currency)
+        self.currency_spinner.values = [currency.upper() for currency in self.PlungeApp.active_currencies]
+        if self.primary_currency == '':
+            self.primary_currency = self.PlungeApp.active_currencies[0].lower()
+            self.PlungeApp.logger.info("Set Primary Currency to %s" % self.primary_currency)
             self.currency_spinner.text = self.primary_currency.upper()
         self.get_stats(0)
 
@@ -206,6 +215,7 @@ class HomeScreen(Screen):
         # get the exchange status
 
         if self.getting_exchange_stats is True:
+
             return
         self.getting_exchange_stats = True
         self.PlungeApp.logger.info("Get the Exchange Stats")
@@ -224,16 +234,21 @@ class HomeScreen(Screen):
 
     def get_personal_stats(self):
         # get the individual status for each account
+        self.PlungeApp.logger.info("Get the Personal Stats")
         if self.getting_personal_stats is True:
             return
         self.getting_personal_stats = True
+        self.saving_personal_stats = False
         self.user = {}
         with open('api_keys.json') as api_keys_file:
             api_keys = json.load(api_keys_file)
         api_keys_file.close()
+        if not self.PlungeApp.active_exchanges or not self.PlungeApp.active_currencies:
+            self.getting_personal_stats = False
+            return
         for self.personal_exchange in self.PlungeApp.active_exchanges:
             self.user[self.personal_exchange] = {'balance': 0, 'num_keys': 0, 'efficiency': 0}
-            for currency in self.PlungeApp.currencies:
+            for currency in self.PlungeApp.active_currencies:
                 self.user[self.personal_exchange][currency] = {'ask_liquidity': 0, 'bid_liquidity': 0, 'ask_rate': 0, 'bid_rate': 0}
             for set in api_keys:
                 if set['exchange'] == self.personal_exchange:
@@ -245,18 +260,21 @@ class HomeScreen(Screen):
                     self.saving_personal_stats = True
                     req = UrlRequest(url, self.save_personal_stats, self.personal_stats_error,
                                      self.personal_stats_error)
-        if self.user[self.personal_exchange]['num_keys'] > 0:
-            self.user[self.personal_exchange]['efficiency'] /= self.user[self.personal_exchange]['num_keys']
 
-        while self.saving_personal_stats is True:
-            continue
+                    while self.saving_personal_stats is True:
+                        continue
 
-        # update the graph data lists
-        self.ensure_lists(self.exchange_efficiency, self.personal_exchange)
-        self.update_lists((self.user[self.personal_exchange]['efficiency'] * 100),
-                          self.exchange_efficiency[self.personal_exchange])
-        self.ensure_lists(self.exchange_balance, self.personal_exchange)
-        self.update_lists(self.user[self.personal_exchange]['balance'], self.exchange_balance[self.personal_exchange])
+                    if self.user[self.personal_exchange]['num_keys'] > 0:
+                        self.user[self.personal_exchange]['efficiency'] /= \
+                            float(self.user[self.personal_exchange]['num_keys'])
+
+            # update the graph data lists
+            self.ensure_lists(self.exchange_efficiency, self.personal_exchange)
+            self.update_lists((self.user[self.personal_exchange]['efficiency'] * 100),
+                              self.exchange_efficiency[self.personal_exchange])
+            self.ensure_lists(self.exchange_balance, self.personal_exchange)
+            self.update_lists(round(float(self.user[self.personal_exchange]['balance']), 4),
+                              self.exchange_balance[self.personal_exchange])
 
         if self.primary_exchange in self.user:
             if self.primary_currency in self.user[self.primary_exchange]:
@@ -277,7 +295,10 @@ class HomeScreen(Screen):
         self.user[self.personal_exchange]['balance'] += result['balance']
         self.user[self.personal_exchange]['num_keys'] += 1
         self.user[self.personal_exchange]['efficiency'] += result['efficiency']
-        for currency in self.PlungeApp.currencies:
+        if not self.PlungeApp.active_currencies:
+            self.saving_personal_stats = False
+            return
+        for currency in self.PlungeApp.active_currencies:
             if currency in result['units']:
                 for order in result['units'][currency]['ask']:
                     self.user[self.personal_exchange][currency]['ask_liquidity'] += order['amount']
@@ -376,13 +397,13 @@ class HomeScreen(Screen):
 
         num_exchanges = 0
 
-        for exchange in self.PlungeApp.exchanges:
+        for exchange in self.PlungeApp.active_exchanges:
             if exchange not in self.user:
                 continue
             num_exchanges += 1
             self.total_efficiency += self.user[exchange]['efficiency']
             self.total_balance += self.user[exchange]['balance']
-            for currency in self.PlungeApp.currencies:
+            for currency in self.PlungeApp.active_currencies:
                 if currency not in self.user[exchange]:
                     continue
                 self.total_ask_liquidity += self.user[exchange][currency]['ask_liquidity']
@@ -408,7 +429,7 @@ class HomeScreen(Screen):
         self.update_lists(self.total_bid_rate, self.total_bid_rate_list)
         self.update_lists(self.total_liquidity, self.total_liquidity_list)
         self.update_lists((self.total_efficiency * 100), self.total_efficiency_list)
-        self.update_lists(self.total_balance, self.total_balance_list)
+        self.update_lists(round(float(self.total_balance), 4), self.total_balance_list)
 
     def toggle_client(self):
         text = self.start_button.text
@@ -428,8 +449,12 @@ class HomeScreen(Screen):
         user_file.close()
         for exchange in user_data:
             for d in user_data[exchange]:
-                self.client.set(str(d['public']), str(d['secret']), str(d['address']), str(exchange), str(d['unit']),
-                                (float(d['bid']) / 100), (float(d['ask']) / 100), str(d['bot']))
+                set = self.client.set(str(d['public']), str(d['secret']), str(d['address']), str(exchange),
+                                      str(d['unit']), (float(d['bid']) / 100), (float(d['ask']) / 100), str(d['bot']))
+                if set is not True:
+                    self.PlungeApp.show_popup(self.PlungeApp.get_string("Popup_Error"),
+                                              self.PlungeApp.get_string("Client_Run_Error"))
+                    return
         self.client.start()
         self.client_logger = client.client.getlogger()
         log_handler = logging.StreamHandler(self.RedirectLogger(self.log_output))
@@ -460,15 +485,25 @@ class HomeScreen(Screen):
     def draw_chart(self, title, y_label, points):
         y_min = min(points) if len(points) > 0 else 0
         y_max = max(points) if len(points) > 0 else 100
-        self.graph = Graph(ylabel=y_label, x_ticks_minor=5, x_ticks_major=25, y_ticks_major=5,
-                      y_grid_label=True, x_grid_label=True, padding=5, x_grid=True, y_grid=True, xmin=0,
-                      xmax=len(points), ymin=(y_min-10), ymax=(y_max+10))
+        y_diff = (y_max - y_min)
+        y_major = float(y_diff) / float(10) if y_diff > 0 else 1
+        period = self.PlungeApp.config.getint('standard', 'period')
+        minute = (float(period) / float(60))
+        x_major = float(30) / float(minute)
+        x_minor = float(5) / float(minute)
+        x_max = 1 if len(points) < 1 else (len(points) - 1)
+        self.graph = Graph(ylabel=y_label, x_ticks_minor=x_minor, x_ticks_major=x_major, y_ticks_major=y_major,
+                           y_grid_label=True, x_grid_label=True, padding=5, x_grid=True, y_grid=True, xmin=0,
+                           xmax=x_max, ymin=(y_min-10), ymax=(y_max+10))
         tuple_points = []
         x = 0
         for point in points:
             tuple_points.append((x, point))
             x += 1
-        plot = MeshLinePlot(color=[0.93725, 0.21176, 0.07843, 1])
+        if self.PlungeApp.config.getint('standard', 'smooth_line') == 1:
+            plot = SmoothLinePlot(color=[0.93725, 0.21176, 0.07843, 1])
+        else:
+            plot = MeshLinePlot(color=[0.93725, 0.21176, 0.07843, 1])
         plot.points = tuple_points
         self.graph.add_plot(plot)
         self.show_graph_popup(title)
@@ -476,11 +511,18 @@ class HomeScreen(Screen):
     def draw_liquidity_chart(self, title, buy_points, sell_points, stem=False):
         y_min = min(buy_points, sell_points)
         y_max = max(buy_points, sell_points)
-        self.graph = Graph(ylabel='NBT', x_ticks_minor=5, x_ticks_major=25, y_ticks_major=5,
-                      y_grid_label=True, x_grid_label=True, padding=5, x_grid=True, y_grid=True, xmin=0,
-                      xmax=len(y_max), ymin=(min(y_min)-10), ymax=(max(y_max)+20))
-        if stem is True:
-            buy_plot = MeshStemPlot(color=[0, 0.65490, 0.82745, 1])
+        y_diff = (max(y_max) - min(y_min))
+        y_major = float(y_diff) / float(10) if y_diff > 0 else 1
+        period = self.PlungeApp.config.getint('standard', 'period')
+        minute = (float(period) / float(60))
+        x_major = float(30) / float(minute)
+        x_minor = float(5) / float(minute)
+        x_max = 1 if len(points) < 1 else (len(points) - 1)
+        self.graph = Graph(ylabel='NBT', x_ticks_minor=x_minor, x_ticks_major=x_major, y_ticks_major=y_major,
+                           y_grid_label=True, x_grid_label=True, padding=5, x_grid=True, y_grid=True, xmin=0,
+                           xmax=x_max, ymin=(min(y_min)-50), ymax=(max(y_max)+50))
+        if self.PlungeApp.config.getint('standard', 'smooth_line') == 1:
+            buy_plot = SmoothLinePlot(color=[0, 0.65490, 0.82745, 1])
         else:
             buy_plot = MeshLinePlot(color=[0, 0.65490, 0.82745, 1])
         points = []
@@ -490,8 +532,8 @@ class HomeScreen(Screen):
             x += 1
         buy_plot.points = points
         self.graph.add_plot(buy_plot)
-        if stem is True:
-            sell_plot = MeshStemPlot(color=[1, 0.72157, 0, 1])
+        if self.PlungeApp.config.getint('standard', 'smooth_line') == 1:
+            sell_plot = SmoothLinePlot(color=[1, 0.72157, 0, 1])
         else:
             sell_plot = MeshLinePlot(color=[1, 0.72157, 0, 1])
         points = []

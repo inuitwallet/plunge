@@ -145,7 +145,7 @@
 
                 Spinner:
                     id: exchange_spinner
-                    values: [app.get_string(exchange) for exchange in app.exchanges]
+                    #values: [app.get_string(exchange) for exchange in app.exchanges]
                     on_text: root.set_exchange_spinners()
 
                 Spinner:
@@ -200,7 +200,7 @@
                         size_hint: (1, 0.7)
                         font_size: 18
                         markup: True
-                        on_ref_press: root.draw_chart(app.get_string('Balance'), app.get_string('Balance'), root.exchange_balance[root.primary_exchange])
+                        #on_ref_press: root.draw_chart(app.get_string('Balance'), app.get_string('Balance'), root.exchange_balance[root.primary_exchange])
 
            #Second Row of Exchange stats
             GridLayout:
@@ -349,7 +349,7 @@
                         size_hint: (1, 0.7)
                         font_size: 18
                         markup: True
-                        on_ref_press: root.draw_chart(app.get_string('Balance'), app.get_string('Balance'), root.total_balance_list)
+                        #on_ref_press: root.draw_chart(app.get_string('Balance'), app.get_string('Balance'), root.total_balance_list)
 
         #Run Section
         BoxLayout:

@@ -216,7 +216,7 @@ class PlungeApp(App):
         config.setdefaults('server', {'host': "eu.nupool.net", 'port': 80})
         config.setdefaults('exchanges', {'ccedk': 0, 'poloniex': 0, 'bitcoincoid': 0, 'bter': 0, 'bittrex': 0})
         config.setdefaults('standard', {'language': 'English', 'period': 30, 'monitor': 0, 'start_min': 0, 'data': 0,
-                                        'show_disclaimer': 1})
+                                        'show_disclaimer': 1, 'smooth_line': 1})
 
     def build_settings(self, settings):
         settings.register_type('string', overrides.SettingStringFocus)
