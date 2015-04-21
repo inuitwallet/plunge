@@ -63,13 +63,17 @@ class Bittrex(Exchange):
   def adjust(self, error):
     pass
 
-  def post(self, method, params, key, secret):
+  def post(self, method, params, key, secret, throttle = 5):
     data = 'https://bittrex.com/api/v1.1' + method + '?apikey=%s&nonce=%d&' % (key, self.nonce()) + urllib.urlencode(params)
     sign = hmac.new(secret, data, hashlib.sha512).hexdigest()
     headers = { 'apisign' : sign }
     connection = httplib.HTTPSConnection('bittrex.com', timeout = 10)
     connection.request('GET', data, headers = headers)
-    return json.loads(connection.getresponse().read())
+    response = json.loads(connection.getresponse().read())
+    if throttle > 0 and not response['success'] and 'THROTTLED' in response['message']:
+      time.sleep(2)
+      return self.post(method, params, key, secret, throttle - 1)
+    return response
 
   def get(self, method, params):
     data = 'https://bittrex.com/api/v1.1' + method + '?' + urllib.urlencode(params)
@@ -419,17 +423,20 @@ class BitcoinCoId(Exchange):
 
   def __repr__(self): return "bitcoincoid"
 
+  def adjust(self, error):
+    if "Nonce must be greater than" in error: # (TODO: regex)
+      if ':' in error: error = error.split(':')[1].strip()
+      error = error.replace('.', '').split()
+      self._shift += 100.0 + (int(error[5]) - int(error[8])) / 1000.0
+    else:
+      self._shift = self._shift + 100.0
+
   def nonce(self, factor = 1000.0):
     n = int((time.time() + self._shift) * float(factor))
-    if n - self._nonce <= 100:
-      time.sleep(0.1)
-      return self.nonce(factor)
+    if n - self._nonce < 300:
+      n = self._nonce + 300
     self._nonce = n
     return n
-
-  def adjust(self, error):
-    if "Invalid nonce" in error: #(TODO: regex)
-      self._shift = min(self._shift + 100, 3600)
 
   def post(self, method, params, key, secret):
     request = { 'nonce' : self.nonce(), 'method' : method }

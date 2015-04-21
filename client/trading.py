@@ -257,14 +257,14 @@ class PyBot(ConnectionThread):
     curtime = time.time()
     efftime = curtime
     lasttime = curtime
-    lastdev = 1.0
+    lastdev = { 'bid': 1.0, 'ask': 1.0 }
     delay = 0.0
     while self.active:
       try:
-        sleep = 15 - time.time() + curtime
+        sleep = 30 - time.time() + curtime
         if sleep < 0:
           delay += abs(sleep)
-          if delay > 1.0:
+          if delay > 5.0:
             self.logger.warning('need to resynchronize trading bot for %s on %s because the deviation reached %.2f', self.unit, repr(self.exchange), delay)
             if self.sync():
               delay = 0.0
@@ -282,6 +282,7 @@ class PyBot(ConnectionThread):
         if self.requester.errorflag:
           self.logger.error('server unresponsive for %s on %s', self.unit, repr(self.exchange))
           self.shutdown()
+          self.limit = self.target.copy()
           efftime = curtime
         else:
           response = self.conn.get('price/' + self.unit, trials = 3, timeout = 10)
@@ -303,7 +304,7 @@ class PyBot(ConnectionThread):
                 self.place_orders()
                 efftime = curtime
                 continue
-              elif curtime - efftime > 120:
+              elif curtime - efftime > 60:
                 efftime = curtime
                 response = self.conn.get(self.key, trials = 1)
                 if 'error' in response:
@@ -319,16 +320,21 @@ class PyBot(ConnectionThread):
                     else:
                       effective_rate /= self.total[side]
                       deviation = 1.0 - min(effective_rate, self.requester.cost[side]) / max(effective_rate, self.requester.cost[side])
-                      if deviation > 0.02 and lastdev > 0.02:
+                      if deviation > 0.02 and lastdev[side] > 0.02:
                         if self.total[side] > 0.5 and effective_rate < self.requester.cost[side]:
                           funds = max(0.5, self.total[side] * (1.0 - max(deviation, 0.1)))
                           self.logger.info("decreasing tier 1 %s limit of %s on %s from %.8f to %.8f", side, self.unit, repr(self.exchange), self.total[side], funds)
                           self.cancel_orders(side)
                           self.limit[side] = funds
                         elif self.limit[side] < self.total[side] * deviation and effective_rate > self.requester.cost[side] and contrib < self.target[side]:
-                          self.logger.info("increasing tier 1 %s limit of %s on %s from %.8f to %.8f", side, self.unit, repr(self.exchange), self.total[side], self.total[side] + max(contrib * deviation, 0.5))
-                          self.limit[side] = max(contrib * deviation, 0.5)
-                      lastdev = deviation
+                          self.logger.info("increasing tier 1 %s limit of %s on %s from %.8f to %.8f",
+                            side, self.unit, repr(self.exchange), self.total[side], self.total[side] + max(1.0, max(contrib * deviation, 0.5)))
+                          self.limit[side] = max(1.0, max(contrib * deviation, 0.5))
+                      elif deviation < 0.01 and lastdev[side] < 0.01 and self.limit[side] < max(1.0, max(contrib * deviation, 0.5)) and contrib < self.target[side] and effective_rate >= self.requester.cost[side]:
+                        self.logger.info("increasing tier 1 %s limit of %s on %s from %.8f to %.8f",
+                          side, self.unit, repr(self.exchange), self.total[side], self.total[side] + max(1.0, max(contrib * deviation, 0.5)))
+                        self.limit[side] = max(1.0, max(contrib * deviation, 0.5))
+                      lastdev[side] = deviation
               self.place_orders()
           else:
             self.logger.error('unable to retrieve server price: %s', response['message'])

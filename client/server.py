@@ -162,6 +162,7 @@ class User(threading.Thread):
     self.logger = logger if logger else logging.getLogger('null')
     self.requests = []
     self.daemon = True
+    self.cancel = False
     self.history = []
     self.page = 1
     self.record()
@@ -203,6 +204,7 @@ class User(threading.Thread):
         requests = self.requests[:]
         self.requests = []
         for rid, request in enumerate(requests):
+          if self.cancel: break
           try:
             orders = self.exchange.validate_request(self.key, self.unit, request[0], request[1])
           except:
@@ -240,9 +242,9 @@ class User(threading.Thread):
           else:
             res = 'r'
             self.last_errors.append("unable to validate request: " + orders['error'])
-            if rid + 1 == len(self.requests):
+            if rid + 1 == len(requests):
               self.logger.warning("unable to validate request %d/%d for user %s at exchange %s on unit %s: %s",
-                rid + 1, len(self.requests), self.key, repr(self.exchange), self.unit, orders['error'])
+                rid + 1, len(requests), self.key, repr(self.exchange), self.unit, orders['error'])
             for side in [ 'bid', 'ask' ]:
               del self.liquidity[side][0]
               self.liquidity[side].append([])
@@ -256,11 +258,13 @@ class User(threading.Thread):
       self.lock.release()
 
   def validate(self):
+    self.cancel = False
     try: self.trigger.release()
     except thread.error: pass # user did not finish last request in time
 
   def finish(self):
     if self.active:
+      self.cancel = True
       try:
         self.lock.acquire()
         self.lock.release()
@@ -423,19 +427,21 @@ def credit():
             target = min(mass, config._interest[name][unit][side]['target'])
             maxlevel = int(ceil(mass / target))
             pricelevels = sorted(list(set( [ order[2] for _,order in orders if order[2] < maxrate ])) + [maxrate, maxrate])
-            if sample == 0:
-              logger.debug('%s pricelevels: %s', side, " ".join([str(s) for s in pricelevels]))
             if len(pricelevels) < maxlevel + 2:
               pricelevels += [maxrate] * (2 + maxlevel - len(pricelevels))
             # calculate level
             levelvolume = [ 0.0 for p in pricelevels ]
             for user,order in orders:
               if order[2] <= maxrate:
-                levelvolume[pricelevels.index(order[2])] += order[1]
+                for i,p in enumerate(pricelevels):
+                  if order[2] < p or p == maxrate:
+                    levelvolume[i] += order[1]
+            lower = mass - int(mass / target) * target
+            higher = int((mass / target) + 1) * target - mass
             lvl = len(pricelevels) - 3
-            for i,v in enumerate(levelvolume):
-              if v >= config._interest[name][unit][side]['target']:
-                lvl = i
+            for i in xrange(1, len(levelvolume) - 1):
+              if levelvolume[i - 1] >= lower and levelvolume[i] >= config._interest[name][unit][side]['target']:
+                lvl = i - 2
                 break
             config._interest[name][unit][side]['low'] = pricelevels[lvl+1]
             config._interest[name][unit][side]['high'] = pricelevels[lvl+2]
@@ -445,16 +451,19 @@ def credit():
               volume[2][user] += order[1]
               if order[2] <= maxrate:
                 ulvl = pricelevels.index(order[2])
-                if ulvl <= lvl:
+                if ulvl < lvl + 1:
                   volume[0][user] += order[1]
-                if ulvl <= lvl + 1:
+                if ulvl < lvl + 2 or pricelevels[lvl + 2] == maxrate:
                   volume[1][user] += order[1]
+            if sample == config._sampling - 1:
+              logger.debug('%s pricelevel %d [%.4f,%.4f]: %s', side, lvl, float(sum(volume[0].values())), float(sum(volume[1].values())), " ".join([str(s) for s in pricelevels]))
+              logger.debug('%s pricevolumes [%.4f,%.4f]: %s', side, lower, higher, " ".join([str(s) for s in levelvolume]))
             # credit higher payout level
             norm = float(sum(volume[1].values()))
             for user in volume[1]:
               if norm > 0 and volume[1][user] > 0:
                 price = pricelevels[lvl+2]
-                contrib = min(volume[1][user], (int((mass / target) + 1) * target - mass) * volume[1][user] / norm)
+                contrib = min(volume[1][user], higher * volume[1][user] / norm)
                 payout = contrib * price
                 volume[0][user] -= contrib
                 volume[2][user] -= contrib
@@ -462,22 +471,22 @@ def credit():
                 keys[user][unit].credits[side][sample][0] = { 'amount' : contrib, 'cost' : price }
                 keys[user][unit].rate[side] += price * contrib / (volume[1][user] * config._sampling)
                 config._interest[name][unit][side]['orders'][sample].append({ 'amount' : contrib, 'cost' : price })
-                creditor.info("[%d/%d] %.8f %s %.8f %s %s %s %.2f",
-                  sample + 1, config._sampling, payout / float(24 * 60  * config._sampling), user, contrib, side, name, unit, price * 100)
+                creditor.info("[%d/%d] %.8f %s %.8f %s %s %s %.2f high %s",
+                  sample + 1, config._sampling, payout / float(24 * 60  * config._sampling), user, contrib, side, name, unit, price * 100, keys[user][unit].address)
             # credit lower payout level
             norm = float(sum([ max(0,v) for v in volume[0].values()]))
             for user in volume[0]:
               if norm > 0 and volume[0][user] > 0:
                 price = pricelevels[lvl+1]
-                contrib = min(volume[0][user], (mass - int(mass / target) * target) * volume[0][user] / norm)
+                contrib = min(volume[0][user], lower * volume[0][user] / norm)
                 payout = contrib * price
                 volume[2][user] -= contrib
                 keys[user][unit].balance += payout / float(24 * 60  * config._sampling)
                 keys[user][unit].credits[side][sample][1] = { 'amount' : contrib, 'cost' : price }
                 keys[user][unit].rate[side] += price * contrib / (volume[0][user] * config._sampling)
                 config._interest[name][unit][side]['orders'][sample].append({ 'amount' : contrib, 'cost' : price })
-                creditor.info("[%d/%d] %.8f %s %.8f %s %s %s %.2f", 
-                  sample + 1, config._sampling, payout / float(24 * 60  * config._sampling), user, contrib, side, name, unit, price * 100)
+                creditor.info("[%d/%d] %.8f %s %.8f %s %s %s %.2f low %s", 
+                  sample + 1, config._sampling, payout / float(24 * 60  * config._sampling), user, contrib, side, name, unit, price * 100, keys[user][unit].address)
             # mark zero payout level
             for user in volume[2]:
               if volume[2][user] > float(10**(-8)):
