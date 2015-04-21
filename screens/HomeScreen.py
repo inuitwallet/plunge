@@ -430,6 +430,7 @@ class HomeScreen(Screen):
         self.update_lists(self.total_liquidity, self.total_liquidity_list)
         self.update_lists((self.total_efficiency * 100), self.total_efficiency_list)
         self.update_lists(round(float(self.total_balance), 4), self.total_balance_list)
+        self.PlungeApp.logger.info("Calculations Finished")
 
     def toggle_client(self):
         text = self.start_button.text
@@ -491,7 +492,7 @@ class HomeScreen(Screen):
         minute = (float(period) / float(60))
         x_major = float(30) / float(minute)
         x_minor = float(5) / float(minute)
-        x_max = 1 if len(points) < 1 else (len(points) - 1)
+        x_max = 1 if len(points) < 2 else (len(points) - 1)
         self.graph = Graph(ylabel=y_label, x_ticks_minor=x_minor, x_ticks_major=x_major, y_ticks_major=y_major,
                            y_grid_label=True, x_grid_label=True, padding=5, x_grid=True, y_grid=True, xmin=0,
                            xmax=x_max, ymin=(y_min-10), ymax=(y_max+10))
@@ -517,7 +518,7 @@ class HomeScreen(Screen):
         minute = (float(period) / float(60))
         x_major = float(30) / float(minute)
         x_minor = float(5) / float(minute)
-        x_max = 1 if len(points) < 1 else (len(points) - 1)
+        x_max = 1 if len(sell_points) < 2 else (len(sell_points) - 1)
         self.graph = Graph(ylabel='NBT', x_ticks_minor=x_minor, x_ticks_major=x_major, y_ticks_major=y_major,
                            y_grid_label=True, x_grid_label=True, padding=5, x_grid=True, y_grid=True, xmin=0,
                            xmax=x_max, ymin=(min(y_min)-50), ymax=(max(y_max)+50))
