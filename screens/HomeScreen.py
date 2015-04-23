@@ -90,6 +90,10 @@ class HomeScreen(Screen):
             self.exchange_sell_side[exchange] = {}
             self.exchange_valid[exchange] = None
 
+        self.client_logger = client.client.getlogger()
+        log_handler = logging.StreamHandler(self.RedirectLogger(self.log_output))
+        self.client_logger.addHandler(log_handler)
+
         # set up the dictionaries that hold the returned server data
         self.pool = {}
         self.stats = {}
@@ -457,9 +461,6 @@ class HomeScreen(Screen):
                                               self.PlungeApp.get_string("Client_Run_Error"))
                     return
         self.client.start()
-        self.client_logger = client.client.getlogger()
-        log_handler = logging.StreamHandler(self.RedirectLogger(self.log_output))
-        self.client_logger.addHandler(log_handler)
         self.PlungeApp.client_running = True
         self.running_label.color = (0, 1, 0.28235, 1)
         self.running_label.text = self.PlungeApp.get_string("Client_Started")
