@@ -452,14 +452,20 @@ class HomeScreen(Screen):
         with open('user_data.json') as user_file:
             user_data = json.load(user_file)
         user_file.close()
+        num_rows = 0
         for exchange in user_data:
             for d in user_data[exchange]:
                 set = self.client.set(str(d['public']), str(d['secret']), str(d['address']), str(exchange),
                                       str(d['unit']), (float(d['bid']) / 100), (float(d['ask']) / 100), str(d['bot']))
+                num_rows += 1
                 if set is not True:
                     self.PlungeApp.show_popup(self.PlungeApp.get_string("Popup_Error"),
                                               self.PlungeApp.get_string("Client_Run_Error"))
                     return
+        if num_rows == 0:
+            self.PlungeApp.show_popup(self.PlungeApp.get_string("Popup_Error"),
+                                      self.PlungeApp.get_string("Client_Run_No_Data"))
+            return
         self.client.start()
         self.PlungeApp.client_running = True
         self.running_label.color = (0, 1, 0.28235, 1)

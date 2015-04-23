@@ -38,6 +38,7 @@
 
   "Popup_Error": "Error",
   "Client_Run_Error": "The was a problem in starting the client.",
+  "Client_Run_No_Data": "There is no data available to start the client.\n\nPlease add at least one row to an exchange on the Settings page",
   "No_Exchanges": "There are no valid users for any exchange.\n\nPlease add at least one user.",
   "No_Currencies": "There are no enabled pairs for %s.\nPlease enable at least on in the settings",
 
