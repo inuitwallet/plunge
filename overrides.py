@@ -138,8 +138,8 @@ class SettingStringExchange(SettingString):
     rates = []
     bot = []
     logger = logging.getLogger('Plunge')
-    currencies = ['btc']
-    bots = ['pybot', 'none']
+    currencies = ['btc', 'ltc', 'eur', 'usd', 'ppc']
+    bots = ['nubot', 'pybot', 'none']
 
     def on_panel(self, instance, value):
         if value is None:
