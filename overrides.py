@@ -1,5 +1,6 @@
-import ConfigParser
 import json
+from kivy.app import App
+from kivy.config import ConfigParser
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
@@ -594,16 +595,22 @@ class SettingStringExchange(SettingString):
         self.selected_bot = value
 
     def set_pool_maximum_rate(self, req, result):
+        if self.exchange not in result:
+            self.rates_error(req, result)
+            return
+        if self.selected_unit.lower() not in result[self.exchange]:
+            self.rates_error(req, result)
+            return
         self.ask_max = (result[self.exchange][self.selected_unit.lower()]['ask']['rate'] * 100)
         self.bid_max = (result[self.exchange][self.selected_unit.lower()]['bid']['rate'] * 100)
         self.ask_slider.max = self.ask_max
         self.bid_slider.max = self.bid_max
-        self.rates_error = False
 
 
     def rates_error(self, req, result):
         self.rates_content.add_widget(Label(text='Unable to get Maximum rate data from the server'))
-        self.rates_error = True
+        self.ask_slider.max = 0
+        self.bid_slider.max = 0
 
     def enter_rates(self, instance):
         """
@@ -612,9 +619,10 @@ class SettingStringExchange(SettingString):
         :return:
         """
         self.calling_rates_button = instance
-        content = BoxLayout(orientation='vertical')
-        config = ConfigParser.ConfigParser()
-        config.readfp(open('plunge.ini'))
+        self.rates_content = BoxLayout(orientation='vertical')
+        config = ConfigParser()
+        config_ini = App.get_running_app().get_application_config()
+        config.read(config_ini)
         url = "http://%s:%s/exchanges" % (config.get('server', 'host'), config.get('server', 'port'))
         self.ask_slider = Slider(step=0.01, size_hint=(0.9, 1))
         self.bid_slider = Slider(step=0.01, size_hint=(0.9, 1))
@@ -625,18 +633,18 @@ class SettingStringExchange(SettingString):
         self.bid_slider.bind(on_touch_down=self.update_slider_values)
         self.bid_slider.bind(on_touch_up=self.update_slider_values)
         self.bid_slider.bind(on_touch_move=self.update_slider_values)
-        content.add_widget(Label(text='Minimal Ask Rate'))
+        self.rates_content.add_widget(Label(text='Minimal Ask Rate'))
         ask_layout = BoxLayout()
         ask_layout.add_widget(self.ask_slider)
         self.ask_value = Label(size_hint=(0.1, 1))
         ask_layout.add_widget(self.ask_value)
-        content.add_widget(ask_layout)
-        content.add_widget(Label(text='Minimal Bid Rate'))
+        self.rates_content.add_widget(ask_layout)
+        self.rates_content.add_widget(Label(text='Minimal Bid Rate'))
         bid_layout = BoxLayout()
         bid_layout.add_widget(self.bid_slider)
         self.bid_value = Label(size_hint=(0.1, 1))
         bid_layout.add_widget(self.bid_value)
-        content.add_widget(bid_layout)
+        self.rates_content.add_widget(bid_layout)
         if instance.text != 'Set Rates':
             rates = instance.text.split(' | ')
             self.ask_slider.value = float(rates[0])
@@ -649,9 +657,9 @@ class SettingStringExchange(SettingString):
         btn = Button(text='Cancel')
         btn.bind(on_release=self.close_rates_popup)
         btnlayout.add_widget(btn)
-        content.add_widget(btnlayout)
+        self.rates_content.add_widget(btnlayout)
         popup_width = min(0.95 * Window.width, dp(500))
-        self.rates_popup = Popup(title='Minimal Interest Rates', content=content, auto_dismiss=False,
+        self.rates_popup = Popup(title='Minimal Interest Rates', content=self.rates_content, auto_dismiss=False,
                                  size_hint=(None, None), size=(popup_width, '300dp'))
         self.rates_popup.open()
 
