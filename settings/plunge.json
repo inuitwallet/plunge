@@ -23,10 +23,38 @@
   },
   {
     "type": "string_exchange",
+    "title": "Bitcoin Indonesia",
+    "desc": "Add users for Bitcoin Indonesia - The number indicates the number of valid users",
+    "section": "exchanges",
+    "key": "bitcoincoid"
+  },
+  {
+    "type": "string_exchange",
     "title": "Bittrex",
     "desc": "Add users for Bittrex - The number indicates the number of valid users",
     "section": "exchanges",
     "key": "bittrex"
+  },
+  {
+    "type": "string_exchange",
+    "title": "BTER",
+    "desc": "Add users for BTER - The number indicates the number of valid users",
+    "section": "exchanges",
+    "key": "bter"
+  },
+  {
+    "type": "string_exchange",
+    "title": "CCEDK",
+    "desc": "Add users for CCEDK - The number indicates the number of valid users",
+    "section": "exchanges",
+    "key": "ccedk"
+  },
+  {
+    "type": "string_exchange",
+    "title": "Poloniex",
+    "desc": "Add users for Poloniex - The number indicates the number of valid users",
+    "section": "exchanges",
+    "key": "poloniex"
   },
   {
     "type": "title",
