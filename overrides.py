@@ -669,13 +669,5 @@ class SettingStringExchange(SettingString):
 
     def close_rates_popup(self, instance):
         if instance.text == "Ok":
-            if self.rates_error is False:
-                if self.ask_slider.value == 0.00 or self.bid_slider.value == 0.00:
-                    self.rates_popup.dismiss()
-                    return
-                self.calling_rates_button.text = str(self.ask_slider.value) + ' | ' + str(self.bid_slider.value)
+            self.calling_rates_button.text = str(self.ask_slider.value) + ' | ' + str(self.bid_slider.value)
         self.rates_popup.dismiss()
-        if self.rates_error is False:
-            self.ask_slider.value = 0
-            self.bid_slider.value = 0
-
