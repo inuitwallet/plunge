@@ -35,6 +35,7 @@ class TopActionBar(ActionBar):
     def __init__(self, PlungeApp, **kwargs):
         super(TopActionBar, self).__init__(**kwargs)
         self.PlungeApp = PlungeApp
+        self.PlungeApp.logger.debug("Build Top Action Bar")
         self.top_action_view = self.ids.top_action_view.__self__
         self.top_action_previous = self.ids.top_action_previous.__self__
         self.top_settings_button = self.ids.top_settings_button.__self__
@@ -47,6 +48,7 @@ class TopActionBar(ActionBar):
     def minimise(self, override=None):
         min = self.top_size_button.text if override is None else override
         if min == self.PlungeApp.get_string("Minimise"):
+            self.PlungeApp.logger.debug("set to min")
             Window.size = (300, 180)
             height = self.height
             self.height = 0.5 * height if height == self.standard_height else height
@@ -68,6 +70,7 @@ class TopActionBar(ActionBar):
             self.PlungeApp.homeScreen.add_widget(self.PlungeApp.homeScreen.min_layout)
             self.PlungeApp.is_min = True
         else:
+            self.PlungeApp.logger.debug("set to max")
             if self.PlungeApp.config.getint('standard', 'monitor') == 1:
                 Window.size = (1000, 800)
             else:
@@ -121,11 +124,14 @@ class PlungeApp(App):
         fh.setLevel(logging.DEBUG)
         ch = logging.StreamHandler()
         ch.setLevel(logging.INFO)
-        formatter = logging.Formatter(fmt='%(asctime)s %(levelname)s: %(message)s', datefmt="%Y/%m/%d-%H:%M:%S")
-        fh.setFormatter(formatter)
-        ch.setFormatter(formatter)
+        fh_formatter = logging.Formatter(fmt='%(asctime)s %(levelname)s %(threadName)s %(funcName)s: %(message)s',
+                                         datefmt="%Y/%m/%d-%H:%M:%S")
+        ch_formatter = logging.Formatter(fmt='%(asctime)s %(levelname)s: %(message)s', datefmt="%Y/%m/%d-%H:%M:%S")
+        fh.setFormatter(fh_formatter)
+        ch.setFormatter(ch_formatter)
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
+        self.logger.debug("finished init on app")
         # self.logger_socket = socketlogger.start_logging_receiver('Client')
         # sys.excepthook = self.log_uncaught_exceptions
         return
@@ -150,7 +156,7 @@ class PlungeApp(App):
             self.logger.error('')
             self.logger.error('##################################################################')
             raise SystemExit
-
+        self.logger.debug("build app")
         self.root = BoxLayout(orientation='vertical')
 
         self.mainScreenManager = ScreenManager(transition=SlideTransition(direction='left'))
@@ -171,9 +177,11 @@ class PlungeApp(App):
             self.set_monitor()
         if self.config.getint('standard', 'show_disclaimer') == 1:
             Clock.schedule_once(self.show_disclaimer, 1)
+        self.logger.debug("finished building app")
         return self.root
 
     def show_disclaimer(self, dt):
+        self.logger.debug("build disclaimer window")
         content = BoxLayout(orientation='vertical')
         content.add_widget(Label(text=self.get_string('Disclaimer_Text'), size_hint=(1, 0.8), font_size=16,
                                  text_size=(500, 250)))
@@ -189,13 +197,16 @@ class PlungeApp(App):
         self.popup = Popup(title=self.get_string('Disclaimer'), content=content, auto_dismiss=False,
                            size_hint=(None, None), size=(550, 450))
         self.popup.open()
+        self.logger.debug("disclaimer is open")
         return
 
     def exit(self):
+        self.logger.debug("exit")
         sys.exit()
 
     def set_monitor(self):
         if self.is_min is False:
+            self.logger.debug("set monitor window size")
             self.homeScreen.max_layout.remove_widget(self.homeScreen.run_layout)
             if self.config.getint('standard', 'monitor') == 1:
                 Window.size = (1000, 800)
@@ -213,12 +224,14 @@ class PlungeApp(App):
         return return_string
 
     def build_config(self, config):
+        self.logger.debug("building default config")
         config.setdefaults('server', {'host': "", 'port': 80})
         config.setdefaults('exchanges', {'ccedk': 0, 'poloniex': 0, 'bitcoincoid': 0, 'bter': 0, 'bittrex': 0})
         config.setdefaults('standard', {'language': 'English', 'period': 30, 'monitor': 0, 'start_min': 0, 'data': 0,
                                         'show_disclaimer': 1, 'smooth_line': 1})
 
     def build_settings(self, settings):
+        self.logger.debug("build settings page")
         settings.register_type('string', overrides.SettingStringFocus)
         settings.register_type('numeric', overrides.SettingNumericFocus)
         settings.register_type('string_exchange', overrides.SettingStringExchange)
@@ -226,6 +239,7 @@ class PlungeApp(App):
             try:
                 saved_data = json.load(user_data)
             except ValueError:
+                self.logger.debug("failed to get saved data")
                 saved_data = []
         user_data.close()
         for exchange in self.exchanges:
@@ -236,6 +250,7 @@ class PlungeApp(App):
         settings.add_json_panel(self.get_string('Plunge_Configuration'), self.config, 'settings/plunge.json')
 
     def on_config_change(self, config, section, key, value):
+        self.logger.debug("config changed %s > %s" % (key, value))
         if section == "standard":
             if key == "period":
                 Clock.unschedule(self.homeScreen.get_stats)
@@ -249,6 +264,7 @@ class PlungeApp(App):
         self.homeScreen.get_stats(0)
 
     def show_popup(self, title, text):
+        self.logger.debug("show pop up %s" % text)
         content = BoxLayout(orientation='vertical')
         content.add_widget(Label(text=text, size_hint=(1, 0.8), font_size=16))
         content.add_widget(BoxLayout(size_hint=(1, 0.1)))
@@ -262,9 +278,11 @@ class PlungeApp(App):
         padding = ((self.popup.width - button.width) / 2)
         button_layout.padding = (padding, 0, padding, 0)
         self.isPopup = True
+        self.logger.debug("popup is open")
         return
 
     def close_popup(self, instance, value=False):
+        self.logger.debug("close pop up")
         self.popup.dismiss()
         self.isPopup = False
         return

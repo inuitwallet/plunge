@@ -34,7 +34,7 @@ class HomeScreen(Screen):
     def __init__(self, PlungeApp, **kwargs):
         super(HomeScreen, self).__init__(**kwargs)
         self.PlungeApp = PlungeApp
-        self.PlungeApp.logger.info("Building Home Page")
+        self.PlungeApp.logger.info("Home Page Init")
         # strong links to widgets
         self.max_layout = self.ids.max_layout.__self__
         self.min_layout = self.ids.min_layout.__self__
@@ -62,6 +62,8 @@ class HomeScreen(Screen):
         self.min_rate = self.ids.min_rate.__self__
         self.min_efficiency = self.ids.min_efficiency.__self__
         self.min_balance = self.ids.min_balance.__self__
+
+        self.PlungeApp.logger.debug("setting home page variables")
 
         self.getting_pool_stats = False
         self.getting_exchange_stats = False
@@ -124,6 +126,7 @@ class HomeScreen(Screen):
         # set up UI and start timers
         self.PlungeApp.logger.info("Setting refresh Period to %s" % self.PlungeApp.config.get('standard', 'period'))
         Clock.schedule_interval(self.get_stats, self.PlungeApp.config.getint('standard', 'period'))
+        self.PlungeApp.logger.debug("finished homepage init")
         return
 
     def set_exchange_spinners(self):
@@ -133,31 +136,38 @@ class HomeScreen(Screen):
         req = UrlRequest(url, self._set_exchange_spinners, self.exchange_spinner_error, self.exchange_spinner_error)
 
     def exchange_spinner_error(self, req, result):
-        self.PlungeApp.logger.warn(result)
+        self.PlungeApp.logger.debug("get spinner values failed")
+        self.PlungeApp.logger.warn("Spinner values failed. Returned %s" % req.resp_status)
 
     def _set_exchange_spinners(self, req, result):
         # see if any exchanges are enabled so that we can display the stats
         self.primary_exchange = ''
         self.primary_currency = ''
         self.PlungeApp.active_exchanges = []
+        self.PlungeApp.logger.debug("set spinner text")
         for exchange in result:
             if exchange in self.PlungeApp.active_exchanges:
                 continue
+            self.PlungeApp.logger.debug("for %s" % exchange)
             self.PlungeApp.active_exchanges.append(exchange)
             if self.PlungeApp.get_string(exchange) == self.exchange_spinner.text:
                 self.primary_exchange = exchange
         if self.primary_exchange != '':
             self.PlungeApp.logger.info("Set Primary Exchange to %s" % self.primary_exchange)
         else:
+            self.PlungeApp.logger.debug("no primary exchange set")
             self.exchange_spinner.values = [self.PlungeApp.get_string(exchange) for
                                             exchange in self.PlungeApp.active_exchanges]
             self.primary_exchange = self.PlungeApp.active_exchanges[0]
             self.exchange_spinner.text = self.PlungeApp.get_string(self.primary_exchange)
             self.PlungeApp.logger.info("Set Primary Exchange to %s" % self.primary_exchange)
         self.PlungeApp.active_currencies = []
+        self.PlungeApp.logger.debug("set currency spinner text")
+        self.PlungeApp.logger.debug("%s" % str(result[self.primary_exchange]))
         for currency in result[self.primary_exchange]:
             if currency in self.PlungeApp.active_currencies:
                 continue
+            self.PlungeApp.logger.debug("set text for %s" % currency)
             self.PlungeApp.active_currencies.append(currency)
         self.currency_spinner.values = [currency.upper() for currency in self.PlungeApp.active_currencies]
         if self.primary_currency == '':
@@ -171,24 +181,30 @@ class HomeScreen(Screen):
         self.PlungeApp.logger.info("Set Primary Currency to %s" % self.primary_currency)
         self.get_stats(0)
 
-    def get_stats(self, dt):
-        pool = Thread(target=self.get_pool_stats)
-        pool.start()
-        exchange = Thread(target=self.get_exchange_stats)
-        exchange.start()
-        personal = Thread(target=self.get_personal_stats)
-        personal.start()
-
     def update_lists(self, value, in_list):
+        self.PlungeApp.logger.debug("update list with %s %s" % (str(value), str(type(value))))
         in_list.append(value)
         data_to_keep = self.PlungeApp.config.getint('standard', 'data')
         if data_to_keep > 0:
             while len(in_list) > data_to_keep:
                 in_list.pop(0)
 
+    def get_stats(self, dt):
+        self.PlungeApp.logger.debug("build and start pool thread")
+        pool = Thread(target=self.get_pool_stats, name='pool_thread')
+        pool.start()
+        self.PlungeApp.logger.debug("build and start exchange thread")
+        exchange = Thread(target=self.get_exchange_stats, name='exchange_thread')
+        exchange.start()
+        self.PlungeApp.logger.debug("build and start personal thread")
+        personal = Thread(target=self.get_personal_stats, name='personal_thread')
+        personal.start()
+
     def get_pool_stats(self):
         # get the pool status
+        self.PlungeApp.logger.debug("getting pool stats")
         if self.getting_pool_stats is True:
+            self.PlungeApp.logger.debug("pool stats are already being fetched so ending")
             return
         self.getting_pool_stats = True
         self.PlungeApp.logger.info("Get the Pool Stats")
@@ -197,7 +213,7 @@ class HomeScreen(Screen):
         req = UrlRequest(url, self.save_pool_stats, self.pool_stats_error, self.pool_stats_error)
 
     def pool_stats_error(self, req, result):
-        self.PlungeApp.logger.warn('Pool stats failed : ' + result)
+        self.PlungeApp.logger.warn('Pool stats failed. Returned %s' % req.resp_status)
         self.getting_pool_stats = False
 
     def save_pool_stats(self, req, result):
@@ -214,12 +230,13 @@ class HomeScreen(Screen):
 
         self.update_pool_stats()
         self.getting_pool_stats = False
+        self.PlungeApp.logger.debug("getting pool stats finished.")
 
     def get_exchange_stats(self):
         # get the exchange status
-
+        self.PlungeApp.logger.debug("getting exchange stats")
         if self.getting_exchange_stats is True:
-
+            self.PlungeApp.logger.debug("exchange stats are already being fetched so ending")
             return
         self.getting_exchange_stats = True
         self.PlungeApp.logger.info("Get the Exchange Stats")
@@ -228,29 +245,38 @@ class HomeScreen(Screen):
         req = UrlRequest(url, self.save_exchange_stats, self.exchange_stats_error, self.exchange_stats_error)
 
     def exchange_stats_error(self, req, result):
-        self.PlungeApp.logger.warn('Exchange stats failed : ' + result)
+        self.PlungeApp.logger.warn('Exchange stats failed. Returned %s' % req.resp_status)
         self.getting_exchange_stats = False
 
     def save_exchange_stats(self, req, result):
         self.PlungeApp.logger.info("Exchange stats returned OK")
         self.stats = result
         self.getting_exchange_stats = False
+        self.PlungeApp.logger.debug("getting exchange stats finished")
 
     def get_personal_stats(self):
         # get the individual status for each account
-        self.PlungeApp.logger.info("Get the Personal Stats")
+        self.PlungeApp.logger.debug("getting personal stats")
         if self.getting_personal_stats is True:
+            self.PlungeApp.logger.debug("personal stats are already being fetched so ending")
             return
         self.getting_personal_stats = True
         self.saving_personal_stats = False
         self.user = {}
+        self.PlungeApp.logger.info("Get the Personal Stats")
         with open('api_keys.json') as api_keys_file:
-            api_keys = json.load(api_keys_file)
+            try:
+                api_keys = json.load(api_keys_file)
+            except ValueError:
+                api_keys = []
+                self.PlungeApp.logger.debug("no api keys found")
         api_keys_file.close()
         if not self.PlungeApp.active_exchanges or not self.PlungeApp.active_currencies:
+            self.PlungeApp.logger.debug("no active exchanges or active currencies found")
             self.getting_personal_stats = False
             return
         for self.personal_exchange in self.PlungeApp.active_exchanges:
+            self.PlungeApp.logger.debug("set stats for %s" % self.personal_exchange)
             self.user[self.personal_exchange] = {'balance': 0, 'num_keys': 0, 'efficiency': 0}
             for currency in self.PlungeApp.active_currencies:
                 self.user[self.personal_exchange][currency] = {'ask_liquidity': 0, 'bid_liquidity': 0, 'ask_rate': 0, 'bid_rate': 0}
@@ -273,6 +299,7 @@ class HomeScreen(Screen):
                             float(self.user[self.personal_exchange]['num_keys'])
 
             # update the graph data lists
+            self.PlungeApp.logger.debug("update personal graphs lists")
             self.ensure_lists(self.exchange_efficiency, self.personal_exchange)
             self.update_lists((self.user[self.personal_exchange]['efficiency'] * 100),
                               self.exchange_efficiency[self.personal_exchange])
@@ -290,19 +317,21 @@ class HomeScreen(Screen):
         self.getting_personal_stats = False
 
     def personal_stats_error(self, req, result):
-        self.PlungeApp.logger.warn('Personal stats failed for %s %s : %s' % (self.personal_exchange,
-                                                                             self.public, result))
+        self.PlungeApp.logger.warn('Personal stats failed for %s %s. Returned %s' % (self.personal_exchange,
+                                                                             self.public, req.resp_status))
         self.saving_personal_stats = False
 
     def save_personal_stats(self, req, result):
-        self.PlungeApp.logger.info("Personal stats returned OK")
         self.user[self.personal_exchange]['balance'] += result['balance']
         self.user[self.personal_exchange]['num_keys'] += 1
         self.user[self.personal_exchange]['efficiency'] += result['efficiency']
+        self.PlungeApp.logger.debug("saving personal stats")
         if not self.PlungeApp.active_currencies:
             self.saving_personal_stats = False
             return
+        self.PlungeApp.logger.info("Personal stats returned OK")
         for currency in self.PlungeApp.active_currencies:
+            self.PlungeApp.logger.debug("saving stats for %s" % currency)
             if currency in result['units']:
                 for order in result['units'][currency]['ask']:
                     self.user[self.personal_exchange][currency]['ask_liquidity'] += order['amount']
@@ -332,6 +361,8 @@ class HomeScreen(Screen):
                 self.ensure_lists(self.exchange_bid_rate, self.personal_exchange, currency)
                 self.update_lists(self.user[self.personal_exchange][currency]['bid_rate'],
                                   self.exchange_bid_rate[self.personal_exchange][currency])
+            else:
+                self.PlungeApp.logger.debug("%s not found in returned stats" % currency)
         self.saving_personal_stats = False
 
     @staticmethod
@@ -496,7 +527,7 @@ class HomeScreen(Screen):
         self.running_label.color = (0.93725, 0.21176, 0.07843, 1)
         self.running_label.text = self.PlungeApp.get_string("Client_Stopped")
         self.start_button.text = self.PlungeApp.get_string('Start')
-        self.PlungeApp.logger.error("Client Stopped")
+        self.PlungeApp.logger.info("Client Stopped")
 
     def draw_chart(self, title, y_label, points):
         y_min = min(points) if len(points) > 0 else 0
