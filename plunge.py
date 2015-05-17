@@ -259,7 +259,6 @@ class PlungeApp(App):
             if key == "monitor":
                 self.set_monitor()
         self.active_exchanges = self.utils.get_active_exchanges()
-        self.homeScreen.exchange_spinner.values = [self.get_string(exchange) for exchange in self.active_exchanges]
         self.homeScreen.set_exchange_spinners()
         self.homeScreen.get_stats(0)
 
