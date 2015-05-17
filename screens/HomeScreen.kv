@@ -145,7 +145,6 @@
 
                 Spinner:
                     id: exchange_spinner
-                    #values: [app.get_string(exchange) for exchange in app.exchanges]
                     on_text: root.set_exchange_spinners()
 
                 Spinner:
@@ -256,8 +255,10 @@
 
             HeadingLabel:
                 size_hint: (1, 0.2)
-                text: app.get_string("Personal_Stats")
+                text: "[ref='personal_info']%s[/ref]" % app.get_string("Personal_Stats")
                 font_size: 20
+                markup: True
+                #on_ref_press: root.show_personal_info()
 
             GridLayout:
                 cols: 6
